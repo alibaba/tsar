@@ -74,7 +74,7 @@ install -p -D -m 0644 devel/tsar.h %{buildroot}/usr/local/tsar/devel/tsar.h
 %attr(755,root,root) %dir /usr/bin/tsardevel
 
 %changelog
-* Wed Jan 6 Ke Li <kongjian@taobao.com>
+* Wed Jan  6 2013 Ke Li <kongjian@taobao.com>
 - merge inner and opensource tsar
 * Thu Dec  9 2010 Ke Li <kongjian@taobao.com>
 - add logrotate for tsar.data
