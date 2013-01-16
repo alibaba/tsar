@@ -1,0 +1,11 @@
+tsar is Taobao monitor tool for collect system activity status, and report it.
+It have a plugin system that is easy for collect plugin development. and may
+setup different output target such as local logfile and remote nagios host.
+
+* Get and deploy tsar
+
+see: http://code.taobao.org/trac/tsar/wiki/ZhWikiStart
+
+* Contribution
+
+We are avtively looking for contributors so if you have any ideas, bug reports, or patchs you would like to contribute please do not hesitate to do so.

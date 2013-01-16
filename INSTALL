@@ -1,0 +1,22 @@
+Simple install procedure
+========================
+
+  % gzip -cd tsar-2.1.0.tar.gz | tar xvf -  # unpack the sources
+  % cd tsar-2.1.0                           # change to the toplevel directory
+  % make                                    # build tsar
+
+  [ Become root if necessary ]
+  % make install                            # install tsar
+  % make uninstall                          # uninstall tsar
+  [ if you want install tsardevel ]
+  % make tsardevel
+  % make uninstall
+
+RPM install
+========================
+
+  %gzip -cd tsar-2.1.0.tar.gz | tar xvf -  # unpack the sources
+  %cd tsar-2.1.0/rpm                       # change to the rpm directory
+  %sh tsar-build.sh .. tsar 2.1.0 1        # create rpm for tsar
+  %rpm -ivh *.rpm                          # install tsar by rpm
+

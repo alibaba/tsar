@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# check argc
+usage()
+{
+  echo "Usage:"
+  echo "tsarmod modname"
+  exit 0
+}
+install()
+{
+ echo "build:make"
+ echo "install:make install"
+ echo "uninstall:make uninstall"
+ echo "test:tsar --list or tsar --$modname --live -i 1"
+}
+if [ $# -ne 1 ]
+then
+ usage
+fi
+
+modname=$1
+
+# mk new mod_test
+mkdir $modname
+sed -e "s/test/$modname/g" < /usr/local/tsar/devel/mod_test.c > ./$modname/mod_$modname.c
+sed -e "s/test/$modname/g" < /usr/local/tsar/devel/mod_test.conf > ./$modname/mod_$modname.conf
+sed -e "s/test/$modname/g" < /usr/local/tsar/devel/Makefile.test > ./$modname/Makefile
+if [ $? -eq 0 ]
+then
+ install
+fi
