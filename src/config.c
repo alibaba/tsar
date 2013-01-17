@@ -148,6 +148,7 @@ void parse_config_file(const char *file_name)
 	memset(&statis, '\0', sizeof(statis));
 	conf.server_port = (int *)malloc(sizeof(int));
 	conf.cycle_time = (int *)malloc(sizeof(int));
+	conf.debug_level = LOG_ERR;
 	while (fgets(config_input_line, LEN_1024, fp)) {
 		if ((token = strchr(config_input_line, '\n')))
 			*token = '\0';
