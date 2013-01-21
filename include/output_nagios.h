@@ -23,9 +23,6 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-/*
- * output data to db and nagios
- */
 
 void output_nagios();
 #endif

@@ -37,6 +37,7 @@ struct configure
 	int	print_nline_interval;	 /* how many lines will skip every print interval */
 	int	print_mode;		/* data type will print: summary or detail */
 	int	print_merge;		/* mult items is merge */
+	int	print_detail;		/* conver data to K/M/G */
 	int	print_ndays;		 /* these days will print.default:1 */
 	int	print_day;		 /* which day will print*/
 	int	print_start_time;	/* the start of the print time*/

@@ -113,6 +113,11 @@ void print_header()
 
 void printf_result(double result)
 {
+	if(conf.print_detail) {
+		printf("%6.2f", result);
+		printf("%s", PRINT_DATA_SPLIT);
+		return;
+	}
 	if ((1000 - result) > 0.1)
 		printf("%6.2f", result);
 	else if ( (1000 - result/1024) > 0.1) {
