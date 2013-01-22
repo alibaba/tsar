@@ -36,6 +36,7 @@ struct module
 	struct  mod_info *info;
 	void    *lib;
 	int	enable;
+	int	spec;
 
 	/* private data used by framework*/
 	int	n_item;

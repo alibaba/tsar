@@ -139,17 +139,34 @@ void print_array_stat(struct module *mod, double *st_array)
 	struct mod_info *info = mod->info;
 
 	for (i=0; i < mod->n_col; i++) {
-		/* print null */
-		if (!st_array || !mod->st_flag || st_array[i] < 0) {
-			/* print record */
-			if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[i].summary_bit))
-					|| ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[i].summary_bit)))
-				printf("------%s", PRINT_DATA_SPLIT);
-		} else {
-			/* print record */
-			if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[i].summary_bit))
-					|| ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[i].summary_bit)))
-				printf_result(st_array[i]);
+		if(mod->spec){
+			/* print null */
+			if (!st_array || !mod->st_flag || st_array[i] < 0) {
+				/* print record */
+				if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[i].summary_bit))
+						|| ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[i].summary_bit)))
+					printf("------%s", PRINT_DATA_SPLIT);
+			} else {
+				/* print record */
+				if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[i].summary_bit))
+						|| ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[i].summary_bit)))
+					printf_result(st_array[i]);
+			}
+
+		}
+		else {
+			/* print null */
+			if (!st_array || !mod->st_flag || st_array[i] < 0) {
+				/* print record */
+				if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[i].summary_bit))
+						|| ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[i].summary_bit)))
+					printf("------%s", PRINT_DATA_SPLIT);
+			} else {
+				/* print record */
+				if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[i].summary_bit))
+						|| ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[i].summary_bit)))
+					printf_result(st_array[i]);
+			}
 		}
 	}
 }
@@ -481,9 +498,17 @@ void print_tail(int tail_type)
 			struct mod_info *info = mod->info;
 			for (i=0; i < mod->n_col; i++) {
 				/* print record */
-				if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[i].summary_bit)) 
-						|| ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[i].summary_bit))) {
-					printf_result(m_tail[k]);
+				if(mod->spec){
+					if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[i].summary_bit))
+							|| ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[i].summary_bit))) {
+						printf_result(m_tail[k]);
+					}
+				}
+				else {
+					if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[i].summary_bit))
+							|| ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[i].summary_bit))) {
+						printf_result(m_tail[k]);
+					}
 				}
 				k++;
 			}
@@ -819,18 +844,35 @@ void running_check(int check_type){
 				}
 				st_array = &mod->st_array[j * mod->n_col];
 				for (k=0; k < mod->n_col; k++) {
-					if (!st_array || !mod->st_flag) {
-						if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[k].summary_bit))
-								|| ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[k].summary_bit))){
-							printf("%s:%s%s=-%s",mod_name,opt,trim(info[k].hdr,LEN_128), " ");
+					if(mod->spec){
+						if (!st_array || !mod->st_flag) {
+							if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[k].summary_bit))
+									|| ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[k].summary_bit))){
+								printf("%s:%s%s=-%s",mod_name,opt,trim(info[k].hdr,LEN_128), " ");
+							}
+						} else {
+							if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[k].summary_bit))
+									|| ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[k].summary_bit))){
+								printf("%s:%s%s=",mod_name,opt,trim(info[k].hdr,LEN_128));
+								//printf_check_result(st_array[k]);
+								printf("%0.1f ",st_array[k]);
+							}
 						}
-					} else {
-						if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[k].summary_bit))
-								|| ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[k].summary_bit))){
-							printf("%s:%s%s=",mod_name,opt,trim(info[k].hdr,LEN_128));
-							//printf_check_result(st_array[k]);
-							printf("%0.1f ",st_array[k]);
+					}else{
+						if (!st_array || !mod->st_flag) {
+							if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[k].summary_bit))
+									|| ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[k].summary_bit))){
+								printf("%s:%s%s=-%s",mod_name,opt,trim(info[k].hdr,LEN_128), " ");
+							}
+						} else {
+							if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[k].summary_bit))
+									|| ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[k].summary_bit))){
+								printf("%s:%s%s=",mod_name,opt,trim(info[k].hdr,LEN_128));
+								//printf_check_result(st_array[k]);
+								printf("%0.1f ",st_array[k]);
+							}
 						}
+
 					}
 				}
 				if(token){

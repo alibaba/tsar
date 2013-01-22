@@ -39,6 +39,32 @@ void parse_mod(char *mod_name)
 	}
 }
 
+void special_mod(char *spec_mod)
+{
+	int i = 0, j = 0;
+	char mod_name[32];
+	struct module *mod = NULL;
+	memset(mod_name,0,LEN_32);
+	sprintf(mod_name,"mod_%s",spec_mod+5);
+	for ( i = 0; i < statis.total_mod_num; i++ )
+	{
+		mod = &mods[i];
+		if (!strcmp(mod->name,mod_name)) {
+			/* set special field */
+			load_modules();
+			char    *token = strtok(NULL, W_SPACE);
+			struct mod_info *info = mod->info;
+			for (j=0; j < mod->n_col; j++) {
+				char *p = info[j].hdr;
+				while( *p  == ' ') p++;
+				if(strstr(token,p)){
+					info[j].summary_bit = SPEC_BIT;
+					mod->spec = 1;
+				}
+			}
+		}
+	}
+}
 
 void parse_int(int *var)
 {
@@ -100,6 +126,8 @@ static int parse_line(char *buff)
 		(void) 0;       /* ignore empty lines */
 	else if (strstr(token, "mod_"))
 		parse_mod(token);
+	else if (strstr(token, "spec_"))
+		special_mod(token);
 	else if (!strcmp(token, "output_interface"))
 		parse_string(conf.output_interface);
 	else if (!strcmp(token, "output_file_path"))
@@ -253,4 +281,23 @@ void get_threshold(){
 	else
 		conf.cmax[conf.mod_num]=atof(tmp[3]);
 	conf.mod_num++;
+}
+
+void set_special_field(char *s)
+{
+	int i = 0, j = 0;
+	struct module *mod = NULL;
+	for ( i = 0; i < statis.total_mod_num; i++ )
+	{
+		mod = &mods[i];
+		struct mod_info *info = mod->info;
+		for (j=0; j < mod->n_col; j++) {
+			char *p = info[j].hdr;
+			while( *p  == ' ') p++;
+			if(strstr(s,p)){
+				info[j].summary_bit = SPEC_BIT;
+				mod->spec = 1;
+			}
+		}
+	}
 }

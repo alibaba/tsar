@@ -117,7 +117,8 @@ enum {
 enum {
 	HIDE_BIT,
 	DETAIL_BIT,
-	SUMMARY_BIT
+	SUMMARY_BIT,
+	SPEC_BIT
 };
 
 

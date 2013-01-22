@@ -45,6 +45,7 @@ void usage()
 			"    --date/-d		show the value for the specify day(n or YYYYMMDD)\n"
 			"    --merge/-m		merge multiply item to one\n"
 			"    --detail/-D	\tdo not conver data to K/M/G\n"
+			"    --spec/-s		show spec field data, tsar --cpu -s sys,util\n"
 			"    --help/-h		help\n");
 
 	fprintf(stderr,
@@ -74,6 +75,7 @@ struct option longopts[] = {
 	{ "date", required_argument, NULL, 'd' },
 	{ "merge", no_argument, NULL, 'm' },
 	{ "detail", no_argument, NULL, 'D' },
+	{ "spec", required_argument, NULL, 's' },
 	{ "help", no_argument, NULL, 'h' },
 	{ 0, 0, 0, 0},
 };
@@ -96,7 +98,7 @@ static void main_init(int argc, char **argv)
 	}
 	/*end*/
 #endif
-	while ((opt = getopt_long(argc, argv, ":cCi:Llf:n:d:mhD", longopts, NULL)) != -1) {
+	while ((opt = getopt_long(argc, argv, ":cCi:Llf:n:d:s:mhD", longopts, NULL)) != -1) {
 		oind++;
 		switch (opt) {
 			case 'c':
@@ -117,6 +119,10 @@ static void main_init(int argc, char **argv)
 				break;
 			case 'f':
 				strcpy(conf.output_file_path ,optarg);
+				break;
+			case 's':
+				set_special_field(optarg);
+				break;
 			case 'n':
 				conf.print_ndays = atoi(optarg);
 				oind++;

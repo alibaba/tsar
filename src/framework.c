@@ -67,10 +67,11 @@ void load_modules()
 				else {
 					mod_register(mod);
 					mod->enable = 1;
+					mod->spec = 0;
 					do_debug(LOG_INFO, "load_modules: load new module '%s' to mods\n", mod_path);
 				}
 			}
-		}	
+		}
 	}
 }
 
