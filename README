@@ -58,6 +58,12 @@ OPTIONS
        -n , --ndays
               show the value for the past days (default: 1)
 
+       -D ,--detail
+              do not conver data to K/M/G
+
+       -s ,--spec
+              show spec field data, tsar --cpu -s sys,util
+
        -h , --help
               print help info
 
