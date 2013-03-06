@@ -11,6 +11,7 @@
 #define DEBUG 0
 
 char *swift_code_usage = "    --swift_code             Swift httpcode";
+int mgrport = 81;
 
 /* httpcode string at swiftclient -p 81 mgr:counters */
 /*
@@ -202,7 +203,7 @@ int read_swift_code_stat()
 
 	int len, conn, bytesWritten, fsize = 0;
 
-	if(my_swift_code_net_connect(HOSTNAME, PORT, &conn, "tcp") != 0){
+	if(my_swift_code_net_connect(HOSTNAME, mgrport, &conn, "tcp") != 0){
 		close(conn);
 		return -1;
 	}
@@ -254,11 +255,15 @@ int read_swift_code_stat()
 	return 0;
 }
 
-void read_swift_code_stats(struct module *mod)
+void read_swift_code_stats(struct module *mod, char *parameter)
 {
 	int retry = 0 ,pos = 0;
 	char buf[LEN_1024];
 	memset(&stats, 0, sizeof(stats));
+	mgrport = atoi(parameter);
+	if(!mgrport){
+		mgrport = 81;
+	}
 	while(read_swift_code_stat() < 0 && retry < RETRY_NUM){
 		retry++;
 	}

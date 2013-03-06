@@ -12,6 +12,7 @@
 #define DEBUG 1
 
 char *swift_usage = "    --swift             Swift object storage infomation";
+int mgrport=81;
 
 /* string at swiftclient -p 81 mgr:info */
 /*
@@ -224,7 +225,7 @@ int read_swift_stat(char *cmd)
 
 	int len, conn, bytesWritten, fsize = 0;
 
-	if(my_swift_net_connect(HOSTNAME, PORT, &conn, "tcp") != 0){
+	if(my_swift_net_connect(HOSTNAME, mgrport, &conn, "tcp") != 0){
 		close(conn);
 		return -1;
 	}
@@ -276,11 +277,15 @@ int read_swift_stat(char *cmd)
 	return 0;
 }
 
-void read_swift_stats(struct module *mod)
+void read_swift_stats(struct module *mod, char *parameter)
 {
 	int retry = 0 ,pos = 0;
 	char buf[LEN_1024];
 	memset(&stats, 0, sizeof(stats));
+	mgrport = atoi(parameter);
+	if(!mgrport){
+		mgrport = 81;
+	}
 	while(read_swift_stat("info") < 0 && retry < RETRY_NUM){
 		retry++;
 	}

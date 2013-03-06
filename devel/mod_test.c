@@ -31,7 +31,7 @@ struct stats_test {
 static char *test_usage = "    --test               test information";
 
 
-static void read_test_stats(struct module *mod)
+static void read_test_stats(struct module *mod, char *parameter)
 {
         char buf[256];
 	memset(buf, 0, sizeof(buf));

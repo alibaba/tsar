@@ -57,6 +57,7 @@ struct module
 	char    opt_line[LEN_32];
 	char    record[LEN_1024];
 	char    usage[LEN_256];
+	char    parameter[LEN_256];
 
 	struct  mod_info *info;
 	void    *lib;
@@ -79,7 +80,7 @@ struct module
 	double  *min_array;
 
 	/* callback function of module */
-	void (*data_collect) (struct module *);
+	void (*data_collect) (struct module *,char *);
 	void (*set_st_record) (struct module *mod, double *, U_64 *, U_64 *, int );
 
 	/* mod manage */

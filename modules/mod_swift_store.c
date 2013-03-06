@@ -12,6 +12,7 @@
 #define DEBUG 1
 
 char *swift_store_usage = "    --swift_store             Swift object storage infomation";
+int mgrport = 81;
 
 /* httpstore string at swiftclient -p 81 mgr:info */
 /*
@@ -185,7 +186,7 @@ int read_swift_store_stat()
 
 	int len, conn, bytesWritten, fsize = 0;
 
-	if(my_swift_store_net_connect(HOSTNAME, PORT, &conn, "tcp") != 0){
+	if(my_swift_store_net_connect(HOSTNAME, mgrport, &conn, "tcp") != 0){
 		close(conn);
 		return -1;
 	}
@@ -237,11 +238,15 @@ int read_swift_store_stat()
 	return 0;
 }
 
-void read_swift_store_stats(struct module *mod)
+void read_swift_store_stats(struct module *mod, char *parameter)
 {
 	int retry = 0 ,pos = 0;
 	char buf[LEN_1024];
 	memset(&stats, 0, sizeof(stats));
+	mgrport = atoi(parameter);
+	if(!mgrport){
+		mgrport = 81;
+	}
 	while(read_swift_store_stat() < 0 && retry < RETRY_NUM){
 		retry++;
 	}

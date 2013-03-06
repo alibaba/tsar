@@ -31,6 +31,10 @@ void parse_mod(char *mod_name)
 	char	*token = strtok(NULL, W_SPACE);
 	if (token && (!strcasecmp(token, "on") || !strcasecmp(token, "enable"))) {
 		strncpy(mod->name, mod_name, strlen(mod_name));
+		token = strtok(NULL, W_SPACE);
+		if(token) {
+			strncpy(mod->parameter, token, strlen(token));
+		}
 		return;
 	}
 	else {
