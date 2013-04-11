@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bases>
+  <scm version="1.0">
+
+
+    <app>
+      <corp>集团</corp>
+      <deptment>
+        <main>技术共享平台</main> 
+        <sub>核心系统研发</sub> 
+        <three>系统</three> 
+      </deptment>
+      <line>
+         <main>核心系统</main>
+         <sub>Cache</sub>
+      </line>
+      <name>tsar</name>
+      <codetype>C/C++</codetype>
+      <connection>http://svn.simba.taobao.com/svn/cdn/trunk/tsar/</connection>
+    </app>
+  </scm>
+</bases>
+
