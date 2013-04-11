@@ -59,7 +59,7 @@ static struct mod_info test_info[] = {
 	{"value3", DETAIL_BIT,  0,  STATS_NULL}
 };
 
-static void set_cpu_record(struct module *mod, double st_array[],
+static void set_test_record(struct module *mod, double st_array[],
 		U_64 pre_array[], U_64 cur_array[], int inter)
 {
 	int i;
@@ -71,5 +71,5 @@ static void set_cpu_record(struct module *mod, double st_array[],
 
 void mod_register(struct module *mod)
 {
-	register_mod_fileds(mod, "--test", test_usage, test_info, 3, read_test_stats, set_cpu_record);
+	register_mod_fileds(mod, "--test", test_usage, test_info, 3, read_test_stats, set_test_record);
 }
