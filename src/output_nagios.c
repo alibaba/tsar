@@ -31,7 +31,7 @@ void output_nagios(){
 	/* if cycle time ok*/
 	int	now_time;
 	now_time = statis.cur_time - statis.cur_time%60;
-	if (now_time%*(conf.cycle_time) != 0)
+	if ((*conf.cycle_time) == 0 || now_time%*(conf.cycle_time) != 0)
 		return;
 
 	/* get hostname */

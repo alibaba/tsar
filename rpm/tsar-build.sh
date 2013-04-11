@@ -19,7 +19,7 @@ usage()
 }
 
 svn_path="Unknown_path"
-svn_revision="1"
+svn_revision="Unknown_revision"
 svn_info()
 {
   str=`svn info ../ 2>/dev/null |

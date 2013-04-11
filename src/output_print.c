@@ -701,7 +701,7 @@ void running_check(int check_type){
 	char	line[2][LEN_10240];
 	char	filename[LEN_128] = {0};
 	FILE	*fp;
-	int	total_num=0,cur_num=0,i,j,k;
+	int	total_num=0,i,j,k;
 	struct  module *mod = NULL;
 	double  *st_array;
 	char    tmp[9][LEN_256];
@@ -728,9 +728,16 @@ void running_check(int check_type){
 	/* get file len */
 	memset(&line[0], 0, LEN_10240);
 	total_num =0;
-	while (fgets(line[0], LEN_10240, fp)) {
-		total_num ++;
-		memset(&line[0], 0, LEN_10240);
+	//从后往前快速找到2个换行
+	fseek(fp, -1, SEEK_END);
+	while(1){
+		if(fgetc(fp) == '\n') ++total_num;
+		if(total_num == 3) break;
+		if(fseek(fp, -2, SEEK_CUR) != 0){
+			//只有1行或者2行数据，直接重定向到文件头
+			fseek(fp, 0, SEEK_SET);
+			break;
+		}
 	}
 	/*FIX ME*/
 	if(total_num == 0){
@@ -742,27 +749,27 @@ void running_check(int check_type){
 			do_debug(LOG_FATAL, "unable to open the log file %s.\n",filename);
 		}
 		total_num = 0;
-		memset(&line[0], 0, 2 * LEN_10240); 
-		while (fgets(line[0], LEN_10240, fp)) {
-			total_num ++;
-			memset(&line[0], 0, LEN_10240);
+		memset(&line[0], 0, 2 * LEN_10240);
+		//tsar.data.1的行数统计
+		fseek(fp, -1, SEEK_END);
+		while(1){
+			if(fgetc(fp) == '\n') ++total_num;
+			if(total_num == 3) break;
+			if(fseek(fp, -2, SEEK_CUR) != 0){
+				fseek(fp, 0, SEEK_SET);
+				break;
+			}
 		}
 		if(total_num < 2){
 			do_debug(LOG_FATAL, "not enough lines at log file %s.\n",filename);
 		}
-		fseek(fp, 0, SEEK_SET);
-		cur_num = 0;
-		while (cur_num < total_num - 2 && fgets(line[0], LEN_10240, fp)){
-			cur_num ++;
-			memset(&line[0], 0, LEN_10240);
-		}
+
 		memset(&line[0], 0, LEN_10240);
 		fgets(line[0], LEN_10240, fp);
 		memset(&line[1], 0, LEN_10240);
 		fgets(line[1], LEN_10240, fp);
 
 	}else if(total_num == 1){
-		fseek(fp, 0, SEEK_SET);
 		memset(&line[1], 0, LEN_10240);
 		fgets(line[1], LEN_10240, fp);
 		fclose(fp);
@@ -772,30 +779,24 @@ void running_check(int check_type){
 			do_debug(LOG_FATAL, "unable to open the log file %s\n",filename);
 		}
 		total_num = 0;
-		memset(&line[0], 0, LEN_10240);
-		while (fgets(line[0], LEN_10240, fp)) {
-			total_num ++; 
-			memset(&line[0], 0, LEN_10240);
-		}   
-		if(total_num < 1){ 
-			do_debug(LOG_FATAL, "not enough lines at log file %s\n",filename);
+		//定位tsar.data.1的最后一行开头
+		fseek(fp, -1, SEEK_END);
+		while(1){
+			if(fgetc(fp) == '\n') ++total_num;
+			//找到倒数第二个换行，读指针刚好指向倒数第一行
+			if(total_num == 2) break;
+			if(fseek(fp, -2, SEEK_CUR) != 0){
+				fseek(fp, 0, SEEK_SET);
+				break;
+			}
 		}
-		fseek(fp, 0, SEEK_SET);
-		cur_num = 0;
-		while (cur_num < total_num - 1 && fgets(line[0], LEN_10240, fp)){
-			cur_num ++; 
-			memset(&line[0], 0, LEN_10240);
+
+		if(total_num < 1){
+			do_debug(LOG_FATAL, "not enough lines at log file %s\n",filename);
 		}
 		memset(&line[0], 0, LEN_10240);
 		fgets(line[0], LEN_10240, fp);
 	}else{
-		fseek(fp, 0, SEEK_SET);
-		memset(&line[0], 0, LEN_10240);
-		cur_num = 0;
-		while (cur_num < total_num - 2 && fgets(line[0], LEN_10240, fp)){
-			cur_num ++;
-			memset(&line[0], 0, LEN_10240);
-		}
 		memset(&line[0], 0, LEN_10240);
 		fgets(line[0], LEN_10240, fp);
 		memset(&line[1], 0, LEN_10240);
