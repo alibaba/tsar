@@ -19,20 +19,20 @@ char *ktables_usage = "    --ktables           Kernel table statistics";
 
 /* Structure for kernel tables statistics */
 struct stats_ktables {
-        unsigned int  file_used;
-        unsigned int  inode_used;
-        unsigned int  dentry_stat;
-        unsigned int  pty_nr;
+	unsigned int  file_used;
+	unsigned int  inode_used;
+	unsigned int  dentry_stat;
+	unsigned int  pty_nr;
 } s_st_ktables[2];
 
 #define STATS_KTABLES_SIZE      (sizeof(struct stats_ktables))
 
 #define KTABLES_STRING_OPS(str, ops, fmt, stat, d)	\
 	ops(str, fmt,					\
-	    stat d file_used,				\
-	    stat d inode_used,				\
-	    stat d dentry_stat,				\
-	    stat d pty_nr)
+			stat d file_used,				\
+			stat d inode_used,				\
+			stat d dentry_stat,				\
+			stat d pty_nr)
 
 union ktables_statistics {
 	struct ktables_detail_statistics
@@ -47,56 +47,56 @@ union ktables_statistics {
 //extern unsigned long itv, oitv;
 
 /*
-*********************************************************
-*Read kernel tables statistics from various system files.
-*********************************************************
-*/
+ *********************************************************
+ *Read kernel tables statistics from various system files.
+ *********************************************************
+ */
 void read_kernel_tables(struct module *mod, int data_type)
 {
 	char buf[MAX_LINE_LEN];
-        FILE *fp;
-        unsigned int parm;
+	FILE *fp;
+	unsigned int parm;
 	myalloc(st_ktables, stats_ktables, STATS_KTABLES_SIZE);
 
-        /* Open /proc/sys/fs/dentry-state file */
-        if ((fp = fopen(FDENTRY_STATE, "r")) != NULL) {
-                fscanf(fp, "%*d %u",
-                       &st_ktables->dentry_stat);
-                fclose(fp);
-        }
+	/* Open /proc/sys/fs/dentry-state file */
+	if ((fp = fopen(FDENTRY_STATE, "r")) != NULL) {
+		fscanf(fp, "%*d %u",
+				&st_ktables->dentry_stat);
+		fclose(fp);
+	}
 
-        /* Open /proc/sys/fs/file-nr file */
-        if ((fp = fopen(FFILE_NR, "r")) != NULL) {
-                fscanf(fp, "%u %u",
-                       &st_ktables->file_used, &parm);
-                fclose(fp);
-                /*
-                 * The number of used handles is the number of allocated ones
-                 * minus the number of free ones.
-                 */
-                st_ktables->file_used -= parm;
-        }
+	/* Open /proc/sys/fs/file-nr file */
+	if ((fp = fopen(FFILE_NR, "r")) != NULL) {
+		fscanf(fp, "%u %u",
+				&st_ktables->file_used, &parm);
+		fclose(fp);
+		/*
+		 * The number of used handles is the number of allocated ones
+		 * minus the number of free ones.
+		 */
+		st_ktables->file_used -= parm;
+	}
 
-        /* Open /proc/sys/fs/inode-state file */
-        if ((fp = fopen(FINODE_STATE, "r")) != NULL) {
-                fscanf(fp, "%u %u",
-                       &st_ktables->inode_used, &parm);
-                fclose(fp);
-                /*
-                 * The number of inuse inodes is the number of allocated ones
-                 * minus the number of free ones.
-                 */
-                st_ktables->inode_used -= parm;
-        }
+	/* Open /proc/sys/fs/inode-state file */
+	if ((fp = fopen(FINODE_STATE, "r")) != NULL) {
+		fscanf(fp, "%u %u",
+				&st_ktables->inode_used, &parm);
+		fclose(fp);
+		/*
+		 * The number of inuse inodes is the number of allocated ones
+		 * minus the number of free ones.
+		 */
+		st_ktables->inode_used -= parm;
+	}
 
-        /* Open /proc/sys/kernel/pty/nr file */
-        if ((fp = fopen(PTY_NR, "r")) != NULL) {
-                fscanf(fp, "%u",
-                       &st_ktables->pty_nr);
-                fclose(fp);
-        }
+	/* Open /proc/sys/kernel/pty/nr file */
+	if ((fp = fopen(PTY_NR, "r")) != NULL) {
+		fscanf(fp, "%u",
+				&st_ktables->pty_nr);
+		fclose(fp);
+	}
 	int pos = KTABLES_STRING_OPS(buf, sprintf, 
-			   KTABLES_STORE_FMT(DATA_SPLIT), st_ktables, ->);
+			KTABLES_STORE_FMT(DATA_SPLIT), st_ktables, ->);
 	buf[pos] = '\0';
 	mod->detail = strdup(buf);
 }
@@ -117,11 +117,11 @@ static char **get_avg(int data_type, int count)
 }
 
 char *ktables_ops(char *last_record,
-		  char *curr_record,
-		  time_t last_time,
-		  time_t curr_time,
-		  int data_type,
-		  int output_type)
+		char *curr_record,
+		time_t last_time,
+		time_t curr_time,
+		int data_type,
+		int output_type)
 {
 	char buf[MAX_STRING_LEN];
 	unsigned long itv;
@@ -129,10 +129,10 @@ char *ktables_ops(char *last_record,
 	CALITV(last_time, curr_time, itv);
 
 	KTABLES_STRING_OPS(last_record, sscanf, 
-			   KTABLES_STORE_FMT(DATA_SPLIT), &s_st_ktables[1], .);
+			KTABLES_STORE_FMT(DATA_SPLIT), &s_st_ktables[1], .);
 
 	KTABLES_STRING_OPS(curr_record, sscanf, 
-			   KTABLES_STORE_FMT(DATA_SPLIT), &s_st_ktables[0], .);
+			KTABLES_STORE_FMT(DATA_SPLIT), &s_st_ktables[0], .);
 
 	DECLARE_TMP_MOD_STATISTICS(ktables);
 
@@ -148,13 +148,13 @@ char *ktables_ops(char *last_record,
 		SET_MOD_STATISTICS(ktables, iused, itv, detail);
 		SET_MOD_STATISTICS(ktables, dstat, itv, detail);
 		SET_MOD_STATISTICS(ktables, ptynr, itv, detail);
-			
+
 		int pos = 0;
 		PRINT(buf + pos, ktables_tmp_s.ktables_detail.fused, pos, output_type);
 		PRINT(buf + pos, ktables_tmp_s.ktables_detail.iused, pos, output_type);
 		PRINT(buf + pos, ktables_tmp_s.ktables_detail.dstat, pos, output_type);
 		PRINT(buf + pos, ktables_tmp_s.ktables_detail.ptynr, pos, output_type);
-		
+
 		buf[pos - 1] = '\0';
 
 	}
@@ -168,9 +168,9 @@ void mod_register(struct module *mod)
 	sprintf(mod->summary_hdr, KTABLES_SUMMARY_HDR(" "));
 	mod->usage = ktables_usage;
 	sprintf(mod->opt_line, "--ktables");
-        mod->data_collect = read_kernel_tables;
+	mod->data_collect = read_kernel_tables;
 	mod->data_operation = ktables_ops;
 	mod->show_avg = get_avg;
-        mod->mod_free = func_mod_free;
+	mod->mod_free = func_mod_free;
 }
 

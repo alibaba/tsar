@@ -52,7 +52,7 @@ static struct mod_info cgblkio_info[] = {
 
 
 static void set_cgblkio_record(struct module *mod, double st_array[],
-                             U_64 pre_array[], U_64 cur_array[], int inter)
+		U_64 pre_array[], U_64 cur_array[], int inter)
 {
 	int i;
 
@@ -99,25 +99,25 @@ void print_cgblkio_stats(struct module *mod)
 	/*set n group's data to buf*/
 	for(i = 0; i < n_group; i++){
 		pos += snprintf(buf + pos, LEN_4096, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu",
-				  blkio_groups[i].group_name,
-				  blkio_groups[i].rd_merges,
-				  blkio_groups[i].wr_merges,
-				  blkio_groups[i].rd_ios,
-				  blkio_groups[i].wr_ios,
-				  blkio_groups[i].rd_secs,
-				  blkio_groups[i].wr_secs,
-				  blkio_groups[i].qusize,
-				  blkio_groups[i].wait,
-				  blkio_groups[i].svctm);
+				blkio_groups[i].group_name,
+				blkio_groups[i].rd_merges,
+				blkio_groups[i].wr_merges,
+				blkio_groups[i].rd_ios,
+				blkio_groups[i].wr_ios,
+				blkio_groups[i].rd_secs,
+				blkio_groups[i].wr_secs,
+				blkio_groups[i].qusize,
+				blkio_groups[i].wait,
+				blkio_groups[i].svctm);
 		if(pos >= LEN_4096)
 			break;
 		pos += snprintf(buf + pos, LEN_4096, ITEM_SPLIT);
 		if(pos >= LEN_4096)
 			break;
 	}
-        //if(pos){
-        //      buf[pos] = '\0';
-        //}
+	//if(pos){
+	//      buf[pos] = '\0';
+	//}
 	/*notice tsar to store my mult item data*/
 	set_mod_record(mod, buf);
 }

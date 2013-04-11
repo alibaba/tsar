@@ -39,11 +39,11 @@ void output_nagios(){
 		do_debug(LOG_FATAL, "send to nagios: gethostname err, errno=%d \n", errno);
 	}
 	while (host_name[i]) {
-                if (!isprint(host_name[i++])) {
-                        host_name[i-1] = '\0';
-                        break;
-                }
-        }
+		if (!isprint(host_name[i++])) {
+			host_name[i-1] = '\0';
+			break;
+		}
+	}
 
 	/* update module parameter */
 	conf.print_merge = MERGE_NOT;

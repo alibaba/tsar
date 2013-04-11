@@ -18,21 +18,21 @@
 #include "tsar.h"
 
 void register_mod_fileds(struct module *mod, char *opt, char *usage,
-				struct mod_info *info, int n_col, void *data_collect, void *set_st_record)
+		struct mod_info *info, int n_col, void *data_collect, void *set_st_record)
 {
-        sprintf(mod->opt_line, "%s", opt);
-        sprintf(mod->usage, "%s", usage);
+	sprintf(mod->opt_line, "%s", opt);
+	sprintf(mod->usage, "%s", usage);
 	mod->info = info;
-        mod->n_col = n_col;
-        mod->data_collect = data_collect;
-        mod->set_st_record = set_st_record;
+	mod->n_col = n_col;
+	mod->data_collect = data_collect;
+	mod->set_st_record = set_st_record;
 }
 
 
 void set_mod_record(struct module *mod, char *record)
 {
 	if (record)
-	        sprintf(mod->record, "%s", record);
+		sprintf(mod->record, "%s", record);
 }
 
 
@@ -83,9 +83,9 @@ void load_modules()
 int is_include_string(char *mods, char *mod)
 {
 	char *token, n_str[LEN_512] = {0};
-	
+
 	memcpy(n_str, mods, strlen(mods));
-	
+
 	token = strtok(n_str, DATA_SPLIT);
 	while (token) {
 		if (!strcmp(token, mod)) {
@@ -127,16 +127,16 @@ int reload_modules(char *s_mod)
  */
 void reload_check_modules()
 {
-        int     i;  
-        struct  module *mod;
+	int     i;  
+	struct  module *mod;
 
-        for (i = 0; i < statis.total_mod_num; i++) {
-                mod = &mods[i];
-                if (!strcmp(mod->name,"mod_apache") || !strcmp(mod->name,"mod_cpu") || !strcmp(mod->name,"mod_mem") || !strcmp(mod->name,"mod_load") || !strcmp(mod->name,"mod_partition") || !strcmp(mod->name,"mod_io") || !strcmp(mod->name,"mod_tcp") || !strcmp(mod->name,"mod_traffic") || !strcmp(mod->name,"mod_nginx")) {
-                        mod->enable = 1;
-                } else
-                        mod->enable = 0;
-        }   
+	for (i = 0; i < statis.total_mod_num; i++) {
+		mod = &mods[i];
+		if (!strcmp(mod->name,"mod_apache") || !strcmp(mod->name,"mod_cpu") || !strcmp(mod->name,"mod_mem") || !strcmp(mod->name,"mod_load") || !strcmp(mod->name,"mod_partition") || !strcmp(mod->name,"mod_io") || !strcmp(mod->name,"mod_tcp") || !strcmp(mod->name,"mod_traffic") || !strcmp(mod->name,"mod_nginx")) {
+			mod->enable = 1;
+		} else
+			mod->enable = 0;
+	}   
 }
 /*end*/
 #endif
@@ -210,16 +210,16 @@ void set_st_record(struct module *mod)
 {
 	int i, j, k = 0;	
 	struct mod_info *info = mod->info;
-	
+
 	mod->st_flag = 1;
 
 	for (i = 0; i < mod->n_item; i++) {
 		/* custom statis compute */
 		if (mod->set_st_record) {
 			mod->set_st_record(mod, &mod->st_array[i * mod->n_col], 
-						&mod->pre_array[i * mod->n_col],
-						&mod->cur_array[i * mod->n_col],
-						conf.print_interval);
+					&mod->pre_array[i * mod->n_col],
+					&mod->cur_array[i * mod->n_col],
+					conf.print_interval);
 		}
 
 		for (j=0; j < mod->n_col; j++) {
@@ -262,7 +262,7 @@ void set_st_record(struct module *mod)
 			k++;
 		}
 	}
-	
+
 	mod->n_record++;
 }
 
@@ -297,12 +297,12 @@ int collect_record_stat()
 	struct module *mod = NULL;
 	U_64 *tmp, array[MAX_COL_NUM] = {0};
 	int  i, n_item, ret, no_p_hdr = 1;
-	
+
 	for (i = 0; i < statis.total_mod_num; i++) {
 		mod = &mods[i];
 		if (!mod->enable)				
 			continue;
-	
+
 		memset(array, 0, sizeof(array));
 		mod->st_flag = 0;
 		ret = 0;
@@ -314,7 +314,7 @@ int collect_record_stat()
 				/* reset struct module fields */	
 				realloc_module_array(mod, n_item);
 			}
-		
+
 			mod->n_item = n_item;
 			/* multiply item because of have ITEM_SPLIT */
 			if (strstr(mod->record, ITEM_SPLIT)) {
@@ -337,7 +337,7 @@ int collect_record_stat()
 			} else { /* one item */
 				ret = convert_record_to_array(mod->cur_array, mod->n_col, mod->record);
 			}
-		
+
 			/* get st record */
 			if (no_p_hdr && mod->pre_flag && ret) {
 				set_st_record(mod);
@@ -433,12 +433,12 @@ void disable_col_zero()
 {
 	struct module *mod = NULL;
 	int  i, j;
-	
+
 	for (i = 0; i < statis.total_mod_num; i++) {
 		mod = &mods[i];
 		if (!mod->enable)	
 			continue;
-		
+
 		if (!mod->n_col)
 			mod->enable = 0;
 		else {
@@ -447,12 +447,12 @@ void disable_col_zero()
 
 			for (j = 0; j < mod->n_col; j++) {
 				if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[j].summary_bit)) 
-					|| ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[j].summary_bit))) {
+						|| ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[j].summary_bit))) {
 					p_col++;
 					break;
 				}
 			}
-	
+
 			if (!p_col)
 				mod->enable = 0;
 		}

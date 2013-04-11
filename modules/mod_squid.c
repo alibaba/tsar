@@ -19,45 +19,45 @@ char *squid_usage = "    --squid             Squid utilities";
 
 struct stats_squid {
 	int usable;
-        struct squid_counters
-        {
-                struct counters_client {
-                        unsigned long long http_requests;
-                        unsigned long long http_hits;
-                        unsigned long long http_kbytes_out;
-                        unsigned long long http_hit_kbytes_out;
+	struct squid_counters
+	{
+		struct counters_client {
+			unsigned long long http_requests;
+			unsigned long long http_hits;
+			unsigned long long http_kbytes_out;
+			unsigned long long http_hit_kbytes_out;
 
-                } cc;
-                struct counters_server {
-                        unsigned long long all_requests;
-                        unsigned long long all_kbytes_in;
-                        unsigned long long all_kbytes_out;
-                } cs;
-        } sc;
-        struct squid_info {
-                struct mem_usage {
-                        unsigned long long mem_total;
-                        unsigned long long mem_free;
-                        unsigned long long mem_size;
-                } mu;
-                struct fd_usage {
-                        unsigned int fd_used;
-                        unsigned int fd_queue;
-                } fu;
-                struct info_internal_data {
-                        unsigned int entries;
-                        unsigned int memobjs;
-                        unsigned int hotitems;
-                } iid;
-                struct squid_float {
+		} cc;
+		struct counters_server {
+			unsigned long long all_requests;
+			unsigned long long all_kbytes_in;
+			unsigned long long all_kbytes_out;
+		} cs;
+	} sc;
+	struct squid_info {
+		struct mem_usage {
+			unsigned long long mem_total;
+			unsigned long long mem_free;
+			unsigned long long mem_size;
+		} mu;
+		struct fd_usage {
+			unsigned int fd_used;
+			unsigned int fd_queue;
+		} fu;
+		struct info_internal_data {
+			unsigned int entries;
+			unsigned int memobjs;
+			unsigned int hotitems;
+		} iid;
+		struct squid_float {
 			unsigned long long meanobjsize;
 			unsigned long long responsetime;
 			unsigned long long disk_hit;
 			unsigned long long mem_hit;
 			unsigned long long http_hit_rate;
 			unsigned long long byte_hit_rate;
-                } sf;
-        } si;
+		} sf;
+	} si;
 } ;
 
 
@@ -76,8 +76,8 @@ struct stats_squid {
 struct stats_squid  s_st_squid[MAXSQUID];
 
 struct p_squid_info {
-        struct squid_counters *scp;
-        struct squid_info * sip;
+	struct squid_counters *scp;
+	struct squid_info * sip;
 };
 
 #define DIGITS "0123456789"
@@ -87,27 +87,27 @@ struct p_squid_info {
 #define MAXINT 2147483647
 
 char *key[] = {
-        "client_http.requests",
-        "client_http.hits",
-        "client_http.kbytes_out",
-        "client_http.hit_kbytes_out"
+	"client_http.requests",
+	"client_http.hits",
+	"client_http.kbytes_out",
+	"client_http.hit_kbytes_out"
 };
 
 char *key_info[] = {
-        "Total in use",
-        "Total free",
-        "Total size",
-        "Number of file desc currently in use",
-        "Files queued for open",
-        "StoreEntries",
-        "StoreEntries with MemObjects",
-        "Hot Object Cache Items",
-        "Mean Object Size",
+	"Total in use",
+	"Total free",
+	"Total size",
+	"Number of file desc currently in use",
+	"Files queued for open",
+	"StoreEntries",
+	"StoreEntries with MemObjects",
+	"Hot Object Cache Items",
+	"Mean Object Size",
 };
 
 char *key_float[] = {
-        "Average HTTP respone time",
-        "Mean Object Size:",
+	"Average HTTP respone time",
+	"Mean Object Size:",
 	"Request Memory Hit Ratios:",
 	"Request Filesystem Hit Ratios:",
 	"Request Hit Ratios:",
@@ -117,23 +117,23 @@ char *key_float[] = {
 
 char *a_trim(char *str, int len)
 {
-        char *dest, *l_str;
-        dest = (char *)malloc(len);
-        int i = 0;
-        l_str = str;
-        if (l_str == NULL)
-                return NULL;
-        while (*l_str++ != '\0' && len--) {
-                if(*l_str != ' ' && *l_str != '\t')
-                        dest[i++] = *l_str;
-        }
-        dest[i] = '\0';
-        return dest;
+	char *dest, *l_str;
+	dest = (char *)malloc(len);
+	int i = 0;
+	l_str = str;
+	if (l_str == NULL)
+		return NULL;
+	while (*l_str++ != '\0' && len--) {
+		if(*l_str != ' ' && *l_str != '\t')
+			dest[i++] = *l_str;
+	}
+	dest[i] = '\0';
+	return dest;
 }
 int read_a_int_value(char *buf,
-		     char *key,
-		     unsigned int *ret,
-		     int type) 
+		char *key,
+		unsigned int *ret,
+		int type) 
 {
 	int k;
 	char *tmp;
@@ -152,15 +152,15 @@ int read_a_int_value(char *buf,
 }
 
 int read_a_long_long_value(char *buf, 
-			   char *key, 
-			   unsigned long long *ret,
-			   int type)
+		char *key, 
+		unsigned long long *ret,
+		int type)
 {
 	int k;
 	char *tmp;
 	/* is str match the keywords? */
 	if ((tmp = strstr(buf, key)) != NULL) {
-		
+
 		/* is number befor the key string? */
 		if (type == LEFT) {
 			tmp = buf;
@@ -173,15 +173,15 @@ int read_a_long_long_value(char *buf,
 }
 /*add for squidclient when counter is nagtive*/
 int read_a_long_long_value_squid(char *buf, 
-			   char *key, 
-			   unsigned long long *ret,
-			   int type)
+		char *key, 
+		unsigned long long *ret,
+		int type)
 {
 	int k;
 	char *tmp;
 	/* is str match the keywords? */
 	if ((tmp = strstr(buf, key)) != NULL) {
-		
+
 		/* is number befor the key string? */
 		if (type == LEFT) {
 			tmp = buf;
@@ -196,10 +196,10 @@ int read_a_long_long_value_squid(char *buf,
 }
 
 int read_a_float_value(char *buf, 
-		       char *key, 
-		       unsigned long long *ret,
-		       int type,
-		       int len)
+		char *key, 
+		unsigned long long *ret,
+		int type,
+		int len)
 {
 	int k;
 	int r, l;
@@ -207,7 +207,7 @@ int read_a_float_value(char *buf,
 	char *tmp2;
 	/* is str match the keywords? */
 	if ((tmp = strstr(buf, key)) != NULL) {
-		
+
 		/* is number befor the key string? */
 		if (type == LEFT) {
 			tmp = buf;
@@ -227,68 +227,68 @@ int read_a_float_value(char *buf,
 void collect_cnts(char *l, struct squid_counters *sc)
 {
 	read_a_long_long_value_squid(l, key[0],
-			       &sc->cc.http_requests, RIGHT);
+			&sc->cc.http_requests, RIGHT);
 
 	read_a_long_long_value(l, key[1], 
-			       &sc->cc.http_hits, RIGHT);
-	
+			&sc->cc.http_hits, RIGHT);
+
 	read_a_long_long_value(l, key[2],
-			       &sc->cc.http_kbytes_out, RIGHT);
+			&sc->cc.http_kbytes_out, RIGHT);
 
 	read_a_long_long_value(l, key[3],
-			       &sc->cc.http_hit_kbytes_out, RIGHT);
+			&sc->cc.http_hit_kbytes_out, RIGHT);
 }
 
 
 void collect_info(char *l, struct squid_info *si)
 {
 	read_a_long_long_value(l, key_info[0], 
-			       &si->mu.mem_total, RIGHT);
-	
+			&si->mu.mem_total, RIGHT);
+
 	read_a_long_long_value(l, key_info[1],
-			       &si->mu.mem_free, RIGHT);
-	
+			&si->mu.mem_free, RIGHT);
+
 	read_a_long_long_value(l, key_info[2],
-			       &si->mu.mem_size, RIGHT);
+			&si->mu.mem_size, RIGHT);
 
 	read_a_int_value(l, key_info[3], 
-			 &si->fu.fd_used, RIGHT);
-	
+			&si->fu.fd_used, RIGHT);
+
 	read_a_int_value(l, key_info[4],
-			 &si->fu.fd_queue, RIGHT);
+			&si->fu.fd_queue, RIGHT);
 
 	/* here don't confuse the order */
 	if (read_a_int_value(l, key_info[6], 
-			     &si->iid.memobjs, LEFT)) return;
+				&si->iid.memobjs, LEFT)) return;
 
 	read_a_int_value(l, key_info[5],
-			 &si->iid.entries, LEFT);
-	
+			&si->iid.entries, LEFT);
+
 	read_a_int_value(l, key_info[7],
-			 &si->iid.hotitems, LEFT);
+			&si->iid.hotitems, LEFT);
 
 	read_a_float_value(l, key_float[0],
-			   &si->sf.responsetime, 
-			   RIGHT, 100);
+			&si->sf.responsetime, 
+			RIGHT, 100);
 
 	read_a_float_value(l, key_float[1],
-			   &si->sf.meanobjsize, 
-			   RIGHT, 100);
+			&si->sf.meanobjsize, 
+			RIGHT, 100);
 	read_a_float_value(l, key_float[3],
-			   &si->sf.disk_hit, 
-			   RIGHT, 10);
+			&si->sf.disk_hit, 
+			RIGHT, 10);
 	read_a_float_value(l, key_float[2],
-			   &si->sf.mem_hit, 
-			   RIGHT, 10);
+			&si->sf.mem_hit, 
+			RIGHT, 10);
 	read_a_float_value(l, key_float[4],
-			   &si->sf.http_hit_rate, 
-			   RIGHT, 10);
+			&si->sf.http_hit_rate, 
+			RIGHT, 10);
 	read_a_float_value(l, key_float[5],
-			   &si->sf.byte_hit_rate, 
-			   RIGHT, 10);
+			&si->sf.byte_hit_rate, 
+			RIGHT, 10);
 	read_a_float_value(l, key_float[6],
-			   &si->sf.disk_hit, 
-			   RIGHT, 10);
+			&si->sf.disk_hit, 
+			RIGHT, 10);
 
 }
 
@@ -324,21 +324,21 @@ void count_squid_nr()
 }
 
 
-ssize_t
+	ssize_t
 mywrite(int fd, void *buf, size_t len)
 {
-        return send(fd, buf, len, 0);
+	return send(fd, buf, len, 0);
 }
 
-ssize_t
+	ssize_t
 myread(int fd, void *buf, size_t len)
 {
-        return recv(fd, buf, len, 0);
+	return recv(fd, buf, len, 0);
 }
 
-int
+	int
 client_comm_connect(int sock, const char *dest_host, 
-		    u_short dest_port, struct timeval *tvp)
+		u_short dest_port, struct timeval *tvp)
 {
 	const struct hostent *hp = NULL;
 	struct sockaddr_in to_addr;
@@ -353,16 +353,16 @@ client_comm_connect(int sock, const char *dest_host,
 	if(fcntl(sock, F_SETFL, flags | O_NONBLOCK) < 0)
 		return -1;
 
-        /* Set up the destination socket address for message to send to. */
-        if (hp == NULL) {
-                to_addr.sin_family = AF_INET;
+	/* Set up the destination socket address for message to send to. */
+	if (hp == NULL) {
+		to_addr.sin_family = AF_INET;
 
-                if ((hp = gethostbyname(dest_host)) == 0)
-                        return (-1);
-                memcpy(&to_addr.sin_addr, hp->h_addr, hp->h_length);
-                to_addr.sin_port = htons(dest_port);
-        }
-        if (connect(sock, (struct sockaddr *) &to_addr, sizeof(struct sockaddr_in)) != 0) {
+		if ((hp = gethostbyname(dest_host)) == 0)
+			return (-1);
+		memcpy(&to_addr.sin_addr, hp->h_addr, hp->h_length);
+		to_addr.sin_port = htons(dest_port);
+	}
+	if (connect(sock, (struct sockaddr *) &to_addr, sizeof(struct sockaddr_in)) != 0) {
 		if (errno != EINPROGRESS) // EINPROGRESS
 			return -1;
 		else
@@ -393,47 +393,47 @@ select:
 
 int parse_squid_info(char *buf, char *cmd, struct p_squid_info *p_si)
 {
-        char *line;
-        line = strtok(buf, "\n");
+	char *line;
+	line = strtok(buf, "\n");
 
-        while(line != NULL) {
-                if(!strcmp(cmd, "counters"))
-                        collect_cnts(line, p_si->scp);
-                else if (!strcmp(cmd, "info")) {
+	while(line != NULL) {
+		if(!strcmp(cmd, "counters"))
+			collect_cnts(line, p_si->scp);
+		else if (!strcmp(cmd, "info")) {
 			collect_info(line, p_si->sip);
-                } else {
-                        fprintf(stderr, "unknown command\n");
-                        return -1;
-                }
-                line = strtok(NULL, "\n");
-        }
+		} else {
+			fprintf(stderr, "unknown command\n");
+			return -1;
+		}
+		line = strtok(NULL, "\n");
+	}
 
-		if(!strcmp(cmd, "counters") && p_si->scp->cc.http_requests == 0){
-			return -1;
-		}
-		if(!strcmp(cmd, "info") && p_si->sip->sf.responsetime == 0){
-			return -1;
-		}
-		return 0;
+	if(!strcmp(cmd, "counters") && p_si->scp->cc.http_requests == 0){
+		return -1;
+	}
+	if(!strcmp(cmd, "info") && p_si->sip->sf.responsetime == 0){
+		return -1;
+	}
+	return 0;
 }
 
 int __get_squid_info(char *squidoption,
-		     char *squidcmd, 
-		     int port, int index)
+		char *squidcmd, 
+		int port, int index)
 {
-        char buf[LEN_4096];
-        char *hostname = "localhost";
-        int len, conn, bytesWritten, fsize = 0;
-        struct p_squid_info psi = {&s_st_squid[index].sc, &s_st_squid[index].si};
+	char buf[LEN_4096];
+	char *hostname = "localhost";
+	int len, conn, bytesWritten, fsize = 0;
+	struct p_squid_info psi = {&s_st_squid[index].sc, &s_st_squid[index].si};
 
 	if ((conn = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
 		close(conn);
 		return -1;
-        }
-        if (client_comm_connect(conn, hostname, port, NULL) < 0) {
+	}
+	if (client_comm_connect(conn, hostname, port, NULL) < 0) {
 		close(conn);
 		return -1;
-        }
+	}
 	int flags;
 	/* set socket fd noblock */
 	if((flags = fcntl(conn, F_GETFL, 0)) < 0) {
@@ -448,30 +448,30 @@ int __get_squid_info(char *squidoption,
 	setsockopt(conn, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(struct timeval));
 	setsockopt(conn, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval));
 
-        bytesWritten = mywrite(conn, squidcmd, strlen(squidcmd));
-        if (bytesWritten < 0) {
+	bytesWritten = mywrite(conn, squidcmd, strlen(squidcmd));
+	if (bytesWritten < 0) {
 		close(conn);
-                return -2;
-        } else if (bytesWritten != strlen(squidcmd)) {
+		return -2;
+	} else if (bytesWritten != strlen(squidcmd)) {
 		close(conn);
-                return -3;
-        }
-        while ((len = myread(conn, buf, sizeof(buf))) > 0) {
-                fsize += len;
-        }
+		return -3;
+	}
+	while ((len = myread(conn, buf, sizeof(buf))) > 0) {
+		fsize += len;
+	}
 	/* read error */
 	if (fsize < 1000) {
 		close(conn);
 		return -1;
 	}
 
-        if (parse_squid_info(buf, squidoption, &psi) < 0) {
+	if (parse_squid_info(buf, squidoption, &psi) < 0) {
 		close(conn);
 		return -1;
 	}
 	close(conn);
-        return 0;
-	
+	return 0;
+
 }
 
 int __read_squid_stat(int port,int index)
@@ -479,24 +479,24 @@ int __read_squid_stat(int port,int index)
 	int i;
 	/* fullfil the raw infomation here 
 	   for each port */
-        char *options[2] = {"info", "counters"};
-        char msg[2][LEN_512];
-	
+	char *options[2] = {"info", "counters"};
+	char msg[2][LEN_512];
+
 	/* we have two command 'info' & 'counters' to run */
-        for(i = 0; i < 2; i++) {
-                //msg[i]=(char *)malloc(LEN_512);
-                sprintf(msg[i],
-                        "GET cache_object://localhost/%s "
-			"HTTP/1.1\r\n"
-			"Host: localhost\r\n"
-			"Accept:*/*\r\n"
-			"Connection: close\r\n\r\n",
-                        options[i]);
-                if(__get_squid_info(options[i], msg[i], port, index) < 0) {
-                        return -1;
-                }
+	for(i = 0; i < 2; i++) {
+		//msg[i]=(char *)malloc(LEN_512);
+		sprintf(msg[i],
+				"GET cache_object://localhost/%s "
+				"HTTP/1.1\r\n"
+				"Host: localhost\r\n"
+				"Accept:*/*\r\n"
+				"Connection: close\r\n\r\n",
+				options[i]);
+		if(__get_squid_info(options[i], msg[i], port, index) < 0) {
+			return -1;
+		}
 		//free(msg[i]);
-        }
+	}
 	return 0;
 }
 
@@ -506,20 +506,20 @@ int store_single_port(char *buf, char *itemname, int i)
 	len += sprintf(buf, "%s=", itemname);
 	/* print single port info to buffer here */
 	len += sprintf(buf + len, 
-		       "%llu,%llu,%llu,%llu,%llu,%llu,"
-		       "%u,%u,%u,%u,%u,%llu,%u,%u",
-		       s_st_squid[i].sc.cc.http_requests,
-		       s_st_squid[i].si.sf.responsetime,
-		       s_st_squid[i].si.sf.http_hit_rate,
-		       s_st_squid[i].si.sf.byte_hit_rate,
-		       s_st_squid[i].si.sf.disk_hit,
-		       s_st_squid[i].si.sf.mem_hit,
-		       s_st_squid[i].si.fu.fd_used,
-		       s_st_squid[i].si.fu.fd_queue,
-		       s_st_squid[i].si.iid.entries,
-		       s_st_squid[i].si.iid.memobjs,
-		       s_st_squid[i].si.iid.hotitems,
-		       s_st_squid[i].si.sf.meanobjsize,
+			"%llu,%llu,%llu,%llu,%llu,%llu,"
+			"%u,%u,%u,%u,%u,%llu,%u,%u",
+			s_st_squid[i].sc.cc.http_requests,
+			s_st_squid[i].si.sf.responsetime,
+			s_st_squid[i].si.sf.http_hit_rate,
+			s_st_squid[i].si.sf.byte_hit_rate,
+			s_st_squid[i].si.sf.disk_hit,
+			s_st_squid[i].si.sf.mem_hit,
+			s_st_squid[i].si.fu.fd_used,
+			s_st_squid[i].si.fu.fd_queue,
+			s_st_squid[i].si.iid.entries,
+			s_st_squid[i].si.iid.memobjs,
+			s_st_squid[i].si.iid.hotitems,
+			s_st_squid[i].si.sf.meanobjsize,
 			squid_nr,
 			live_squid_nr);
 	return len;
@@ -560,7 +560,7 @@ void read_squid_stat(struct module *mod)
 		/* generate the item name */
 		int n = sprintf(itemname, "port%d", port_list[i]);
 		itemname[n] = '\0';
-	
+
 		/* print log to buffer */
 		pos += store_single_port(buf + pos, itemname, i);
 		/* print a seperate char */
@@ -570,11 +570,11 @@ void read_squid_stat(struct module *mod)
 		buf[pos] = '\0';
 		set_mod_record(mod, buf);
 	}
- }
+}
 
 
 static void set_squid_record(struct module *mod, double st_array[],
-			     U_64 pre_array[], U_64 cur_array[], int inter)
+		U_64 pre_array[], U_64 cur_array[], int inter)
 {
 	int i;
 
@@ -593,7 +593,7 @@ static void set_squid_record(struct module *mod, double st_array[],
 
 static struct mod_info s_info[] = {
 	{"   qps", SUMMARY_BIT,  MERGE_SUM,  STATS_SUB_INTER},
-        {"    rt", DETAIL_BIT, MERGE_AVG,  STATS_NULL},
+	{"    rt", DETAIL_BIT, MERGE_AVG,  STATS_NULL},
 	{" r_hit", DETAIL_BIT, MERGE_AVG,  STATS_NULL},
 	{" b_hit", DETAIL_BIT, MERGE_AVG,  STATS_NULL},
 	{" d_hit", DETAIL_BIT, MERGE_AVG,  STATS_NULL},

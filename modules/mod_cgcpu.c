@@ -36,7 +36,7 @@ static struct mod_info cgcpu_info[] = {
 
 
 static void set_cgcpu_record(struct module *mod, double st_array[],
-                             U_64 pre_array[], U_64 cur_array[], int inter)
+		U_64 pre_array[], U_64 cur_array[], int inter)
 {
 	int i;
 	for (i = 0; i < mod->n_col; i++) {
@@ -56,12 +56,12 @@ void print_cgcpu_stats(struct module *mod)
 	/*set n group's data to buf*/
 	for(i = 0; i < n_group; i++){
 		pos += snprintf(buf + pos, LEN_1024, "%s=%llu", cgcpu_groups[i].group_name, (
-			unsigned long long int)(cgcpu_groups[i].sum_exec_runtime * 1000)); //ms->us
-                if(pos >= LEN_4096)
-                        break;
+					unsigned long long int)(cgcpu_groups[i].sum_exec_runtime * 1000)); //ms->us
+		if(pos >= LEN_4096)
+			break;
 		pos += snprintf(buf + pos, LEN_1024, ITEM_SPLIT);
-                if(pos >= LEN_4096)
-                        break;
+		if(pos >= LEN_4096)
+			break;
 	}
 	//if(pos){
 	//	buf[pos] = '\0';
@@ -108,7 +108,7 @@ void read_cgcpu_stats(struct module *mod)
 
 			assert(n_task + 1 <= MAX_TASK);
 
-		//read sum_exe_time of each task and add up
+			//read sum_exe_time of each task and add up
 			for (i = 0; i <= n_task; i++) {
 				snprintf(path, 128, "/proc/%d/sched", tasks[i].pid);
 				if ((schedfd = fopen(path,"r")) == NULL) {

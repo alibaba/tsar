@@ -2,15 +2,15 @@
 
 #define PAGING_DETAIL_HDR(d)				\
 	"  pgin"d" pgout"d" fault"d"majflt"d		\
-	"  free"d" scank"d" scand"d" steal"
+"  free"d" scank"d" scand"d" steal"
 
 #define PAGING_STORE_FMT(d)			\
 	"%ld"d"%ld"d"%ld"d"%ld"d		\
-	"%ld"d"%ld"d"%ld"d"%ld"
+"%ld"d"%ld"d"%ld"d"%ld"
 
 #define PAGING_DETAIL_FMT(d)		\
 	"%5.1f"d"%5.1f"d"%5.1f"d"%5.1f"d	\
-	"%5.1f"d"%5.1f"d"%5.1f"d"%5.1f"
+"%5.1f"d"%5.1f"d"%5.1f"d"%5.1f"
 
 #define PAGING_SUMMARY_HDR(d)			\
 	"  pgin"d" pgout"
@@ -19,26 +19,26 @@ char *paging_usage = "    --paging            Paging statistics";
 
 /* Structure for paging statistics */
 struct stats_paging {
-        unsigned long pgpgin;
-        unsigned long pgpgout;
-        unsigned long pgfault;
-        unsigned long pgmajfault;
-        unsigned long pgfree;
-        unsigned long pgscan_kswapd;
-        unsigned long pgscan_direct;
-        unsigned long pgsteal;
+	unsigned long pgpgin;
+	unsigned long pgpgout;
+	unsigned long pgfault;
+	unsigned long pgmajfault;
+	unsigned long pgfree;
+	unsigned long pgscan_kswapd;
+	unsigned long pgscan_direct;
+	unsigned long pgsteal;
 }s_st_paging[2];
 
 #define PAGING_STRING_OPS(str, ops, fmt, stat, d)	\
 	ops(str, fmt,					\
-	    stat d pgpgin,				\
-	    stat d pgpgout,				\
-	    stat d pgfault,				\
-	    stat d pgmajfault,				\
-	    stat d pgfree,				\
-	    stat d pgscan_kswapd,			\
-	    stat d pgscan_direct,			\
-	    stat d pgsteal)
+			stat d pgpgin,				\
+			stat d pgpgout,				\
+			stat d pgfault,				\
+			stat d pgmajfault,				\
+			stat d pgfree,				\
+			stat d pgscan_kswapd,			\
+			stat d pgscan_direct,			\
+			stat d pgsteal)
 
 #define STATS_PAGING_SIZE (sizeof(struct stats_paging))
 
@@ -68,80 +68,80 @@ union paging_statistics {
  */
 void read_vmstat_paging(struct module *mod, int data_type)
 {
-        FILE *fp;
-        char line[128], buf[MAX_LINE_LEN];
-        unsigned long pgtmp;
-        int ok = FALSE;
-	
-        if ((fp = fopen(VMSTAT, "r")) == NULL)
-                return;
+	FILE *fp;
+	char line[128], buf[MAX_LINE_LEN];
+	unsigned long pgtmp;
+	int ok = FALSE;
+
+	if ((fp = fopen(VMSTAT, "r")) == NULL)
+		return;
 	myalloc(st_paging, stats_paging, STATS_PAGING_SIZE);
-        st_paging->pgsteal = 0;
-        st_paging->pgscan_kswapd = st_paging->pgscan_direct = 0;
+	st_paging->pgsteal = 0;
+	st_paging->pgscan_kswapd = st_paging->pgscan_direct = 0;
 
-        while (fgets(line, 128, fp) != NULL) {
+	while (fgets(line, 128, fp) != NULL) {
 
-                if (!strncmp(line, "pgpgin ", 7)) {
-                        /* Read number of pages the system paged in */
-                        sscanf(line + 7, "%lu", &st_paging->pgpgin);
-                        ok = TRUE;
-                }
-                else if (!strncmp(line, "pgpgout ", 8)) {
-                        /* Read number of pages the system paged out */
-                        sscanf(line + 8, "%lu", &st_paging->pgpgout);
-                }
-                else if (!strncmp(line, "pgfault ", 8)) {
-                        /* Read number of faults (major+minor) made by the system */
-                        sscanf(line + 8, "%lu", &st_paging->pgfault);
-                }
-                else if (!strncmp(line, "pgmajfault ", 11)) {
-                        /* Read number of faults (major only) made by the system */
-                        sscanf(line + 11, "%lu", &st_paging->pgmajfault);
-                }
-                else if (!strncmp(line, "pgfree ", 7)) {
-                        /* Read number of pages freed by the system */
-                        sscanf(line + 7, "%lu", &st_paging->pgfree);
-                }
-                else if (!strncmp(line, "pgsteal_", 8)) {
-                        /* Read number of pages stolen by the system */
-                        sscanf(strchr(line, ' '), "%lu", &pgtmp);
-                        st_paging->pgsteal += pgtmp;
-                }
-                else if (!strncmp(line, "pgscan_kswapd_", 14)) {
-                        /* Read number of pages scanned by the kswapd daemon */
-                        sscanf(strchr(line, ' '), "%lu", &pgtmp);
-                        st_paging->pgscan_kswapd += pgtmp;
-                }
-                else if (!strncmp(line, "pgscan_direct_", 14)) {
-                        /* Read number of pages scanned directly */
-                        sscanf(strchr(line, ' '), "%lu", &pgtmp);
-                        st_paging->pgscan_direct += pgtmp;
-                }
-        }
+		if (!strncmp(line, "pgpgin ", 7)) {
+			/* Read number of pages the system paged in */
+			sscanf(line + 7, "%lu", &st_paging->pgpgin);
+			ok = TRUE;
+		}
+		else if (!strncmp(line, "pgpgout ", 8)) {
+			/* Read number of pages the system paged out */
+			sscanf(line + 8, "%lu", &st_paging->pgpgout);
+		}
+		else if (!strncmp(line, "pgfault ", 8)) {
+			/* Read number of faults (major+minor) made by the system */
+			sscanf(line + 8, "%lu", &st_paging->pgfault);
+		}
+		else if (!strncmp(line, "pgmajfault ", 11)) {
+			/* Read number of faults (major only) made by the system */
+			sscanf(line + 11, "%lu", &st_paging->pgmajfault);
+		}
+		else if (!strncmp(line, "pgfree ", 7)) {
+			/* Read number of pages freed by the system */
+			sscanf(line + 7, "%lu", &st_paging->pgfree);
+		}
+		else if (!strncmp(line, "pgsteal_", 8)) {
+			/* Read number of pages stolen by the system */
+			sscanf(strchr(line, ' '), "%lu", &pgtmp);
+			st_paging->pgsteal += pgtmp;
+		}
+		else if (!strncmp(line, "pgscan_kswapd_", 14)) {
+			/* Read number of pages scanned by the kswapd daemon */
+			sscanf(strchr(line, ' '), "%lu", &pgtmp);
+			st_paging->pgscan_kswapd += pgtmp;
+		}
+		else if (!strncmp(line, "pgscan_direct_", 14)) {
+			/* Read number of pages scanned directly */
+			sscanf(strchr(line, ' '), "%lu", &pgtmp);
+			st_paging->pgscan_direct += pgtmp;
+		}
+	}
 	int pos = PAGING_STRING_OPS(buf, sprintf, 
-				    PAGING_STORE_FMT(DATA_SPLIT), st_paging, ->);
+			PAGING_STORE_FMT(DATA_SPLIT), st_paging, ->);
 	buf[pos] = '\0';
 	mod->detail = strdup(buf);
 
-        fclose(fp);
-        return;
+	fclose(fp);
+	return;
 }
 
 char * paging_ops(char *last_record,
-		  char *curr_record,
-		  time_t last_time,
-		  time_t curr_time,
-		  int data_type,
-		  int output_type)
+		char *curr_record,
+		time_t last_time,
+		time_t curr_time,
+		int data_type,
+		int output_type)
 {
 	char buf[MAX_STRING_LEN];
 	int pos = 0;
 	unsigned long itv;
 
 	PAGING_STRING_OPS(last_record, sscanf,
-			  PAGING_STORE_FMT(DATA_SPLIT), &s_st_paging[1], .);
+			PAGING_STORE_FMT(DATA_SPLIT), &s_st_paging[1], .);
 	PAGING_STRING_OPS(curr_record, sscanf,
-			  PAGING_STORE_FMT(DATA_SPLIT), &s_st_paging[0], .);
+			PAGING_STORE_FMT(DATA_SPLIT), &s_st_paging[0], .);
 
 	DECLARE_TMP_MOD_STATISTICS(paging);
 
@@ -154,7 +154,7 @@ char * paging_ops(char *last_record,
 		COMPUTE_MOD_VALUE(paging, S_VALUE, detail, pgscan_kswapd, itv, kswapd);
 		COMPUTE_MOD_VALUE(paging, S_VALUE, detail, pgscan_direct, itv, direct);
 		COMPUTE_MOD_VALUE(paging, S_VALUE, detail, pgsteal, itv, steal);
-		
+
 		SET_MOD_STATISTICS(paging, in, itv, detail);
 		SET_MOD_STATISTICS(paging, out, itv, detail);
 		SET_MOD_STATISTICS(paging, fault, itv, detail);
@@ -215,9 +215,9 @@ void mod_register(struct module *mod)
 	sprintf(mod->summary_hdr, PAGING_SUMMARY_HDR(" "));
 	mod->usage = paging_usage;
 	sprintf(mod->opt_line, "--paging");
-        mod->data_collect = read_vmstat_paging;
+	mod->data_collect = read_vmstat_paging;
 	mod->data_operation = paging_ops;
 	mod->show_avg = get_paging_avg;
-        mod->mod_free = func_mod_free;
+	mod->mod_free = func_mod_free;
 }
 

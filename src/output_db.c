@@ -34,11 +34,11 @@ void send_sql_txt(int fd, int have_collect)
 		do_debug(LOG_FATAL, "send_sql_txt: gethostname err, errno=%d", errno);
 	}
 	while (host_name[i]) {
-                if (!isprint(host_name[i++])) {
-                        host_name[i-1] = '\0';
-                        break;
-                }
-        }
+		if (!isprint(host_name[i++])) {
+			host_name[i-1] = '\0';
+			break;
+		}
+	}
 
 	/* get st_array */
 	if (get_st_array_from_file(have_collect))

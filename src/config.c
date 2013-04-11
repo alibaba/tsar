@@ -80,7 +80,7 @@ void parse_int(int *var)
 
 void parse_string(char *var)
 {
-        char    *token = strtok(NULL, W_SPACE);
+	char    *token = strtok(NULL, W_SPACE);
 
 	if (token)
 		strncpy(var, token, strlen(token));
@@ -88,37 +88,37 @@ void parse_string(char *var)
 
 void parse_add_string(char *var)
 {
-        char    *token = strtok(NULL, W_SPACE);
-        if (var == NULL){
-                if(token)
-                        strncpy(var, token, strlen(token));
-        }else{
-                if(token){
-                        strcat(token, ",");
-                        strncat(token, var, strlen(var));
-                }
-                if(token)
-                        strncpy(var, token, strlen(token));
-        }
+	char    *token = strtok(NULL, W_SPACE);
+	if (var == NULL){
+		if(token)
+			strncpy(var, token, strlen(token));
+	}else{
+		if(token){
+			strcat(token, ",");
+			strncat(token, var, strlen(var));
+		}
+		if(token)
+			strncpy(var, token, strlen(token));
+	}
 }
 
 void set_debug_level()
 {
-        char    *token = strtok(NULL, W_SPACE);
-        if(token){
-                if (!strcmp(token,"INFO"))
-                        conf.debug_level = LOG_INFO;
-                else if (!strcmp(token,"WARN"))
-                        conf.debug_level = LOG_WARN;
-                else if (!strcmp(token,"DEBUG"))
-                        conf.debug_level = LOG_DEBUG;
-                else if (!strcmp(token,"ERROR"))
-                        conf.debug_level = LOG_ERR;
-                else if (!strcmp(token,"FATAL"))
-                        conf.debug_level = LOG_FATAL;
-                else
-                        conf.debug_level = LOG_ERR;
-        }
+	char    *token = strtok(NULL, W_SPACE);
+	if(token){
+		if (!strcmp(token,"INFO"))
+			conf.debug_level = LOG_INFO;
+		else if (!strcmp(token,"WARN"))
+			conf.debug_level = LOG_WARN;
+		else if (!strcmp(token,"DEBUG"))
+			conf.debug_level = LOG_DEBUG;
+		else if (!strcmp(token,"ERROR"))
+			conf.debug_level = LOG_ERR;
+		else if (!strcmp(token,"FATAL"))
+			conf.debug_level = LOG_FATAL;
+		else
+			conf.debug_level = LOG_ERR;
+	}
 }
 
 /* parse every config line */
@@ -140,26 +140,26 @@ static int parse_line(char *buff)
 		parse_string(conf.output_db_addr);
 	else if (!strcmp(token, "output_db_mod"))
 		parse_add_string(conf.output_db_mod);
-        else if (!strcmp(token, "output_nagios_mod"))
-                parse_add_string(conf.output_nagios_mod);
+	else if (!strcmp(token, "output_nagios_mod"))
+		parse_add_string(conf.output_nagios_mod);
 	else if (!strcmp(token, "output_stdio_mod"))
 		parse_add_string(conf.output_stdio_mod);
-        else if (!strcmp(token, "debug_level"))
-                set_debug_level();
-        else if (!strcmp(token, "include"))
-                get_include_conf();
-        else if (!strcmp(token, "server_addr"))
-                parse_string(conf.server_addr);
-        else if (!strcmp(token, "server_port"))
-                parse_int(conf.server_port);
-        else if (!strcmp(token, "cycle_time"))
-                parse_int(conf.cycle_time);
-        else if (!strcmp(token, "send_nsca_cmd"))
-                parse_string(conf.send_nsca_cmd);
-        else if (!strcmp(token, "send_nsca_conf"))
-                parse_string(conf.send_nsca_conf);
-        else if (!strcmp(token, "threshold"))
-                get_threshold();
+	else if (!strcmp(token, "debug_level"))
+		set_debug_level();
+	else if (!strcmp(token, "include"))
+		get_include_conf();
+	else if (!strcmp(token, "server_addr"))
+		parse_string(conf.server_addr);
+	else if (!strcmp(token, "server_port"))
+		parse_int(conf.server_port);
+	else if (!strcmp(token, "cycle_time"))
+		parse_int(conf.cycle_time);
+	else if (!strcmp(token, "send_nsca_cmd"))
+		parse_string(conf.send_nsca_cmd);
+	else if (!strcmp(token, "send_nsca_conf"))
+		parse_string(conf.send_nsca_conf);
+	else if (!strcmp(token, "threshold"))
+		get_threshold();
 	else
 		return 0;
 	return 1;

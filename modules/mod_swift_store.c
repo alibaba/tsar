@@ -24,7 +24,7 @@ int mgrport = 81;
  * Request Filesystem Hit Ratios(5min):    coss: 9.8%, tcoss: 13.8%
  *
  *
-*/
+ */
 const static char *SWIFT_STORE[] = {
 	"StoreEntries",
 	"on-memory objects",
@@ -169,7 +169,7 @@ void set_swift_store_record(struct module *mod, double st_array[],
 	for (i = 0; i < mod->n_col; i++) {
 		st_array[i] = cur_array[i];
 		if(i >= 4)
-		st_array[i] /= 1000;
+			st_array[i] /= 1000;
 	}
 }
 

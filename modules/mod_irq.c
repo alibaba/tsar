@@ -15,7 +15,7 @@ char * irq_usage = "    --irq               Interrupts statistics";
  * whereas individual interrupts are saved as %u.
  */
 struct __stats_irq {
-        unsigned long long irq_nr;
+	unsigned long long irq_nr;
 };
 
 typedef struct __stats_irq (*stats_irq)[2];
@@ -40,11 +40,11 @@ static union __irq_statistics irq_statistics[MAXIRQ][NR_ARRAY];
 
 #define SET_IRQ_STATISTICS(val, target, member, i)	\
 	__SET_MOD_STATISTICS				\
-	(val.irq_detail.member,				\
-	 target[MEAN].irq_detail.member,		\
-	 target[MAX].irq_detail.member,			\
-	 target[MIN].irq_detail.member,			\
-	 (i))					
+(val.irq_detail.member,				\
+ target[MEAN].irq_detail.member,		\
+ target[MAX].irq_detail.member,			\
+ target[MIN].irq_detail.member,			\
+ (i))					
 
 static int f_init = FALSE;
 
@@ -63,64 +63,64 @@ static void init_structure(int nr)
 
 long stringToNum(char *string)
 {
-        long  temp = 0;
-        const char *ptr = string;
+	long  temp = 0;
+	const char *ptr = string;
 
-        while(*string != '\0')
+	while(*string != '\0')
+	{
+		if ((*string < '0') || (*string > '9'))
 		{
-			if ((*string < '0') || (*string > '9'))
-				{
-					break;
-				}
-			temp = temp * 10 + (*string - '0');
-			string++;
+			break;
 		}
+		temp = temp * 10 + (*string - '0');
+		string++;
+	}
 	if (*ptr == '-')
-		{
-			temp = -temp;
-		}
-        return temp;
+	{
+		temp = -temp;
+	}
+	return temp;
 }
 
 void  getword(char *textline)
 {       int i;
 
-        i = 0;
-        for(; isspace(textline[text_index]); text_index++)
+	i = 0;
+	for(; isspace(textline[text_index]); text_index++)
 		;
-        for(; !isspace(textline[text_index]); i++, text_index++){
-                word[i] = textline[text_index];
-        }
+	for(; !isspace(textline[text_index]); i++, text_index++){
+		word[i] = textline[text_index];
+	}
 
-        word[i]= '\0';
+	word[i]= '\0';
 }
 
 
 int countCPUNumber()   /*the number of word is equal to the number of processor*/
 {
-        int in = 0;
+	int in = 0;
 	int cpu_number = 0;
 	//      printf("string length is %d", strlen(textline));
-        for(; textline[text_index] != '\0'; text_index++){
-                if(isalnum(textline[text_index]) && in == 0){
-                        in = 1;
-                        cpu_number++;
-                }
-                else if(isspace(textline[text_index])){
-                        in = 0;
-                }
-        }
+	for(; textline[text_index] != '\0'; text_index++){
+		if(isalnum(textline[text_index]) && in == 0){
+			in = 1;
+			cpu_number++;
+		}
+		else if(isspace(textline[text_index])){
+			in = 0;
+		}
+	}
 	return cpu_number;
 }
 
 /*
-***************************************************************************
-* Count number of interrupts that are in /proc/stat file.
-*
-* RETURNS:
-* Number of interrupts, including total number of interrupts.
-***************************************************************************
-*/
+ ***************************************************************************
+ * Count number of interrupts that are in /proc/stat file.
+ *
+ * RETURNS:
+ * Number of interrupts, including total number of interrupts.
+ ***************************************************************************
+ */
 static int count_irq_nr(char *record)
 {
 	FILE *fp;
@@ -146,37 +146,37 @@ static int count_irq_nr(char *record)
 void read_irq_stat(struct module *mod, int data_type)
 {
 	char buf[MAX_LINE_LEN];
-        FILE *fp;
+	FILE *fp;
 	int i, pos = 0;
 	int cpu_nr;
-        int inter_num;
-        unsigned long long inter_sum;
- 
-        fp = fopen(INTERRUPT, "r");
+	int inter_num;
+	unsigned long long inter_sum;
 
-        if(fp == NULL){
-                perror("unable to open file /proc/interrupts");
-                exit(-1);
-        }
+	fp = fopen(INTERRUPT, "r");
 
-        fgets(textline, 256, fp);
+	if(fp == NULL){
+		perror("unable to open file /proc/interrupts");
+		exit(-1);
+	}
 
-        cpu_nr = countCPUNumber();
+	fgets(textline, 256, fp);
 
-        while(fgets(textline, MAX_LINE_LEN, fp) != NULL){
-                text_index = 0;
-                getword(textline);
-                if(isalpha(*word)){
-                        continue;
-                }
-                inter_num = (int)stringToNum(word);
-                inter_sum = 0;
-                for(i = 0; i!= cpu_nr; i++){
-                        getword(textline);
-                        inter_sum += stringToNum(word);
-                }
+	cpu_nr = countCPUNumber();
+
+	while(fgets(textline, MAX_LINE_LEN, fp) != NULL){
+		text_index = 0;
+		getword(textline);
+		if(isalpha(*word)){
+			continue;
+		}
+		inter_num = (int)stringToNum(word);
+		inter_sum = 0;
+		for(i = 0; i!= cpu_nr; i++){
+			getword(textline);
+			inter_sum += stringToNum(word);
+		}
 		pos += sprintf(buf + pos, "in%d=%lld;", inter_num, inter_sum);
-        }
+	}
 	fclose(fp);
 	buf[pos] = '\0';
 	mod->detail = strdup(buf);
@@ -184,23 +184,23 @@ void read_irq_stat(struct module *mod, int data_type)
 
 
 void __irq_ops(char *_detail_last,
-	       char *_detail_curr,
-	       int dtype, int otype,
-	       stats_irq si,
-	       char *_buf, int *pos,
-	       unsigned long itv,
-	       unsigned int idx)
+		char *_detail_curr,
+		int dtype, int otype,
+		stats_irq si,
+		char *_buf, int *pos,
+		unsigned long itv,
+		unsigned int idx)
 {
 	union __irq_statistics tmp;
 	int len = 0;
 	IRQ_STRING_OPS(_detail_curr, sscanf,
-		       IRQ_STORE_FMT(DATA_SPLIT), &(*si)[0], .);
+			IRQ_STORE_FMT(DATA_SPLIT), &(*si)[0], .);
 	IRQ_STRING_OPS(_detail_last, sscanf,
-		       IRQ_STORE_FMT(DATA_SPLIT), &(*si)[1], .);
+			IRQ_STORE_FMT(DATA_SPLIT), &(*si)[1], .);
 
 	__COMPUTE_MOD_VALUE(tmp.irq_detail.intr, S_VALUE,
-			    (*si)[1].irq_nr, (*si)[0].irq_nr, itv);
-	
+			(*si)[1].irq_nr, (*si)[0].irq_nr, itv);
+
 	SET_IRQ_STATISTICS(tmp, irq_statistics[idx], intr, itv);
 
 	if (dtype == DATA_DETAIL) {
@@ -215,11 +215,11 @@ void __irq_ops(char *_detail_last,
 
 
 char *irq_ops(char *last_record,
-	      char *curr_record,
-	      time_t last_time,
-	      time_t curr_time,
-	      int data_type, 
-	      int output_type)
+		char *curr_record,
+		time_t last_time,
+		time_t curr_time,
+		int data_type, 
+		int output_type)
 {
 	unsigned long itv;
 	char buf[MAX_LINE_LEN];
@@ -236,7 +236,7 @@ char *irq_ops(char *last_record,
 	CALITV(last_time, curr_time, itv);
 
 	stats_irq temp_si = s_st_irq;
-	
+
 	char last_mnt[MAX_STRING_LEN] = {0};
 	char curr_mnt[MAX_STRING_LEN] = {0};
 
@@ -245,18 +245,18 @@ char *irq_ops(char *last_record,
 	}
 	else {
 		while((last_record = getitem(last_record, last_mnt)) != NULL &&
-		      (curr_record = getitem(curr_record, curr_mnt)) != NULL) {
-			
+				(curr_record = getitem(curr_record, curr_mnt)) != NULL) {
+
 			__irq_ops(last_mnt , curr_mnt,
-				  data_type, output_type,
-				  temp_si, buf + pos, &pos, itv, i);
+					data_type, output_type,
+					temp_si, buf + pos, &pos, itv, i);
 			i++;
 			temp_si++;
 			memset(last_mnt, '0', MAX_STRING_LEN);
 			memset(curr_mnt, '0', MAX_STRING_LEN);
 		}
 	}
-		
+
 
 	buf[pos] = '\0';
 	return(strdup(buf));
@@ -290,10 +290,10 @@ void mod_register(struct module *mod)
 	sprintf(mod->summary_hdr, IRQ_SUMMARY_HDR);
 	mod->usage = irq_usage;
 	sprintf(mod->opt_line, "--irq");
-        mod->data_collect = read_irq_stat;
+	mod->data_collect = read_irq_stat;
 	mod->data_operation = irq_ops;
 	mod->show_avg = get_avg;
-        mod->mod_free = func_mod_free;
+	mod->mod_free = func_mod_free;
 }
 
 

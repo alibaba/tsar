@@ -233,8 +233,8 @@ void running_print_live()
 	init_module_fields();
 
 	/* skip first record */
-        if(collect_record_stat() == 0)
-                do_debug(LOG_INFO, "collect_record_stat warn\n");
+	if(collect_record_stat() == 0)
+		do_debug(LOG_INFO, "collect_record_stat warn\n");
 	sleep(conf.print_interval);
 
 	/* print live record */
@@ -266,14 +266,14 @@ void running_print_live()
 
 
 /* find where start printting
-返回值：
-0 查找成功
-1 需要再往上一个文件查询
-2 查找失败，发生在对tsar.data.x查找时，要找的时间比该文件的最晚时间还晚，此时说明查找落在了轮转期的数据丢失部分，不应再继续查找，
-3 查找失败，发生在对tsar.data查找时，说明tsar已经有一段时间没有运行，从要查找的时间点到现在都没有数据，不应再继续查找
-4 查找失败，发生的场景是，tsar中间有段时间没有采集数据，而要查找的时间点正好又落在这个区间，不应再继续查找
-5 查找过程中碰到日志格式错误
-6 未知错误*/
+   返回值：
+   0 查找成功
+   1 需要再往上一个文件查询
+   2 查找失败，发生在对tsar.data.x查找时，要找的时间比该文件的最晚时间还晚，此时说明查找落在了轮转期的数据丢失部分，不应再继续查找，
+   3 查找失败，发生在对tsar.data查找时，说明tsar已经有一段时间没有运行，从要查找的时间点到现在都没有数据，不应再继续查找
+   4 查找失败，发生的场景是，tsar中间有段时间没有采集数据，而要查找的时间点正好又落在这个区间，不应再继续查找
+   5 查找过程中碰到日志格式错误
+   6 未知错误*/
 int find_offset_from_start(FILE *fp,int number)
 {
 	char	line[LEN_10240] = {0};
@@ -671,7 +671,7 @@ void running_print()
 		print_num++;
 		memset(line, 0, sizeof(line));
 	}
-	
+
 	if (n_record) {
 		printf("\n");
 		print_tail(TAIL_MAX);
@@ -693,10 +693,6 @@ char* trim(char* src,int max_len){
 	return index;
 }
 
-#ifdef OLDTSAR
-/*tsar -check output similar as:
-v014119.cm3   tsar   apache/qps=5.35 apache/rt=165.89 apache/busy=2 apache/idle=148 cpu=3.58 mem=74.93% load1=0.22 load5=0.27 load15=0.20 xvda=0.15 ifin=131.82 ifout=108.86 TCPretr=0.12 df/=4.04% df/home=10.00% df/opt=71.22% df/tmp=2.07% df/usr=21.27% df/var=5.19% 
- */
 void running_check(int check_type){
 	char	line[2][LEN_10240];
 	char	filename[LEN_128] = {0};
@@ -890,6 +886,10 @@ void running_check(int check_type){
 		fp = NULL;
 		return;
 	}
+#ifdef OLDTSAR
+/*tsar -check output similar as:
+  v014119.cm3   tsar   apache/qps=5.35 apache/rt=165.89 apache/busy=2 apache/idle=148 cpu=3.58 mem=74.93% load1=0.22 load5=0.27 load15=0.20 xvda=0.15 ifin=131.82 ifout=108.86 TCPretr=0.12 df/=4.04% df/home=10.00% df/opt=71.22% df/tmp=2.07% df/usr=21.27% df/var=5.19% 
+ */
 	//------------------------------RUN_CHECK-------------------------------------------
 	if(check_type == RUN_CHECK){
 		for (i = 0; i < statis.total_mod_num; i++) {
@@ -1026,6 +1026,6 @@ void running_check(int check_type){
 		fclose(fp);
 		fp = NULL;
 	}
+#endif
 }
 /*end*/
-#endif

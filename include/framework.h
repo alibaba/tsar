@@ -64,7 +64,7 @@ struct module
 
 
 void register_mod_fileds(struct module *mod, char *opt, char *usage,
-				struct mod_info *info, int n_col, void *data_collect, void *set_st_record);
+		struct mod_info *info, int n_col, void *data_collect, void *set_st_record);
 void set_mod_record(struct module *mod, char *record);
 void init_module_fields();
 int reload_modules(char *s_mod);

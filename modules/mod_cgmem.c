@@ -37,7 +37,7 @@ static struct mod_info cgmem_info[] = {
 
 
 static void set_cgmem_record(struct module *mod, double st_array[],
-                             U_64 pre_array[], U_64 cur_array[], int inter)
+		U_64 pre_array[], U_64 cur_array[], int inter)
 {
 	int i;
 	for (i = 0; i < mod->n_col; i++) {
@@ -54,22 +54,22 @@ void print_cgmem_stats(struct module *mod)
 	/*set n group's data to buf*/
 	for(i = 0; i < n_group; i++){
 		pos += snprintf(buf + pos, LEN_4096, "%s=%lu,%lu,%lu,%lu,%lu,%lu",
-				  cgmem_groups[i].group_name,
-				  cgmem_groups[i].cache + cgmem_groups[i].rss,
-				  cgmem_groups[i].swap,
-				  cgmem_groups[i].inanon,
-				  cgmem_groups[i].acanon,
-				  cgmem_groups[i].infile,
-				  cgmem_groups[i].acfile);
-                if(pos >= LEN_4096)
-                        break;
+				cgmem_groups[i].group_name,
+				cgmem_groups[i].cache + cgmem_groups[i].rss,
+				cgmem_groups[i].swap,
+				cgmem_groups[i].inanon,
+				cgmem_groups[i].acanon,
+				cgmem_groups[i].infile,
+				cgmem_groups[i].acfile);
+		if(pos >= LEN_4096)
+			break;
 		pos += snprintf(buf + pos, LEN_4096, ITEM_SPLIT);
 		if(pos >= LEN_4096)
 			break;
 	}
-        //if(pos){
-        //      buf[pos] = '\0';
-        //}
+	//if(pos){
+	//      buf[pos] = '\0';
+	//}
 	/*notice tsar to store my mult item data*/
 	set_mod_record(mod, buf);
 }

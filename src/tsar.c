@@ -49,8 +49,8 @@ void usage()
 			"    --help/-h		help\n");
 
 	fprintf(stderr,
-		"Modules Enabled:\n"
-		);
+			"Modules Enabled:\n"
+	       );
 
 	for (i = 0; i < statis.total_mod_num; i++) {
 		mod = &mods[i];
@@ -160,11 +160,11 @@ static void main_init(int argc, char **argv)
 	if (RUN_NULL == conf.running_mode)
 		conf.running_mode = RUN_PRINT;
 
-        if(conf.running_mode == RUN_CHECK_NEW){
-                conf.print_interval = 60;
-                conf.print_tail = 0;
-                conf.print_nline_interval = conf.print_interval;
-        }
+	if(conf.running_mode == RUN_CHECK_NEW){
+		conf.print_interval = 60;
+		conf.print_tail = 0;
+		conf.print_nline_interval = conf.print_interval;
+	}
 
 	if (!strlen(conf.output_print_mod))
 		conf.print_mode = DATA_SUMMARY;
@@ -216,9 +216,9 @@ void running_cron()
 	if (strstr(conf.output_interface, "db")) {
 		output_db(have_collect);
 	}
-        if (strstr(conf.output_interface, "nagios")) {
-                output_nagios();
-        }
+	if (strstr(conf.output_interface, "nagios")) {
+		output_nagios();
+	}
 }
 
 
@@ -247,22 +247,22 @@ int main(int argc, char **argv)
 			running_cron();
 			break;
 #ifdef OLDTSAR
-		/*for check option*/
+			/*for check option*/
 		case RUN_CHECK:
 			reload_check_modules();
 			/* disable module when n_col is zero */
 			running_check(RUN_CHECK);
 			break;
-		/*end*/
+			/*end*/
 #endif
 		case RUN_CHECK_NEW:
 			if(reload_modules(conf.output_print_mod)){
 				conf.print_mode = DATA_DETAIL;
 			};
-            /* disable module when n_col is zero */
-            disable_col_zero();
-            running_check(RUN_CHECK_NEW);
-            break;
+			/* disable module when n_col is zero */
+			disable_col_zero();
+			running_check(RUN_CHECK_NEW);
+			break;
 		case RUN_PRINT:
 			/* reload module by output_stdio_mod and output_print_mod*/
 			reload_modules(conf.output_stdio_mod);
@@ -281,13 +281,13 @@ int main(int argc, char **argv)
 			/* reload module by output_stdio_mod and output_print_mod*/
 			reload_modules(conf.output_stdio_mod);
 			reload_modules(conf.output_print_mod);
-			
+
 			/* disable module when n_col is zero */
 			disable_col_zero();
 
 			running_print_live();
 			break;
-		
+
 		default:
 			break;
 	}

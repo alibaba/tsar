@@ -6,15 +6,15 @@
 static char *percpu_usage = "    --percpu            Per cpu share (user, system, interrupt, nice, & idle)";
 
 struct stats_percpu {
-        unsigned long long cpu_user;
-        unsigned long long cpu_nice;
-        unsigned long long cpu_sys;
-        unsigned long long cpu_idle;
-        unsigned long long cpu_iowait;
-        unsigned long long cpu_steal;
-        unsigned long long cpu_hardirq;
-        unsigned long long cpu_softirq;
-        unsigned long long cpu_guest;
+	unsigned long long cpu_user;
+	unsigned long long cpu_nice;
+	unsigned long long cpu_sys;
+	unsigned long long cpu_idle;
+	unsigned long long cpu_iowait;
+	unsigned long long cpu_steal;
+	unsigned long long cpu_hardirq;
+	unsigned long long cpu_softirq;
+	unsigned long long cpu_guest;
 	char cpu_name[10];
 };
 
@@ -22,50 +22,50 @@ struct stats_percpu {
 
 static void read_percpu_stats(struct module *mod)
 {
-        FILE *fp;
-        char line[LEN_4096];
-        char buf[LEN_4096];
+	FILE *fp;
+	char line[LEN_4096];
+	char buf[LEN_4096];
 	memset(buf, 0, LEN_4096);
-        struct stats_percpu st_percpu;
+	struct stats_percpu st_percpu;
 	int pos = 0, cpus = 0;
 
 	memset(&st_percpu, 0, STATS_PERCPU_SIZE);
-        if ((fp = fopen(STAT_PATH, "r")) == NULL) {
+	if ((fp = fopen(STAT_PATH, "r")) == NULL) {
 		return;
-        }
-        while (fgets(line, LEN_4096, fp) != NULL) {
-                if (!strncmp(line, "cpu", 3)) {
-                        /*
-                         * Read the number of jiffies spent in the different modes
-                         * (user, nice, etc.) among all proc. CPU usage is not reduced
-                         * to one processor to avoid rounding problems.
-                         */
-                        sscanf(line, "%s %llu %llu %llu %llu %llu %llu %llu %llu %llu",
-				st_percpu.cpu_name,
-                               &st_percpu.cpu_user,
-                               &st_percpu.cpu_nice,
-                               &st_percpu.cpu_sys,
-                               &st_percpu.cpu_idle,
-                               &st_percpu.cpu_iowait,
-                               &st_percpu.cpu_hardirq,
-                               &st_percpu.cpu_softirq,
-                               &st_percpu.cpu_steal,
-                               &st_percpu.cpu_guest);
+	}
+	while (fgets(line, LEN_4096, fp) != NULL) {
+		if (!strncmp(line, "cpu", 3)) {
+			/*
+			 * Read the number of jiffies spent in the different modes
+			 * (user, nice, etc.) among all proc. CPU usage is not reduced
+			 * to one processor to avoid rounding problems.
+			 */
+			sscanf(line, "%s %llu %llu %llu %llu %llu %llu %llu %llu %llu",
+					st_percpu.cpu_name,
+					&st_percpu.cpu_user,
+					&st_percpu.cpu_nice,
+					&st_percpu.cpu_sys,
+					&st_percpu.cpu_idle,
+					&st_percpu.cpu_iowait,
+					&st_percpu.cpu_hardirq,
+					&st_percpu.cpu_softirq,
+					&st_percpu.cpu_steal,
+					&st_percpu.cpu_guest);
 			if (st_percpu.cpu_name[3] == '\0') //ignore cpu summary stat
 				continue;
 
 			pos += sprintf(buf + pos, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu",
-                          /* the store order is not same as read procedure */
-				st_percpu.cpu_name,
-				st_percpu.cpu_user,
-				st_percpu.cpu_sys,
-				st_percpu.cpu_iowait,
-				st_percpu.cpu_hardirq,
-				st_percpu.cpu_softirq,
-				st_percpu.cpu_idle,
-				st_percpu.cpu_nice,
-				st_percpu.cpu_steal,
-				st_percpu.cpu_guest);
+					/* the store order is not same as read procedure */
+					st_percpu.cpu_name,
+					st_percpu.cpu_user,
+					st_percpu.cpu_sys,
+					st_percpu.cpu_iowait,
+					st_percpu.cpu_hardirq,
+					st_percpu.cpu_softirq,
+					st_percpu.cpu_idle,
+					st_percpu.cpu_nice,
+					st_percpu.cpu_steal,
+					st_percpu.cpu_guest);
 
 			pos += sprintf(buf + pos, ITEM_SPLIT);
 
@@ -78,12 +78,12 @@ static void read_percpu_stats(struct module *mod)
 		buf[pos] = '\0';
 		set_mod_record(mod, buf);
 	}
-        fclose(fp);
-        return;
+	fclose(fp);
+	return;
 }
 
 static void set_percpu_record(struct module *mod, double st_array[],
-                           U_64 pre_array[], U_64 cur_array[], int inter)
+		U_64 pre_array[], U_64 cur_array[], int inter)
 {
 	U_64 pre_total, cur_total;
 	int i,j;
@@ -114,15 +114,15 @@ static void set_percpu_record(struct module *mod, double st_array[],
 }
 
 static struct mod_info percpu_info[] = {
-        {"  user", DETAIL_BIT,  0,  STATS_NULL},
-        {"   sys", DETAIL_BIT,  0,  STATS_NULL},
-        {"  wait", DETAIL_BIT,  0,  STATS_NULL},
-        {"  hirq", DETAIL_BIT,  0,  STATS_NULL},
-        {"  sirq", DETAIL_BIT,  0,  STATS_NULL},
-        {"  util", SUMMARY_BIT,  0,  STATS_NULL},
-        {"  nice", HIDE_BIT,  0,  STATS_NULL},
-        {" steal", HIDE_BIT,  0,  STATS_NULL},
-        {" guest", HIDE_BIT,  0,  STATS_NULL},
+	{"  user", DETAIL_BIT,  0,  STATS_NULL},
+	{"   sys", DETAIL_BIT,  0,  STATS_NULL},
+	{"  wait", DETAIL_BIT,  0,  STATS_NULL},
+	{"  hirq", DETAIL_BIT,  0,  STATS_NULL},
+	{"  sirq", DETAIL_BIT,  0,  STATS_NULL},
+	{"  util", SUMMARY_BIT,  0,  STATS_NULL},
+	{"  nice", HIDE_BIT,  0,  STATS_NULL},
+	{" steal", HIDE_BIT,  0,  STATS_NULL},
+	{" guest", HIDE_BIT,  0,  STATS_NULL},
 };
 
 void mod_register(struct module *mod)

@@ -15,7 +15,7 @@ int mgrport = 81;
 
 /* httpcode string at swiftclient -p 81 mgr:mem_stats */
 /*
-------------------------------------------------
+   ------------------------------------------------
 MALLOC:        4916632 (    4.7 MB) Bytes in use by application
 MALLOC: +      4399104 (    4.2 MB) Bytes in page heap freelist
 MALLOC: +       105992 (    0.1 MB) Bytes in central cache freelist
@@ -32,289 +32,289 @@ MALLOC:             53              Spans in use
 MALLOC:              5              Thread heaps in use
 MALLOC:           4096              Tcmalloc page size
 ------------------------------------------------
-*/
+ */
 
 #define DATA_COUNT (sizeof(SWIFT_TCMALLOC)/sizeof(SWIFT_TCMALLOC[0]))
 const static char *SWIFT_TCMALLOC[] = {
-    "Bytes in use by application",
-    "Bytes in page heap freelist",
-    "Bytes in central cache freelist",
-    "Bytes in transfer cache freelist",
-    "Bytes in thread cache freelists",
-    "Bytes in malloc metadata",
-    "Actual memory used",
-    "Bytes released to OS",
-    "Virtual address space used",
-    "Spans in use",
-    "Thread heaps in use",
-    "Tcmalloc page size",
+	"Bytes in use by application",
+	"Bytes in page heap freelist",
+	"Bytes in central cache freelist",
+	"Bytes in transfer cache freelist",
+	"Bytes in thread cache freelists",
+	"Bytes in malloc metadata",
+	"Actual memory used",
+	"Bytes released to OS",
+	"Virtual address space used",
+	"Spans in use",
+	"Thread heaps in use",
+	"Tcmalloc page size",
 };
 
 /* struct for httpcode counters */
 struct status_swift_tcmalloc {
-    unsigned long long uba;
-    unsigned long long phf;
-    unsigned long long ccf;
-    unsigned long long trcf;
-    unsigned long long thcf;
-    unsigned long long mm;
-    unsigned long long amu;
-    unsigned long long brto;
-    unsigned long long vasu;
-    unsigned long long siu;
-    unsigned long long thiu;
-    unsigned long long tps;
+	unsigned long long uba;
+	unsigned long long phf;
+	unsigned long long ccf;
+	unsigned long long trcf;
+	unsigned long long thcf;
+	unsigned long long mm;
+	unsigned long long amu;
+	unsigned long long brto;
+	unsigned long long vasu;
+	unsigned long long siu;
+	unsigned long long thiu;
+	unsigned long long tps;
 } stats;
 
 /* swift register info for tsar */
 struct mod_info swift_tcmalloc_info[] = {
-    {"   uba", DETAIL_BIT,  0,  STATS_NULL},
-    {"   phf", DETAIL_BIT,  0,  STATS_NULL},
-    {"   ccf", DETAIL_BIT,  0,  STATS_NULL},
-    {"  trcf", DETAIL_BIT,  0,  STATS_NULL},
-    {"  thcf", DETAIL_BIT,  0,  STATS_NULL},
-    {"    mm", DETAIL_BIT,  0,  STATS_NULL},
-    {"   amu", DETAIL_BIT,  0,  STATS_NULL},
-    {"  brto", DETAIL_BIT,  0,  STATS_NULL},
-    {"  vasu", DETAIL_BIT,  0,  STATS_NULL},
-    {"   siu", DETAIL_BIT,  0,  STATS_NULL},
-    {"  thiu", DETAIL_BIT,  0,  STATS_NULL},
-    {"   tps", DETAIL_BIT,  0,  STATS_NULL},
+	{"   uba", DETAIL_BIT,  0,  STATS_NULL},
+	{"   phf", DETAIL_BIT,  0,  STATS_NULL},
+	{"   ccf", DETAIL_BIT,  0,  STATS_NULL},
+	{"  trcf", DETAIL_BIT,  0,  STATS_NULL},
+	{"  thcf", DETAIL_BIT,  0,  STATS_NULL},
+	{"    mm", DETAIL_BIT,  0,  STATS_NULL},
+	{"   amu", DETAIL_BIT,  0,  STATS_NULL},
+	{"  brto", DETAIL_BIT,  0,  STATS_NULL},
+	{"  vasu", DETAIL_BIT,  0,  STATS_NULL},
+	{"   siu", DETAIL_BIT,  0,  STATS_NULL},
+	{"  thiu", DETAIL_BIT,  0,  STATS_NULL},
+	{"   tps", DETAIL_BIT,  0,  STATS_NULL},
 };
 /* opens a tcp or udp connection to a remote host or local socket */
 int my_swift_tcmalloc_net_connect(const char *host_name, int port, int *sd, char *proto)
 {
-    struct sockaddr_in servaddr;
-    struct protoent *ptrp;
-    int result;
+	struct sockaddr_in servaddr;
+	struct protoent *ptrp;
+	int result;
 
-    bzero((char *)&servaddr, sizeof(servaddr));
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_port = htons(port);
-    inet_pton(AF_INET, host_name, &servaddr.sin_addr);
+	bzero((char *)&servaddr, sizeof(servaddr));
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_port = htons(port);
+	inet_pton(AF_INET, host_name, &servaddr.sin_addr);
 
-    /* map transport protocol name to protocol number */
-    if(((ptrp = getprotobyname(proto))) == NULL) {
-        if(DEBUG)
-            printf("Cannot map \"%s\" to protocol number\n", proto);
+	/* map transport protocol name to protocol number */
+	if(((ptrp = getprotobyname(proto))) == NULL) {
+		if(DEBUG)
+			printf("Cannot map \"%s\" to protocol number\n", proto);
 
-        return 3;
-    }
+		return 3;
+	}
 
-    /* create a socket */
-    *sd = socket(PF_INET, (!strcmp(proto, "udp")) ? SOCK_DGRAM : SOCK_STREAM, ptrp->p_proto);
+	/* create a socket */
+	*sd = socket(PF_INET, (!strcmp(proto, "udp")) ? SOCK_DGRAM : SOCK_STREAM, ptrp->p_proto);
 
-    if(*sd < 0) {
-        close(*sd);
+	if(*sd < 0) {
+		close(*sd);
 
-        if(DEBUG)
-            printf("Socket creation failed\n");
+		if(DEBUG)
+			printf("Socket creation failed\n");
 
-        return 3;
-    }
+		return 3;
+	}
 
-    /* open a connection */
-    result = connect(*sd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+	/* open a connection */
+	result = connect(*sd, (struct sockaddr *)&servaddr, sizeof(servaddr));
 
-    if(result < 0) {
-        close(*sd);
+	if(result < 0) {
+		close(*sd);
 
-        switch(errno) {
-        case ECONNREFUSED:
-            if(DEBUG)
-                printf("Connection refused by host\n");
+		switch(errno) {
+			case ECONNREFUSED:
+				if(DEBUG)
+					printf("Connection refused by host\n");
 
-            break;
+				break;
 
-        case ETIMEDOUT:
-            if(DEBUG)
-                printf("Timeout while attempting connection\n");
+			case ETIMEDOUT:
+				if(DEBUG)
+					printf("Timeout while attempting connection\n");
 
-            break;
+				break;
 
-        case ENETUNREACH:
-            if(DEBUG)
-                printf("Network is unreachable\n");
+			case ENETUNREACH:
+				if(DEBUG)
+					printf("Network is unreachable\n");
 
-            break;
+				break;
 
-        default:
-            if(DEBUG)
-                printf("Connection refused or timed out\n");
-        }
+			default:
+				if(DEBUG)
+					printf("Connection refused or timed out\n");
+		}
 
-        return 2;
-    }
+		return 2;
+	}
 
-    return 0;
+	return 0;
 }
 ssize_t mywrite_swift_tcmalloc(int fd, void *buf, size_t len)
 {
-    return send(fd, buf, len, 0);
+	return send(fd, buf, len, 0);
 }
 
 ssize_t myread_swift_tcmalloc(int fd, void *buf, size_t len)
 {
-    return recv(fd, buf, len, 0);
+	return recv(fd, buf, len, 0);
 }
 
 /* get value from counter */
 int read_swift_tcmalloc_value(char *buf,
-                              const char *key,
-                              unsigned long long *ret)
+		const char *key,
+		unsigned long long *ret)
 {
-    char *p;
+	char *p;
 
-    /* is str match the keywords? */
-    if ((p = strstr(buf, key)) != NULL) {
-        p = buf;
+	/* is str match the keywords? */
+	if ((p = strstr(buf, key)) != NULL) {
+		p = buf;
 
-        /* compute the offset */
-        if (strncmp(buf, "MALLOC:  ", sizeof("MALLOC:  ") - 1) == 0) {
-            p += sizeof("MALLOC:  ") - 1;
-        } else if (strncmp(buf, "MALLOC: +", sizeof("MALLOC: +") - 1) == 0) {
-            p += sizeof("MALLOC: +") - 1;
-        } else if (strncmp(buf, "MALLOC: =", sizeof("MALLOC: =") - 1) == 0) {
-            p += sizeof("MALLOC: =") - 1;
-        }
+		/* compute the offset */
+		if (strncmp(buf, "MALLOC:  ", sizeof("MALLOC:  ") - 1) == 0) {
+			p += sizeof("MALLOC:  ") - 1;
+		} else if (strncmp(buf, "MALLOC: +", sizeof("MALLOC: +") - 1) == 0) {
+			p += sizeof("MALLOC: +") - 1;
+		} else if (strncmp(buf, "MALLOC: =", sizeof("MALLOC: =") - 1) == 0) {
+			p += sizeof("MALLOC: =") - 1;
+		}
 
-        while(isspace(*p)) p ++;
+		while(isspace(*p)) p ++;
 
-        //fprintf(stderr, "read_swift_tcmalloc_value: key: %s, buf: %s, p: %s\n", key, buf, p);
+		//fprintf(stderr, "read_swift_tcmalloc_value: key: %s, buf: %s, p: %s\n", key, buf, p);
 
-        if (isalnum(*p) == 0) return 0;
+		if (isalnum(*p) == 0) return 0;
 
-        *ret = atoll(p);
+		*ret = atoll(p);
 
-        return 1;
-    } else return 0;
+		return 1;
+	} else return 0;
 }
 int parse_swift_tcmalloc_info(char *buf)
 {
-    char *line;
-    int  i;
-    line = strtok(buf, "\n");
+	char *line;
+	int  i;
+	line = strtok(buf, "\n");
 
-    while(line != NULL) {
-        for (i = 0; i < DATA_COUNT; i ++) {
-            read_swift_tcmalloc_value(line, SWIFT_TCMALLOC[i],
-                                      (unsigned long long *)((char *)&stats + i * sizeof(unsigned long long)));
-        };
+	while(line != NULL) {
+		for (i = 0; i < DATA_COUNT; i ++) {
+			read_swift_tcmalloc_value(line, SWIFT_TCMALLOC[i],
+					(unsigned long long *)((char *)&stats + i * sizeof(unsigned long long)));
+		};
 
-        line = strtok(NULL, "\n");
-    }
+		line = strtok(NULL, "\n");
+	}
 
-    return 0;
+	return 0;
 }
 
 void set_swift_tcmalloc_record(struct module *mod, double st_array[],
-                               U_64 pre_array[], U_64 cur_array[], int inter)
+		U_64 pre_array[], U_64 cur_array[], int inter)
 {
-    int i;
+	int i;
 
-    for (i = 0; i < mod->n_col; i++) {
-            st_array[i] = cur_array[i];
-    }
+	for (i = 0; i < mod->n_col; i++) {
+		st_array[i] = cur_array[i];
+	}
 }
 
 int read_swift_tcmalloc_stat()
 {
-    char msg[LEN_512];
-    char buf[LEN_4096];
-    sprintf(msg,
-            "GET cache_object://localhost/mem_stats "
-            "HTTP/1.1\r\n"
-            "Host: localhost\r\n"
-            "Accept:*/*\r\n"
-            "Connection: close\r\n\r\n");
+	char msg[LEN_512];
+	char buf[LEN_4096];
+	sprintf(msg,
+			"GET cache_object://localhost/mem_stats "
+			"HTTP/1.1\r\n"
+			"Host: localhost\r\n"
+			"Accept:*/*\r\n"
+			"Connection: close\r\n\r\n");
 
-    int len, conn, bytesWritten, fsize = 0;
+	int len, conn, bytesWritten, fsize = 0;
 
-    if(my_swift_tcmalloc_net_connect(HOSTNAME, mgrport, &conn, "tcp") != 0) {
-        close(conn);
-        return -1;
-    }
+	if(my_swift_tcmalloc_net_connect(HOSTNAME, mgrport, &conn, "tcp") != 0) {
+		close(conn);
+		return -1;
+	}
 
-    int flags;
+	int flags;
 
-    /* set socket fd noblock */
-    if((flags = fcntl(conn, F_GETFL, 0)) < 0) {
-        close(conn);
-        return -1;
-    }
+	/* set socket fd noblock */
+	if((flags = fcntl(conn, F_GETFL, 0)) < 0) {
+		close(conn);
+		return -1;
+	}
 
-    if(fcntl(conn, F_SETFL, flags & ~O_NONBLOCK) < 0) {
-        close(conn);
-        return -1;
-    }
+	if(fcntl(conn, F_SETFL, flags & ~O_NONBLOCK) < 0) {
+		close(conn);
+		return -1;
+	}
 
-    struct timeval timeout = {10, 0};
+	struct timeval timeout = {10, 0};
 
-    setsockopt(conn, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(struct timeval));
+	setsockopt(conn, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(struct timeval));
 
-    setsockopt(conn, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval));
+	setsockopt(conn, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval));
 
-    bytesWritten = mywrite_swift_tcmalloc(conn, msg, strlen(msg));
+	bytesWritten = mywrite_swift_tcmalloc(conn, msg, strlen(msg));
 
-    if (bytesWritten < 0) {
-        close(conn);
-        return -2;
-    } else if (bytesWritten != strlen(msg)) {
-        close(conn);
-        return -3;
-    }
+	if (bytesWritten < 0) {
+		close(conn);
+		return -2;
+	} else if (bytesWritten != strlen(msg)) {
+		close(conn);
+		return -3;
+	}
 
-    while ((len = myread_swift_tcmalloc(conn, buf, sizeof(buf))) > 0) {
-        fsize += len;
-    }
+	while ((len = myread_swift_tcmalloc(conn, buf, sizeof(buf))) > 0) {
+		fsize += len;
+	}
 
-    /* read error */
-    if (fsize < 0) {
-        close(conn);
-        return -1;
-    }
+	/* read error */
+	if (fsize < 0) {
+		close(conn);
+		return -1;
+	}
 
-    if (parse_swift_tcmalloc_info(buf) < 0) {
-        close(conn);
-        return -1;
-    }
+	if (parse_swift_tcmalloc_info(buf) < 0) {
+		close(conn);
+		return -1;
+	}
 
-    close(conn);
-    return 0;
+	close(conn);
+	return 0;
 }
 
 void read_swift_tcmalloc_stats(struct module *mod, char *parameter)
 {
-    int retry = 0 , pos = 0;
-    char buf[LEN_1024];
-    memset(&stats, 0, sizeof(stats));
-    mgrport = atoi(parameter);
-    if(!mgrport){
-	    mgrport = 81;
-    }
-    while(read_swift_tcmalloc_stat() < 0 && retry < RETRY_NUM) {
-        retry++;
-    }
+	int retry = 0 , pos = 0;
+	char buf[LEN_1024];
+	memset(&stats, 0, sizeof(stats));
+	mgrport = atoi(parameter);
+	if(!mgrport){
+		mgrport = 81;
+	}
+	while(read_swift_tcmalloc_stat() < 0 && retry < RETRY_NUM) {
+		retry++;
+	}
 
-    pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
-                  stats.uba,
-                  stats.phf,
-                  stats.ccf,
-                  stats.trcf,
-                  stats.thcf,
-                  stats.mm,
-                  stats.amu,
-                  stats.brto,
-                  stats.vasu,
-                  stats.siu,
-                  stats.thiu,
-                  stats.tps
-                 );
-    buf[pos] = '\0';
-    set_mod_record(mod, buf);
+	pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
+			stats.uba,
+			stats.phf,
+			stats.ccf,
+			stats.trcf,
+			stats.thcf,
+			stats.mm,
+			stats.amu,
+			stats.brto,
+			stats.vasu,
+			stats.siu,
+			stats.thiu,
+			stats.tps
+		     );
+	buf[pos] = '\0';
+	set_mod_record(mod, buf);
 }
 
 void mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift_tcmalloc", swift_tcmalloc_usage, swift_tcmalloc_info, DATA_COUNT, read_swift_tcmalloc_stats, set_swift_tcmalloc_record);
+	register_mod_fileds(mod, "--swift_tcmalloc", swift_tcmalloc_usage, swift_tcmalloc_info, DATA_COUNT, read_swift_tcmalloc_stats, set_swift_tcmalloc_record);
 }

@@ -1,7 +1,7 @@
 /* rndc: Remote Name Daemon Controller
    daoxian, 2011-11-8
    Copyright(C) Taobao Inc.
-*/
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -92,11 +92,11 @@ static void create_script()
 		"	return split /\\n/, $val;\n"
 		"}\n";
 
-		FILE *fp = fopen("/tmp/rndc_tsar.pl", "w");
-		if (!fp)
-			return;
-		fputs(script, fp);
-		fclose(fp);
+	FILE *fp = fopen("/tmp/rndc_tsar.pl", "w");
+	if (!fp)
+		return;
+	fputs(script, fp);
+	fclose(fp);
 }
 
 static void exec_script()
@@ -148,9 +148,9 @@ static void read_rndc_stats(struct module *mod)
 
 
 static void set_rndc_stats(struct module *mod, double st_array[],
-                 U_64 pre_array[], U_64 cur_array[], int inter)
+		U_64 pre_array[], U_64 cur_array[], int inter)
 {
-    int i;
+	int i;
 	for (i = 0; i < 6; i ++)
 	{
 		if(cur_array[i] >= pre_array[i])
@@ -162,13 +162,13 @@ static void set_rndc_stats(struct module *mod, double st_array[],
 }
 
 static struct mod_info rndc_info[] = {
-    {"   qps", SUMMARY_BIT,MERGE_NULL,  STATS_NULL},
-    {" rt_05", DETAIL_BIT, MERGE_NULL,  STATS_NULL},
-    {" rt_10", DETAIL_BIT, MERGE_NULL,  STATS_NULL},
-    {" rt_20", DETAIL_BIT, MERGE_NULL,  STATS_NULL},
-    {" rt_50", DETAIL_BIT, MERGE_NULL,  STATS_NULL},
-    {"rt_50+", DETAIL_BIT, MERGE_NULL,  STATS_NULL},
-    {"badvs",  DETAIL_BIT, MERGE_NULL,  STATS_NULL},
+	{"   qps", SUMMARY_BIT,MERGE_NULL,  STATS_NULL},
+	{" rt_05", DETAIL_BIT, MERGE_NULL,  STATS_NULL},
+	{" rt_10", DETAIL_BIT, MERGE_NULL,  STATS_NULL},
+	{" rt_20", DETAIL_BIT, MERGE_NULL,  STATS_NULL},
+	{" rt_50", DETAIL_BIT, MERGE_NULL,  STATS_NULL},
+	{"rt_50+", DETAIL_BIT, MERGE_NULL,  STATS_NULL},
+	{"badvs",  DETAIL_BIT, MERGE_NULL,  STATS_NULL},
 };
 
 void mod_register(struct module *mod)

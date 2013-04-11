@@ -49,19 +49,19 @@ struct configure
 	char	output_db_mod[LEN_512];  /* which mod will output */
 	char	output_db_addr[LEN_512]; /* db addr */
 
-        /* output nagios */
-        char    server_addr[LEN_512];
-        int     *server_port;
-        int     *cycle_time;
-        char    send_nsca_cmd[LEN_512];
-        char    send_nsca_conf[LEN_512];
+	/* output nagios */
+	char    server_addr[LEN_512];
+	int     *server_port;
+	int     *cycle_time;
+	char    send_nsca_cmd[LEN_512];
+	char    send_nsca_conf[LEN_512];
 
-        char    check_name[MAX_MOD_NUM][LEN_32];
-        float   wmin[MAX_MOD_NUM];
-        float   wmax[MAX_MOD_NUM];
-        float   cmin[MAX_MOD_NUM];
-        float   cmax[MAX_MOD_NUM];
-        int     mod_num;
+	char    check_name[MAX_MOD_NUM][LEN_32];
+	float   wmin[MAX_MOD_NUM];
+	float   wmax[MAX_MOD_NUM];
+	float   cmin[MAX_MOD_NUM];
+	float   cmax[MAX_MOD_NUM];
+	int     mod_num;
 
 	/* output file */
 	char	output_file_path[LEN_128];

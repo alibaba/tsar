@@ -15,20 +15,20 @@ int mgrport = 81;
 
 /* httpcode string at swiftclient -p 81 mgr:counters */
 /*
-http status code 200 = 223291656
-http status code 204 = 54
-http status code 206 = 25473
-http status code 302 = 299
-http status code 304 = 29595013
-http status code 400 = 159
-http status code 403 = 50675
-http status code 404 = 1261657
-http status code 500 = 51
-http status code 502 = 5
-http status code 503 = 229
-http status code 504 = 213
-http status code other = 8981
-*/
+   http status code 200 = 223291656
+   http status code 204 = 54
+   http status code 206 = 25473
+   http status code 302 = 299
+   http status code 304 = 29595013
+   http status code 400 = 159
+   http status code 403 = 50675
+   http status code 404 = 1261657
+   http status code 500 = 51
+   http status code 502 = 5
+   http status code 503 = 229
+   http status code 504 = 213
+   http status code other = 8981
+ */
 const static char *SWIFT_CODE[] = {
 	"http status code 200",
 	"http status code 206",

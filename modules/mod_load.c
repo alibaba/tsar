@@ -2,7 +2,7 @@
 
 #define LOAD_DETAIL_HDR(d)			\
 	"  runq"d" plist"d"  min1"d		\
-	"  min5"d" min15"
+"  min5"d" min15"
 
 #define LOAD_STORE_FMT(d)			\
 	"%ld"d"%d"d"%d"d"%d"d"%d"
@@ -32,14 +32,14 @@ void read_stat_load(struct module *mod)
 	if ((fp = fopen(LOADAVG, "r")) == NULL) {
 		return;
 	}
-	
+
 	/* Read load averages and queue length */
 	fscanf(fp, "%d.%d %d.%d %d.%d %ld/%d %*d\n",
-	       &load_tmp[0], &st_load.load_avg_1,
-	       &load_tmp[1], &st_load.load_avg_5,
-	       &load_tmp[2], &st_load.load_avg_15,
-	       &st_load.nr_running,
-	       &st_load.nr_threads);
+			&load_tmp[0], &st_load.load_avg_1,
+			&load_tmp[1], &st_load.load_avg_5,
+			&load_tmp[2], &st_load.load_avg_15,
+			&st_load.nr_running,
+			&st_load.nr_threads);
 
 	st_load.load_avg_1  += load_tmp[0] * 100;
 	st_load.load_avg_5  += load_tmp[1] * 100;
@@ -51,18 +51,18 @@ void read_stat_load(struct module *mod)
 	}
 
 	int pos = sprintf(buf , "%u,%u,%u,%lu,%u",
-			  st_load.load_avg_1,
-			  st_load.load_avg_5,
-			  st_load.load_avg_15,
-			  st_load.nr_running,
-			  st_load.nr_threads);
+			st_load.load_avg_1,
+			st_load.load_avg_5,
+			st_load.load_avg_15,
+			st_load.nr_running,
+			st_load.nr_threads);
 	buf[pos] = '\0';
 	set_mod_record(mod, buf);
-        fclose(fp);
+	fclose(fp);
 }
 
 static void set_load_record(struct module *mod, double st_array[],
-                           U_64 pre_array[], U_64 cur_array[], int inter)
+		U_64 pre_array[], U_64 cur_array[], int inter)
 {
 	int i;
 	for (i = 0; i < 3; i++) {
@@ -73,11 +73,11 @@ static void set_load_record(struct module *mod, double st_array[],
 }
 
 static struct mod_info load_info[] = {
-        {" load1", SUMMARY_BIT,  0,  STATS_NULL},
-        {" load5", DETAIL_BIT,  0,  STATS_NULL},
-        {"load15", DETAIL_BIT,  0,  STATS_NULL},
-        {"  runq", DETAIL_BIT,  0,  STATS_NULL},
-        {"  plit", DETAIL_BIT,  0,  STATS_NULL}
+	{" load1", SUMMARY_BIT,  0,  STATS_NULL},
+	{" load5", DETAIL_BIT,  0,  STATS_NULL},
+	{"load15", DETAIL_BIT,  0,  STATS_NULL},
+	{"  runq", DETAIL_BIT,  0,  STATS_NULL},
+	{"  plit", DETAIL_BIT,  0,  STATS_NULL}
 };
 
 void mod_register(struct module *mod)

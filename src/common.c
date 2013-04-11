@@ -63,7 +63,7 @@ int merge_one_string(U_64 *array, int l_array, char *string, struct module *mod,
 	int i, len;
 	U_64 array_2[MAX_COL_NUM] = {0};
 	struct mod_info *info = mod->info;
-	
+
 	if (!(len = convert_record_to_array(array_2, l_array, string)))
 		return 0;
 
@@ -128,7 +128,7 @@ int get_strtok_num(char *str, char *split)
 
 	if (!str || !strlen(str))
 		return 0;
-	
+
 	memcpy(n_str, str, strlen(str));
 	/* set print opt line */
 	token = strtok(n_str, split);
@@ -158,7 +158,7 @@ void get_mod_hdr(char hdr[], struct module *mod)
 			}
 		}
 		else if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[i].summary_bit))
-			|| ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[i].summary_bit))) {
+				|| ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[i].summary_bit))) {
 			if (strlen(info[i].hdr) > 6) {
 				info[i].hdr[6] = '\0';
 			}

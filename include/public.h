@@ -49,13 +49,13 @@
 #define RED_FMT(s) "\033[40;31m"s"\033[0m"
 
 #define COLOR(val, fmt, str, ret, color) do				\
-		{							\
-			if ((val) > 100)				\
-				ret = sprintf(str,			\
-					      color##_FMT(fmt), (val));	\
-			else						\
-				ret = sprintf(str, fmt, (val));		\
-		} while(0)
+{							\
+	if ((val) > 100)				\
+	ret = sprintf(str,			\
+			color##_FMT(fmt), (val));	\
+	else						\
+	ret = sprintf(str, fmt, (val));		\
+} while(0)
 
 #define FALSE 0
 #define TRUE 1
@@ -129,43 +129,43 @@ enum {MIN, MEAN, MAX};
 
 
 #define __PRINT_S(buffer, val, ret) do {			\
-		int _i;						\
-		double _f;					\
-		char u[] = {'K', 'M', 'G', 'T'};		\
-		__INDENT((val), _i, _f);			\
-		(ret) += sprintf((buffer), FMT_S, _f, u[_i]);	\
-	}while(0)
+	int _i;						\
+	double _f;					\
+	char u[] = {'K', 'M', 'G', 'T'};		\
+	__INDENT((val), _i, _f);			\
+	(ret) += sprintf((buffer), FMT_S, _f, u[_i]);	\
+}while(0)
 
 #define __PRINT_SP(buffer, val, ret) do {			\
-		(ret) += sprintf(buffer, FMT_SP, (val));	\
-	}while(0)
+	(ret) += sprintf(buffer, FMT_SP, (val));	\
+}while(0)
 
 #define __PRINT_NAGIOS(buffer, val, ret) do {			\
-		(ret) += sprintf(buffer, FMT_NAGIOS, (val));	\
-	}while(0)
+	(ret) += sprintf(buffer, FMT_NAGIOS, (val));	\
+}while(0)
 
 #define PRINT(buffer, val, ret, type) do {			\
-		if (type == OUTPUT_NAGIOS) {			\
-			__PRINT_NAGIOS(buffer, val, ret);	\
-		}						\
-		else{						\
-			if ((val) < KB)	{			\
-				__PRINT_SP(buffer, val, ret);	\
-			}					\
-			else {					\
-				__PRINT_S(buffer, val, ret);	\
-			}					\
-		}						\
-	} while(0)
+	if (type == OUTPUT_NAGIOS) {			\
+		__PRINT_NAGIOS(buffer, val, ret);	\
+	}						\
+	else{						\
+		if ((val) < KB)	{			\
+			__PRINT_SP(buffer, val, ret);	\
+		}					\
+		else {					\
+			__PRINT_S(buffer, val, ret);	\
+		}					\
+	}						\
+} while(0)
 
 #define myalloc(p, type, size)					\
 	struct type * p = NULL;					\
-	p = (struct type *)malloc(size);			\
-	if(!p) {						\
-		fprintf(stderr, "failed to alloc memory\n");	\
-		exit(EXIT_FAILURE);				\
-	}							\
-	memset(p, 0, size)					\
+p = (struct type *)malloc(size);			\
+if(!p) {						\
+	fprintf(stderr, "failed to alloc memory\n");	\
+	exit(EXIT_FAILURE);				\
+}							\
+memset(p, 0, size)					\
 
 #define BUFFER_ROTATE(mod, size)					\
 	do {								\
@@ -175,10 +175,10 @@ enum {MIN, MEAN, MAX};
 
 inline void func_mod_free(struct module *mod)
 {
-        free(mod->detail);
-        free(mod->summary);
-        mod->detail = NULL;
-        mod->summary = NULL;
+	free(mod->detail);
+	free(mod->summary);
+	mod->detail = NULL;
+	mod->summary = NULL;
 }
 
 #define INIT_STRING_P(s, nr, len)				\
@@ -186,17 +186,17 @@ inline void func_mod_free(struct module *mod)
 		int i;						\
 		s = (char **)malloc((nr) * sizeof(char *));	\
 		for(i = 0; i < (nr); i++)			\
-			s[i] = (char *)malloc(len);		\
+		s[i] = (char *)malloc(len);		\
 	} while(0)
 
 
 #define DECLARE_TMP_MOD_STATISTICS(mod)		\
 	union mod##_statistics mod##_tmp_s;	\
-	
+
 #define SET_CURRENT_VALUE(mod, type, member, ret)	\
 	do {						\
 		mod##_tmp_s.mod##_##type.ret =		\
-			s_st_##mod[CURR].member;	\
+		s_st_##mod[CURR].member;	\
 	}while(0)
 
 #define __COMPUTE_MOD_VALUE(ret, ops, m1, m2, i)	\
@@ -217,11 +217,11 @@ inline void func_mod_free(struct module *mod)
 	do {								\
 		/*printf("i = %ld\n", (i));*/				\
 		__COMPUTE_MOD_VALUE(					\
-				    mod##_tmp_s.mod##_##type.ret,	\
-				    ops,				\
-				    s_st_##mod[1].member,		\
-				    s_st_##mod[0].member,		\
-				    (i));				\
+				mod##_tmp_s.mod##_##type.ret,	\
+				ops,				\
+				s_st_##mod[1].member,		\
+				s_st_##mod[0].member,		\
+				(i));				\
 	} while(0)
 
 
@@ -235,7 +235,7 @@ inline void func_mod_free(struct module *mod)
 			sw = 1;					\
 		} else {					\
 			if (((val) - (max)) > 0.00001)		\
-				(max) = (val);			\
+			(max) = (val);			\
 			else if (((min) - (val)) > 0.00001) {	\
 				(min) = (val);			\
 			}					\
@@ -245,32 +245,32 @@ inline void func_mod_free(struct module *mod)
 
 #define SET_MOD_STATISTICS(mod, member, i, type)	\
 	__SET_MOD_STATISTICS				\
-	(						\
-	 mod##_tmp_s.mod##_##type.member,		\
-	 mod##_statis[MEAN].mod##_##type.member,	\
-	 mod##_statis[MAX].mod##_##type.member,		\
-	 mod##_statis[MIN].mod##_##type.member,		\
-	 i)
+(						\
+						mod##_tmp_s.mod##_##type.member,		\
+						mod##_statis[MEAN].mod##_##type.member,	\
+						mod##_statis[MAX].mod##_##type.member,		\
+						mod##_statis[MIN].mod##_##type.member,		\
+						i)
 
 #define __PRINT_AVG(buf, pos, val, member, idx, count, otype) do	\
-		{							\
-			if ((idx) == MEAN)				\
-				val[(idx)].member =			\
-					val[(idx)].member / (count);	\
-			PRINT(buf[(idx)] + pos[(idx)],			\
-			      val[(idx)].member,			\
-			      pos[(idx)], (otype));			\
-		}while(0)
+{							\
+	if ((idx) == MEAN)				\
+	val[(idx)].member =			\
+	val[(idx)].member / (count);	\
+	PRINT(buf[(idx)] + pos[(idx)],			\
+			val[(idx)].member,			\
+			pos[(idx)], (otype));			\
+}while(0)
 
 #define __PRINT_AVG_SEP(buf, pos, val, member, sep, idx, count, otype) do \
-		{							\
-			if((idx) == MEAN)				\
-				val[(idx)].member =			\
-					(val[(idx)].member / (count));	\
-			PRINT(buf[(idx)] + pos[(idx)],			\
-			      val[(idx)].member * (sep),		\
-			      pos[(idx)], (otype));			\
-		}while(0)
+{							\
+	if((idx) == MEAN)				\
+	val[(idx)].member =			\
+	(val[(idx)].member / (count));	\
+	PRINT(buf[(idx)] + pos[(idx)],			\
+			val[(idx)].member * (sep),		\
+			pos[(idx)], (otype));			\
+}while(0)
 
 inline char *getitem(char *r, char *mnt) 
 {

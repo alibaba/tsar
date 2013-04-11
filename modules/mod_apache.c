@@ -33,12 +33,12 @@ void read_apache_stats(struct module *mod)
 {
 	int fd, n, m, sockfd, send, pos;
 	char buf[LEN_4096] = {0}, request[LEN_4096], line[LEN_4096],
-		buff[LEN_4096];
+	     buff[LEN_4096];
 	memset(buf, 0, LEN_4096);
 	struct sockaddr_in servaddr;
 	FILE *stream = NULL;
 	/* FIX me */
- 	char *cmd = "server-status?auto";
+	char *cmd = "server-status?auto";
 	struct hostinfo hinfo;
 	init_host_info(&hinfo);
 	struct stats_apache st_apache;
@@ -53,20 +53,20 @@ void read_apache_stats(struct module *mod)
 	st_apache.response_time = * (unsigned long long *)&buff[8];
 	/*fullfil another member int the structure*/
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-        bzero(&servaddr, sizeof(servaddr));
-        servaddr.sin_family = AF_INET;
-        servaddr.sin_port = htons(hinfo.port);
-        inet_pton(AF_INET, hinfo.host, &servaddr.sin_addr);
+	bzero(&servaddr, sizeof(servaddr));
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_port = htons(hinfo.port);
+	inet_pton(AF_INET, hinfo.host, &servaddr.sin_addr);
 	sprintf(request, 
-		"GET /%s HTTP/1.0\r\n"
-		"User-Agent: Wget/1.9\r\n"
-		"Host: %s\r\n"
-		"Accept:*/*\r\n"
-		"Connection: Close\r\n\r\n",
-		cmd, hinfo.host);
+			"GET /%s HTTP/1.0\r\n"
+			"User-Agent: Wget/1.9\r\n"
+			"Host: %s\r\n"
+			"Accept:*/*\r\n"
+			"Connection: Close\r\n\r\n",
+			cmd, hinfo.host);
 
-        if ((m = connect(sockfd, (struct sockaddr *) &servaddr,
-			 sizeof(servaddr))) == -1 ) {
+	if ((m = connect(sockfd, (struct sockaddr *) &servaddr,
+					sizeof(servaddr))) == -1 ) {
 		goto writebuf;
 	}
 
@@ -88,11 +88,11 @@ void read_apache_stats(struct module *mod)
 	}
 writebuf:
 	pos = sprintf(buf,"%lld,%lld,%lld,%d,%d",
-			  st_apache.query,
-			  st_apache.response_time / 1000,
-			  st_apache.kBytes_sent,
-			  st_apache.busy_proc,
-			  st_apache.idle_proc);
+			st_apache.query,
+			st_apache.response_time / 1000,
+			st_apache.kBytes_sent,
+			st_apache.busy_proc,
+			st_apache.idle_proc);
 	buf[pos] = '\0';
 	if (stream)
 		fclose(stream);
@@ -102,25 +102,25 @@ writebuf:
 }
 
 static void set_apache_record(struct module *mod, double st_array[],
-				U_64 pre_array[], U_64 cur_array[], int inter)
+		U_64 pre_array[], U_64 cur_array[], int inter)
 {
-        int i;
-        /* set st record */
-        if(cur_array[0] >= pre_array[0])
-                st_array[0] = (cur_array[0] - pre_array[0]) / (inter * 1.0);
-        if((cur_array[1] >= pre_array[1]) && (cur_array[0] > pre_array[0]))
-                st_array[1] = (cur_array[1] - pre_array[1]) / ((cur_array[0] - pre_array[0]) * 1.0);
+	int i;
+	/* set st record */
+	if(cur_array[0] >= pre_array[0])
+		st_array[0] = (cur_array[0] - pre_array[0]) / (inter * 1.0);
+	if((cur_array[1] >= pre_array[1]) && (cur_array[0] > pre_array[0]))
+		st_array[1] = (cur_array[1] - pre_array[1]) / ((cur_array[0] - pre_array[0]) * 1.0);
 	if(cur_array[2] >= pre_array[2])
 		st_array[2] = (cur_array[2] - pre_array[2]) / (inter * 1.0);
-        for (i = 3; i <= 4; i++) st_array[i] = cur_array[i];
+	for (i = 3; i <= 4; i++) st_array[i] = cur_array[i];
 }
 
 static struct mod_info apache_info[] = {
-        {"   qps", SUMMARY_BIT,  0,  STATS_SUB_INTER},
-        {"    rt", SUMMARY_BIT,  0,  STATS_SUB_INTER},
-        {"  sent", DETAIL_BIT,  0,  STATS_SUB_INTER},
-        {"  busy", DETAIL_BIT,  0,  STATS_NULL},
-        {"  idle", DETAIL_BIT,  0,  STATS_NULL},
+	{"   qps", SUMMARY_BIT,  0,  STATS_SUB_INTER},
+	{"    rt", SUMMARY_BIT,  0,  STATS_SUB_INTER},
+	{"  sent", DETAIL_BIT,  0,  STATS_SUB_INTER},
+	{"  busy", DETAIL_BIT,  0,  STATS_NULL},
+	{"  idle", DETAIL_BIT,  0,  STATS_NULL},
 };
 
 void mod_register(struct module *mod)

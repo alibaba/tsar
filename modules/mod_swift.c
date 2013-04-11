@@ -25,7 +25,7 @@ int mgrport=81;
  * client_http.requests = 150291472
  * client_http.bytes_in = 6380253436
  * client_http.bytes_out = 5730106537327
-*/
+ */
 const static char *SWIFT_STORE[] = {
 	"client_http.requests",
 	"client_http.bytes_in",

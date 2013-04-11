@@ -1,21 +1,21 @@
 #include "tsar.h"
 
 char *mem_usage =
-	"    --mem               Physical memory share (active, inactive, cached, free, wired)";
+"    --mem               Physical memory share (active, inactive, cached, free, wired)";
 
 /* Structure for memory and swap space utilization statistics */
 struct stats_mem {
-        unsigned long frmkb;
-        unsigned long bufkb;
-        unsigned long camkb;
-        unsigned long tlmkb;
-        unsigned long acmkb;
-        unsigned long iamkb;
-        unsigned long slmkb;
-        unsigned long frskb;
-        unsigned long tlskb; 
-        unsigned long caskb;
-        unsigned long comkb;
+	unsigned long frmkb;
+	unsigned long bufkb;
+	unsigned long camkb;
+	unsigned long tlmkb;
+	unsigned long acmkb;
+	unsigned long iamkb;
+	unsigned long slmkb;
+	unsigned long frskb;
+	unsigned long tlskb; 
+	unsigned long caskb;
+	unsigned long comkb;
 };
 
 static void read_mem_stats(struct module *mod)
@@ -79,19 +79,19 @@ static void read_mem_stats(struct module *mod)
 	}
 
 	int pos = sprintf(buf, "%lu,%u,%lu,%lu,%lu,%u",
-			  st_mem.frmkb,
-			  0, /* used */
-			  st_mem.bufkb,
-			  st_mem.camkb,
-			  st_mem.tlmkb,
-			  0 /* util */);
+			st_mem.frmkb,
+			0, /* used */
+			st_mem.bufkb,
+			st_mem.camkb,
+			st_mem.tlmkb,
+			0 /* util */);
 	buf[pos] = '\0';
 	set_mod_record(mod, buf);
 	fclose(fp);
 	return;
 }
 static void set_mem_record(struct module *mod, double st_array[],
-                           U_64 pre_array[], U_64 cur_array[], int inter)
+		U_64 pre_array[], U_64 cur_array[], int inter)
 {
 	st_array[0] = cur_array[0]<<10;
 	st_array[1] = (cur_array[4] - cur_array[0] -cur_array[2] -cur_array[3])<<10;
@@ -102,12 +102,12 @@ static void set_mem_record(struct module *mod, double st_array[],
 }
 
 static struct mod_info mem_info[] = {
-        {"  free", DETAIL_BIT,  0,  STATS_NULL},
-        {"  used", DETAIL_BIT,  0,  STATS_NULL},
-        {"  buff", DETAIL_BIT, 0,  STATS_NULL},
-        {"  cach", DETAIL_BIT,  0,  STATS_NULL},
-        {" total", DETAIL_BIT,  0,  STATS_NULL},
-        {"  util", SUMMARY_BIT,  0,  STATS_NULL}
+	{"  free", DETAIL_BIT,  0,  STATS_NULL},
+	{"  used", DETAIL_BIT,  0,  STATS_NULL},
+	{"  buff", DETAIL_BIT, 0,  STATS_NULL},
+	{"  cach", DETAIL_BIT,  0,  STATS_NULL},
+	{" total", DETAIL_BIT,  0,  STATS_NULL},
+	{"  util", SUMMARY_BIT,  0,  STATS_NULL}
 };
 
 void mod_register(struct module *mod)

@@ -33,31 +33,31 @@ char buffer[MAX_INPUT_BUFFER];
 
 struct stats_haproxy{
 	unsigned long stat;
-        unsigned long uptime;
-        unsigned long conns;
-        unsigned long qps;
-        unsigned long hit;
-        unsigned long rt;
+	unsigned long uptime;
+	unsigned long conns;
+	unsigned long qps;
+	unsigned long hit;
+	unsigned long rt;
 };
 //#define STATS_HAPROXY_SIZE       (sizeof(struct stats_haproxy))
 
 static struct mod_info info[] = {
-        {"  stat", SUMMARY_BIT, MERGE_NULL,  STATS_NULL},
-        {"uptime", SUMMARY_BIT, MERGE_NULL,  STATS_NULL},
-        {" conns", DETAIL_BIT, MERGE_NULL,  STATS_NULL},
+	{"  stat", SUMMARY_BIT, MERGE_NULL,  STATS_NULL},
+	{"uptime", SUMMARY_BIT, MERGE_NULL,  STATS_NULL},
+	{" conns", DETAIL_BIT, MERGE_NULL,  STATS_NULL},
 	{"   qps", SUMMARY_BIT, MERGE_NULL,  STATS_NULL},
-        {"   hit", SUMMARY_BIT,  MERGE_NULL,  STATS_NULL},
-        {"    rt", DETAIL_BIT,  MERGE_NULL,  STATS_NULL},
+	{"   hit", SUMMARY_BIT,  MERGE_NULL,  STATS_NULL},
+	{"    rt", DETAIL_BIT,  MERGE_NULL,  STATS_NULL},
 };
 
 static char *haproxy_usage = "    --haproxy           haproxy usage";
 struct stats_haproxy st_haproxy;
 
 /*
-*******************************************************
-* Read swapping statistics from haproxy.stat & 80 port
-*******************************************************
-*/
+ *******************************************************
+ * Read swapping statistics from haproxy.stat & 80 port
+ *******************************************************
+ */
 static void read_haproxy(struct module *mod)
 {
 	int i,pos=0;
@@ -88,7 +88,7 @@ static void read_haproxy(struct module *mod)
 
 
 static void set_haproxy_record(struct module *mod, double st_array[],
-				U_64 pre_array[], U_64 cur_array[], int inter)
+		U_64 pre_array[], U_64 cur_array[], int inter)
 {
 	int i;
 	for (i = 0; i <3; i++) st_array[i] = cur_array[i];
@@ -108,7 +108,7 @@ void mod_register(struct module *mod)
 
 
 /* Returns 1 if we're done processing the document body; 0 to keep going */
-static int
+	static int
 document_headers_done (char *full_page)
 {
 	const char *body;
@@ -125,195 +125,195 @@ document_headers_done (char *full_page)
 	return 1;
 }
 
-int get_http_status(){
-	if(my_tcp_connect (server_address, server_port, &sd) == 0)
-	{
-		close(sd);
-		if(DEBUG)
-			printf("connect host %s at %d\n",server_address,server_port);
-		return 0;
-	}else
-	{
-		close(sd);
-		return -1;
-		if(DEBUG)
-			printf("cat't connect host %s at %d\n",server_address,server_port);
-	}
-	char *buf;
-	char *full_page;
-	char *page;
-	char *status_line;
-	char *status_code;
-	int http_status;
-	int i = 0;
-	size_t pagesize = 0;
-
-	asprintf (&buf, "GET %s HTTP/1.0\r\nUser-Agent: check_http\r\n", URL);
-	/* tell HTTP/1.1 servers not to keep the connection alive */
-	asprintf (&buf, "%sConnection: close\r\n", buf);
-	if (server_address)
-	{
-		asprintf (&buf, "%sHost: %s:%d\r\n", buf, server_address, server_port);
-	}
-	asprintf (&buf, "%s%s", buf, CRLF);
-	if(DEBUG){
-		printf ("send %s\n", buf);
-	}
-	my_send (buf, strlen (buf));
-	full_page = strdup("");
-	while ((i = my_recv (buffer, MAX_INPUT_BUFFER-1)) > 0) {
-		buffer[i] = '\0';
-		asprintf (&full_page, "%s%s", full_page, buffer);
-		pagesize += i;
-		if (document_headers_done (full_page)) {
-			i = 0;
-			break;
+	int get_http_status(){
+		if(my_tcp_connect (server_address, server_port, &sd) == 0)
+		{
+			close(sd);
+			if(DEBUG)
+				printf("connect host %s at %d\n",server_address,server_port);
+			return 0;
+		}else
+		{
+			close(sd);
+			return -1;
+			if(DEBUG)
+				printf("cat't connect host %s at %d\n",server_address,server_port);
 		}
-	}
-	if(DEBUG){
-		printf("%s\n",full_page);
-	}
-	//error
-	if (i < 0 && errno != ECONNRESET) {
-		printf("HTTP CRITICAL - Error on receive\n");
-	}
-	/* return a CRITICAL status if we couldn't read any data */
-	if (pagesize == (size_t) 0){
-		printf("HTTP CRITICAL - No data received from host\n");
-	}
-	/* close the connect */
-	if(sd) close(sd);
+		char *buf;
+		char *full_page;
+		char *page;
+		char *status_line;
+		char *status_code;
+		int http_status;
+		int i = 0;
+		size_t pagesize = 0;
+
+		asprintf (&buf, "GET %s HTTP/1.0\r\nUser-Agent: check_http\r\n", URL);
+		/* tell HTTP/1.1 servers not to keep the connection alive */
+		asprintf (&buf, "%sConnection: close\r\n", buf);
+		if (server_address)
+		{
+			asprintf (&buf, "%sHost: %s:%d\r\n", buf, server_address, server_port);
+		}
+		asprintf (&buf, "%s%s", buf, CRLF);
+		if(DEBUG){
+			printf ("send %s\n", buf);
+		}
+		my_send (buf, strlen (buf));
+		full_page = strdup("");
+		while ((i = my_recv (buffer, MAX_INPUT_BUFFER-1)) > 0) {
+			buffer[i] = '\0';
+			asprintf (&full_page, "%s%s", full_page, buffer);
+			pagesize += i;
+			if (document_headers_done (full_page)) {
+				i = 0;
+				break;
+			}
+		}
+		if(DEBUG){
+			printf("%s\n",full_page);
+		}
+		//error
+		if (i < 0 && errno != ECONNRESET) {
+			printf("HTTP CRITICAL - Error on receive\n");
+		}
+		/* return a CRITICAL status if we couldn't read any data */
+		if (pagesize == (size_t) 0){
+			printf("HTTP CRITICAL - No data received from host\n");
+		}
+		/* close the connect */
+		if(sd) close(sd);
 
 
-	/* find status line and null-terminate it */
-	page = full_page;
-	page += (size_t) strspn (page, "\r\n");
-	status_line = page;
-	status_line[strcspn(status_line, "\r\n")] = 0;
-	//strip(status_line);
-	if(DEBUG)
-		printf ("STATUS: %s\n", status_line);
-	status_code = strchr (status_line, ' ') + sizeof (char);
-	http_status = atoi (status_code);
-	return http_status;
-}
+		/* find status line and null-terminate it */
+		page = full_page;
+		page += (size_t) strspn (page, "\r\n");
+		status_line = page;
+		status_line[strcspn(status_line, "\r\n")] = 0;
+		//strip(status_line);
+		if(DEBUG)
+			printf ("STATUS: %s\n", status_line);
+		status_code = strchr (status_line, ' ') + sizeof (char);
+		http_status = atoi (status_code);
+		return http_status;
+	}
 
 
 /* opens a tcp or udp connection to a remote host or local socket */
 int np_net_connect (const char *host_name, int port, int *sd, char* proto)
 {
-        struct sockaddr_in servaddr;
-        struct protoent *ptrp;
-        int result;
+	struct sockaddr_in servaddr;
+	struct protoent *ptrp;
+	int result;
 
-        bzero((char *)&servaddr,sizeof(servaddr));
-        servaddr.sin_family=AF_INET;
-        servaddr.sin_port=htons(port);
-        inet_pton(AF_INET, server_address, &servaddr.sin_addr);
+	bzero((char *)&servaddr,sizeof(servaddr));
+	servaddr.sin_family=AF_INET;
+	servaddr.sin_port=htons(port);
+	inet_pton(AF_INET, server_address, &servaddr.sin_addr);
 
-        /* map transport protocol name to protocol number */
-        if(((ptrp=getprotobyname(proto)))==NULL){
+	/* map transport protocol name to protocol number */
+	if(((ptrp=getprotobyname(proto)))==NULL){
 		if(DEBUG)
-                printf("Cannot map \"%s\" to protocol number\n",proto);
-                return 3;
-        }
+			printf("Cannot map \"%s\" to protocol number\n",proto);
+		return 3;
+	}
 
-        /* create a socket */
-        *sd=socket(PF_INET,(!strcmp(proto,"udp"))?SOCK_DGRAM:SOCK_STREAM,ptrp->p_proto);
-        if(*sd<0){
+	/* create a socket */
+	*sd=socket(PF_INET,(!strcmp(proto,"udp"))?SOCK_DGRAM:SOCK_STREAM,ptrp->p_proto);
+	if(*sd<0){
 		close(*sd);
 		if(DEBUG)
-                printf("Socket creation failed\n");
-                return 3;
-        }
-        /* open a connection */
-        result=connect(*sd,(struct sockaddr *)&servaddr,sizeof(servaddr));
-        if(result<0){
+			printf("Socket creation failed\n");
+		return 3;
+	}
+	/* open a connection */
+	result=connect(*sd,(struct sockaddr *)&servaddr,sizeof(servaddr));
+	if(result<0){
 		close(*sd);
-                switch(errno){
-                        case ECONNREFUSED:
+		switch(errno){
+			case ECONNREFUSED:
 				if(DEBUG)
-                                printf("Connection refused by host\n");
-                                break;
-                        case ETIMEDOUT:
+					printf("Connection refused by host\n");
+				break;
+			case ETIMEDOUT:
 				if(DEBUG)
-                                printf("Timeout while attempting connection\n");
-                                break;
-                        case ENETUNREACH:
+					printf("Timeout while attempting connection\n");
+				break;
+			case ENETUNREACH:
 				if(DEBUG)
-                                printf("Network is unreachable\n");
-                                break;
-                        default:
+					printf("Network is unreachable\n");
+				break;
+			default:
 				if(DEBUG)
-                                printf("Connection refused or timed out\n");
-                }
+					printf("Connection refused or timed out\n");
+		}
 
-                return 2;
-        }
-        return 0;
+		return 2;
+	}
+	return 0;
 }
 
 int StrToInt(const char* str){
-        int num = 0;
-        if(str != NULL)
-        {   
-                const char* digit = str;
-                while(*digit != '\0')
-                {   
-                        if(*digit >= '0' && *digit <= '9')
-                        {   
-                                 num = num * 10 + (*digit - '0');
-                        }else
-                        {   
-                                num = 0;
-                                break;
-                        }   
-                        digit ++; 
-                }   
-        }   
-        return num;
+	int num = 0;
+	if(str != NULL)
+	{   
+		const char* digit = str;
+		while(*digit != '\0')
+		{   
+			if(*digit >= '0' && *digit <= '9')
+			{   
+				num = num * 10 + (*digit - '0');
+			}else
+			{   
+				num = 0;
+				break;
+			}   
+			digit ++; 
+		}   
+	}   
+	return num;
 }
 
 int get_haproxy_detail(void)
 {
-        int s, t, len;
-        struct sockaddr_un remote;
-        char str[MAX_SIZE];
-        char show_info[20] = "show info\n";
-        char show_tsar[20] = "show tsar\n";
-        char *p_split;
-        /*result for tsar to show*/
+	int s, t, len;
+	struct sockaddr_un remote;
+	char str[MAX_SIZE];
+	char show_info[20] = "show info\n";
+	char show_tsar[20] = "show tsar\n";
+	char *p_split;
+	/*result for tsar to show*/
 	if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
 		close(s);
 		if(DEBUG)
-                perror("socket");
+			perror("socket");
 		return -1;
-        }
+	}
 
-        remote.sun_family = AF_UNIX;
-        strcpy(remote.sun_path, SOCK_PATH);
-        len = strlen(remote.sun_path) + sizeof(remote.sun_family);
-        if (connect(s, (struct sockaddr *)&remote, len) == -1) {
+	remote.sun_family = AF_UNIX;
+	strcpy(remote.sun_path, SOCK_PATH);
+	len = strlen(remote.sun_path) + sizeof(remote.sun_family);
+	if (connect(s, (struct sockaddr *)&remote, len) == -1) {
 		close(s);
 		if(DEBUG)
-		perror("connect");
+			perror("connect");
 		return -1;
-        }
-        //get info
-        memset(str, '\0', sizeof(str));
-        if (send(s, show_tsar, strlen(show_tsar), 0) == -1) {
+	}
+	//get info
+	memset(str, '\0', sizeof(str));
+	if (send(s, show_tsar, strlen(show_tsar), 0) == -1) {
 		close(s);
 		if(DEBUG)
-		perror("send");
+			perror("send");
 		return -1;
-        }
+	}
 
-        if ((t=recv(s, str, MAX_SIZE, 0)) > 0) {
-        str[t] = '\0';
-        } else {
+	if ((t=recv(s, str, MAX_SIZE, 0)) > 0) {
+		str[t] = '\0';
+	} else {
 		close(s);
-                if (t < 0 && DEBUG) perror("recv");
-                else if(DEBUG) perror("Server closed connection\n");
+		if (t < 0 && DEBUG) perror("recv");
+		else if(DEBUG) perror("Server closed connection\n");
 		return -1;
 	}
 	//check if info right
@@ -371,18 +371,18 @@ int get_haproxy_detail(void)
 			sscanf(p_split,"req hit ratio: %d.%d ", &a, &b);
 			st_haproxy.hit = a * 1000 + b;
 		}
-                if(strstr(p_split,"Uptime_sec"))
-                {
-                        char *p=strstr(p_split," ");
-                        st_haproxy.uptime = StrToInt(p+1);
-                }
-                if(strstr(p_split,"CurrConns"))
-                {
-                        char *p=strstr(p_split," ");
-                        st_haproxy.conns = StrToInt(p+1);
-                }
-                p_split = strtok(NULL, "\n");
-        }
-        close(s);
+		if(strstr(p_split,"Uptime_sec"))
+		{
+			char *p=strstr(p_split," ");
+			st_haproxy.uptime = StrToInt(p+1);
+		}
+		if(strstr(p_split,"CurrConns"))
+		{
+			char *p=strstr(p_split," ");
+			st_haproxy.conns = StrToInt(p+1);
+		}
+		p_split = strtok(NULL, "\n");
+	}
+	close(s);
 	return 0;
 }

@@ -12,11 +12,11 @@ char *partition_usage = "    --partition         Disk and partition usage";
 
 struct stats_partition {
 	int bsize;                           /* block size*/
-        unsigned long long blocks;           /* total blocks*/
-        unsigned long long bfree;            /* free for non root user*/
-        unsigned long long bavail;           /* avail for root*/
-        unsigned long long itotal;
-        unsigned long long ifree;
+	unsigned long long blocks;           /* total blocks*/
+	unsigned long long bfree;            /* free for non root user*/
+	unsigned long long bavail;           /* avail for root*/
+	unsigned long long itotal;
+	unsigned long long ifree;
 };
 #define STATS_PARTITION_SIZE (sizeof(struct stats_partition))
 
@@ -61,7 +61,7 @@ int __read_partition_stat(char *fsname, struct stats_partition *sp)
 }
 
 int store_single_partition(char *buf, char *mntpath,
-			  struct stats_partition *sp) 
+		struct stats_partition *sp) 
 {
 	int len = 0;
 	float util;
@@ -73,10 +73,10 @@ int store_single_partition(char *buf, char *mntpath,
 		util = 0;
 	len += sprintf(buf, "%s=", mntpath);
 	len += sprintf(buf+len, "%d,%lld,%lld,%lld", 
-		       sp->bsize,
-		       sp->bfree,
-		       sp->blocks,		       
-		       sp->bavail);
+			sp->bsize,
+			sp->bfree,
+			sp->blocks,		       
+			sp->bavail);
 	return len;
 
 }
@@ -88,21 +88,21 @@ void read_partition_stat(struct module *mod)
 	char buf[LEN_4096];
 	memset(buf, 0, LEN_4096);
 	FILE *mntfile;
-        struct mntent *mnt = NULL;
+	struct mntent *mnt = NULL;
 	struct stats_partition temp;
-	
+
 	memset(&temp, 0, sizeof(temp));
 
 	/* part_nr = count_partition_nr(NULL); */
-	
-        mntfile = setmntent("/etc/mtab", "r");
+
+	mntfile = setmntent("/etc/mtab", "r");
 
 	/* init part_nr */
 	part_nr = 0;
 	/* traverse the mount table */
-        while((mnt = getmntent(mntfile)) != NULL) {
+	while((mnt = getmntent(mntfile)) != NULL) {
 		/* only recore block filesystems */
-                if(! strncmp(mnt->mnt_fsname, "/", 1)) {
+		if(! strncmp(mnt->mnt_fsname, "/", 1)) {
 			/* we only read MAXPART partition */
 			if(part_nr >= MAXPART) break;
 			/* read each partition infomation */
@@ -123,7 +123,7 @@ void read_partition_stat(struct module *mod)
 }
 
 static void set_part_record(struct module *mod, double st_array[],
-                           U_64 pre_array[], U_64 cur_array[], int inter)
+		U_64 pre_array[], U_64 cur_array[], int inter)
 {
 	st_array[0] = cur_array[3] * cur_array[0];
 	st_array[1] = (cur_array[2] - cur_array[1]) * cur_array[0];

@@ -15,12 +15,12 @@ int mgrport = 81;
 
 /* swiftclient -p 81 mgr:counters */
 /*
-server_http.requests = 13342113
-server_http.errors = 220
-server_http.bytes_in = 210982517709
-server_http.bytes_out = 0
-server_http.svc_time = 1526450363
-*/
+   server_http.requests = 13342113
+   server_http.errors = 220
+   server_http.bytes_in = 210982517709
+   server_http.bytes_out = 0
+   server_http.svc_time = 1526450363
+ */
 const static char *SWIFT_FWD[] = {
 	"server_http.requests",
 	"server_http.errors",
