@@ -1,3 +1,4 @@
+
 /*
  * (C) 2010-2011 Alibaba Group Holding Limited
  *
@@ -15,8 +16,10 @@
  *
  */
 
+
 #ifndef _OUTPUT_DB_H
 #define _OUTPUT_DB_H
+
 
 #include <netinet/in.h>
 #include <sys/types.h>
@@ -24,6 +27,8 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
+
 void output_db(int have_collect);
+
 
 #endif

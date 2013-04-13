@@ -1,3 +1,4 @@
+
 /*
  * (C) 2010-2011 Alibaba Group Holding Limited
  *
@@ -15,7 +16,9 @@
  *
  */
 
+
 #include "tsar.h"
+
 
 void register_mod_fileds(struct module *mod, char *opt, char *usage,
 		struct mod_info *info, int n_col, void *data_collect, void *set_st_record)
@@ -99,8 +102,9 @@ int is_include_string(char *mods, char *mod)
 
 /*
  * reload modules by mods, if not find in mods, then set module disable 
+ * return 1 if mod load ok
+ * return 0 else
  */
-//如果有模块被成功reload 返回1 否则返回0
 int reload_modules(char *s_mod)
 {
 	int	i;
@@ -349,7 +353,6 @@ int collect_record_stat()
 				mod->pre_flag = 1;
 		} else
 			mod->pre_flag = 0;
-		//printf("%s %s\n",mod->cur_array,mod->pre_array);
 		/* swap cur_array to pre_array */
 		tmp = mod->pre_array;
 		mod->pre_array = mod->cur_array;

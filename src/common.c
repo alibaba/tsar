@@ -1,3 +1,4 @@
+
 /*
  * (C) 2010-2011 Alibaba Group Holding Limited
  *
@@ -14,14 +15,14 @@
  * limitations under the License.
  *
  */
+ 
 
 #include "tsar.h"
+
 
 int is_digit(char *str)
 {
 	/*dont handle minus value in tsar.data */
-	//if(*str == '-')
-	//	str++;
 	while (*str) {
 		if (!isdigit(*str++))
 			return 0;

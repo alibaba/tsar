@@ -1,3 +1,4 @@
+
 /*
  * (C) 2010-2011 Alibaba Group Holding Limited
  *
@@ -15,8 +16,10 @@
  *
  */
 
+
 #ifndef _TSARMOD_H
 #define _TSARMOD_H
+
 
 #include <string.h>
 #include <unistd.h>
@@ -30,6 +33,7 @@
 #include <getopt.h>
 #include <ctype.h>
 #include <sys/stat.h>
+
 
 #define	U_64		unsigned long long
 
@@ -51,6 +55,7 @@ struct mod_info {
 	int     merge_mode;
 	int     stats_opt;
 };
+
 struct module
 {
 	char    name[LEN_32];
@@ -88,7 +93,7 @@ struct module
 };
 
 void register_mod_fileds(struct module *mod, char *opt, char *usage,
-		struct mod_info *info, int n_col, void *data_collect, void *set_st_record);
+    struct mod_info *info, int n_col, void *data_collect, void *set_st_record);
 void set_mod_record(struct module *mod, char *record);
 
 enum {
@@ -97,7 +102,6 @@ enum {
 	SUMMARY_BIT,
 	SPEC_BIT
 };
-
 
 enum {
 	MERGE_NULL,

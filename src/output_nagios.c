@@ -1,3 +1,4 @@
+
 /*
  * (C) 2010-2011 Alibaba Group Holding Limited
  *
@@ -15,10 +16,13 @@
  *
  */
 
+
 #include <fcntl.h>
 #include "tsar.h"
 
+
 #define PRE_RECORD_FILE		"/tmp/.tsar.tmp"
+
 
 void output_nagios(){
 	struct	module *mod;
@@ -74,20 +78,20 @@ void output_nagios(){
 			double  *st_array;
 			struct mod_info *info = mod->info;
 			j = 0;
-			//get mod_name.(item_name).col_name value
+			/* get mod_name.(item_name).col_name value */
 			while (token) {
 				memset(check, 0, sizeof(check));
 				strcat(check,mod->name+4);
 				strcat(check,".");
 				s_token = strstr(token, ITEM_SPSTART);
-				//multi item
+				/* multi item */
 				if(s_token){
 					memset(opt, 0, sizeof(opt));
 					strncat(opt, token, s_token - token);
 					strcat(check,opt);
 					strcat(check,".");
 				}
-				//get value
+				/* get value */
 				st_array = &mod->st_array[j * mod->n_col];
 				token = strtok(NULL, ITEM_SPLIT);
 				j++;
