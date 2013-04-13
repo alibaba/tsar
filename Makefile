@@ -10,6 +10,7 @@ install:
 	#mkdir for tsar
 	mkdir -p /usr/local/tsar/modules
 	mkdir -p /etc/tsar
+	mkdir -p /usr/local/man/man8/
 	#copy tsar shared so
 	cp modules/*.so /usr/local/tsar/modules
 	#copy bin file
