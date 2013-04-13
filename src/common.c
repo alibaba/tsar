@@ -175,7 +175,7 @@ void get_mod_hdr(char hdr[], struct module *mod)
 int get_st_array_from_file(int have_collect)
 {
 	struct  module *mod;
-	int  i, ret;
+	int  i, ret = 0;
 	char pre_line[LEN_10240] = {0};
 	char line[LEN_10240] = {0};
 	char detail[LEN_1024] = {0};
