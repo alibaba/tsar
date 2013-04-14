@@ -1,3 +1,4 @@
+
 /*
  * (C) 2010-2011 Alibaba Group Holding Limited
  *
@@ -14,14 +15,14 @@
  * limitations under the License.
  *
  */
+ 
 
 #include "tsar.h"
+
 
 int is_digit(char *str)
 {
 	/*dont handle minus value in tsar.data */
-	//if(*str == '-')
-	//	str++;
 	while (*str) {
 		if (!isdigit(*str++))
 			return 0;
@@ -174,7 +175,7 @@ void get_mod_hdr(char hdr[], struct module *mod)
 int get_st_array_from_file(int have_collect)
 {
 	struct  module *mod;
-	int  i, ret;
+	int  i, ret = 0;
 	char pre_line[LEN_10240] = {0};
 	char line[LEN_10240] = {0};
 	char detail[LEN_1024] = {0};

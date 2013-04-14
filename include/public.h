@@ -1,3 +1,4 @@
+
 /*
  * (C) 2010-2011 Alibaba Group Holding Limited
  *
@@ -15,13 +16,16 @@
  *
  */
 
+
 #ifndef _PUBLIC_H
 #define _PUBLIC_H
+
 
 #include <errno.h>
 #include <math.h>
 #include <ctype.h>
 #include "tsar.h"
+
 
 /*
  * /proc/files
@@ -40,6 +44,7 @@
 #define FINODE_STATE    "/proc/sys/fs/inode-state"
 #define PTY_NR          "/proc/sys/kernel/pty/nr"
 
+
 /*
  *  ANSI Color setting segment
  *
@@ -47,6 +52,7 @@
 #define BLUE_FMT(s) "\033[40;34m"s"\033[0m"
 #define GREEN_FMT(s) "\033[40;32m"s"\033[0m"
 #define RED_FMT(s) "\033[40;31m"s"\033[0m"
+
 
 #define COLOR(val, fmt, str, ret, color) do				\
 {							\
@@ -63,6 +69,7 @@
 
 #define CURR 0
 #define PAST 1
+
 
 /*
  * for statistics
@@ -289,5 +296,6 @@ inline char *getitem(char *r, char *mnt)
 }
 
 #define CALITV(pt, ct, i) ((i) = ((pt) < (ct)) ? (ct) - (pt) : 1)
+
 
 #endif

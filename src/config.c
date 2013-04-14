@@ -1,3 +1,4 @@
+
 /*
  * (C) 2010-2011 Alibaba Group Holding Limited
  *
@@ -15,11 +16,14 @@
  *
  */
 
+
 #include "tsar.h"
-//add mod to tsar
+
+
+/* add mod to tsar */
 void parse_mod(char *mod_name)
 {
-	// check if the mod load already
+	/* check if the mod load already */
 	int i = 0;
 	for ( i = 0; i < statis.total_mod_num; i++ )
 	{
@@ -127,7 +131,8 @@ static int parse_line(char *buff)
 	char    *token;
 
 	if ((token = strtok(buff, W_SPACE)) == NULL)
-		(void) 0;       /* ignore empty lines */
+    /* ignore empty lines */
+		(void) 0;       
 	else if (strstr(token, "mod_"))
 		parse_mod(token);
 	else if (strstr(token, "spec_"))
@@ -193,7 +198,7 @@ void parse_config_file(const char *file_name)
 		}
 		if (config_input_line[0] == '\0')
 			continue;
-		//FIXME can't supprot wrap line
+		/* FIXME can't supprot wrap line */
 		if (!parse_line(config_input_line)) {
 			do_debug(LOG_INFO, "parse_config_file: unknown keyword in '%s' \n", config_input_line);
 		}
@@ -201,7 +206,8 @@ void parse_config_file(const char *file_name)
 	}
 	fclose(fp);
 }
-//deal with the include statment
+
+/* deal with the include statment */
 void get_include_conf()
 {
 	char *token = strtok(NULL, W_SPACE);
@@ -247,7 +253,7 @@ void get_include_conf()
 				}
 				if (config_input_line[0] == '\0')
 					continue;
-				//FIXME can't supprot wrap line
+				/* FIXME can't supprot wrap line */
 				if (!parse_line(config_input_line)) {
 					do_debug(LOG_INFO, "parse_config_file: unknown keyword in '%s' at file %s\n", config_input_line, buf);
 				}
@@ -259,7 +265,8 @@ void get_include_conf()
 			do_debug(LOG_WARN,"pclose error\n");
 	}
 }
-// get nagios alert threshold value
+
+/* get nagios alert threshold value */
 void get_threshold(){
 	/* set nagios value */
 	char *token = strtok(NULL, W_SPACE);

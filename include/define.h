@@ -1,3 +1,4 @@
+
 /*
  * (C) 2010-2011 Alibaba Group Holding Limited
  *
@@ -15,8 +16,10 @@
  *
  */
 
+
 #ifndef _DEFINE_H
 #define _DEFINE_H
+
 
 //-check & --check function for old tsar amon usage
 #define OLDTSAR
@@ -47,7 +50,6 @@
 #define PRINT_SEC_SPLIT	" "
 #define W_SPACE		" \t\r\n"
 
-
 #define DEFAULT_PRINT_NUM	20
 #define DEFAULT_PRINT_INTERVAL	5
 
@@ -71,6 +73,7 @@
 #define APACHERT "/tmp/apachert.mmap"
 #define TCP "/proc/net/tcp"
 #define NETSTAT "/proc/net/netstat"
+
 
 enum {
 	MERGE_NOT,
@@ -134,5 +137,6 @@ enum {
 	STATS_SUB,
 	STATS_SUB_INTER
 };
+
 
 #endif

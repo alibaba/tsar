@@ -1,4 +1,4 @@
-CFLAGS = -g -Wall
+CFLAGS = -g -O2 -Wall
 CC = gcc
 INCLUDE_DIR = ../include
 

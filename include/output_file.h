@@ -1,3 +1,4 @@
+
 /*
  * (C) 2010-2011 Alibaba Group Holding Limited
  *
@@ -15,8 +16,11 @@
  *
  */
 
+
 #ifndef _OUTPUT_FILE_H
 #define _OUTPUT_FILE_H
+
+
 /*
  * output data to file
  */
@@ -32,5 +36,8 @@ struct file_header
 	time_t	t_start;	
 };
 
+
 void output_file();
+
+
 #endif
