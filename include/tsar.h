@@ -17,8 +17,8 @@
  */
 
 
-#ifndef _TSAR_H
-#define _TSAR_H
+#ifndef TSAR_H
+#define TSAR_H
 
 
 #include <string.h>

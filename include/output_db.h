@@ -17,8 +17,8 @@
  */
 
 
-#ifndef _TSAR_OUTPUT_DB_H
-#define _TSAR_OUTPUT_DB_H
+#ifndef TSAR_OUTPUT_DB_H
+#define TSAR_OUTPUT_DB_H
 
 
 #include <netinet/in.h>

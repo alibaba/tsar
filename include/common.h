@@ -17,8 +17,8 @@
  */
 
 
-#ifndef _TSAR_COMMON_H
-#define _TSAR_COMMON_H
+#ifndef TSAR_COMMON_H
+#define TSAR_COMMON_H
 
 
 #define PRE_RECORD_FILE         "/tmp/.tsar.tmp"

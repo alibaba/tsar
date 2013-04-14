@@ -17,8 +17,8 @@
  */
  
 
-#ifndef _TSAR_FRAMEWORK_H
-#define _TSAR_FRAMEWORK_H
+#ifndef TSAR_FRAMEWORK_H
+#define TSAR_FRAMEWORK_H
 
 
 #include "define.h"

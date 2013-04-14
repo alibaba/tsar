@@ -17,8 +17,8 @@
  */
 
 
-#ifndef _TSAR_DEBUG_H
-#define _TSAR_DEBUG_H
+#ifndef TSAR_DEBUG_H
+#define TSAR_DEBUG_H
 
 
 typedef enum
