@@ -17,8 +17,8 @@
  */
 
 
-#ifndef _OUTPUT_NAGIOS_H
-#define _OUTPUT_NAGIOS_H
+#ifndef _TSAR_OUTPUT_NAGIOS_H
+#define _TSAR_OUTPUT_NAGIOS_H
 
 
 #include <netinet/in.h>

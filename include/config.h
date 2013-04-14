@@ -17,8 +17,8 @@
  */
 
 
-#ifndef _CONFIG_H
-#define _CONFIG_H
+#ifndef _TSAR_CONFIG_H
+#define _TSAR_CONFIG_H
 
 
 #include "define.h"

@@ -17,8 +17,8 @@
  */
 
 
-#ifndef _PUBLIC_H
-#define _PUBLIC_H
+#ifndef _TSAR_PUBLIC_H
+#define _TSAR_PUBLIC_H
 
 
 #include <errno.h>

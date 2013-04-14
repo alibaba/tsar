@@ -17,8 +17,8 @@
  */
 
 
-#ifndef _OUTPUT_FILE_H
-#define _OUTPUT_FILE_H
+#ifndef _TSAR_OUTPUT_FILE_H
+#define _TSAR_OUTPUT_FILE_H
 
 
 /*

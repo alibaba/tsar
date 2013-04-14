@@ -17,8 +17,8 @@
  */
 
 
-#ifndef _DEFINE_H
-#define _DEFINE_H
+#ifndef _TSAR_DEFINE_H
+#define _TSAR_DEFINE_H
 
 
 //-check & --check function for old tsar amon usage
