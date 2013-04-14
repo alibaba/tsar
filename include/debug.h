@@ -1,3 +1,4 @@
+
 /*
  * (C) 2010-2011 Alibaba Group Holding Limited
  *
@@ -15,8 +16,10 @@
  *
  */
 
+
 #ifndef _DEBUG_H
 #define _DEBUG_H
+
 
 typedef enum
 {
@@ -29,4 +32,6 @@ typedef enum
 
 
 void do_debug(log_level_t level, const char *fmt, ...);
+
+
 #endif

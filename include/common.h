@@ -1,3 +1,4 @@
+
 /*
  * (C) 2010-2011 Alibaba Group Holding Limited
  *
@@ -15,9 +16,13 @@
  *
  */
 
+
 #ifndef _COMMON_H
 #define _COMMON_H
+
+
 #define PRE_RECORD_FILE         "/tmp/.tsar.tmp"
+
 /*
  * convert data to array
  */
@@ -27,4 +32,6 @@ int strtok_next_item(char item[], char *record, int *start);
 int merge_mult_item_to_array(U_64 *array, struct module *mod);
 int get_strtok_num(char *str, char *split);
 int get_st_array_from_file(int have_collect);
+
+
 #endif

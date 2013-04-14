@@ -1,3 +1,4 @@
+
 /*
  * (C) 2010-2011 Alibaba Group Holding Limited
  *
@@ -15,10 +16,13 @@
  *
  */
 
+
 #ifndef _CONFIG_H
 #define _CONFIG_H
 
+
 #include "define.h"
+
 
 struct configure
 {
@@ -67,8 +71,11 @@ struct configure
 	char	output_file_path[LEN_128];
 };
 
+
 void parse_config_file(const char *file_name);
 void get_include_conf();
 void get_threshold();
 void set_special_field(char *spec_field);
+
+
 #endif

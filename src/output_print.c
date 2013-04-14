@@ -1,3 +1,4 @@
+
 /*
  * (C) 2010-2011 Alibaba Group Holding Limited
  *
@@ -15,7 +16,9 @@
  *
  */
 
+
 #include "tsar.h"
+
 
 /*
  * adjust print opt line
@@ -266,14 +269,15 @@ void running_print_live()
 
 
 /* find where start printting
-   返回值：
-   0 查找成功
-   1 需要再往上一个文件查询
-   2 查找失败，发生在对tsar.data.x查找时，要找的时间比该文件的最晚时间还晚，此时说明查找落在了轮转期的数据丢失部分，不应再继续查找，
-   3 查找失败，发生在对tsar.data查找时，说明tsar已经有一段时间没有运行，从要查找的时间点到现在都没有数据，不应再继续查找
-   4 查找失败，发生的场景是，tsar中间有段时间没有采集数据，而要查找的时间点正好又落在这个区间，不应再继续查找
-   5 查找过程中碰到日志格式错误
-   6 未知错误*/
+ * return
+ * 0 ok
+ * 1 need find last tsar.data file
+ * 2 find error, find time is later than the last line at tsar.data.x, should stop find any more
+ * 3 find error, tsar haved stopped after find time, should stop find it
+ * 4 find error, data not exist, tsar just lost some time data which contains find time
+ * 5 log format error
+ * 6 other error
+ */
 int find_offset_from_start(FILE *fp,int number)
 {
 	char	line[LEN_10240] = {0};
@@ -349,7 +353,7 @@ int find_offset_from_start(FILE *fp,int number)
 				}
 			}
 			else {
-				//fatal error,log format error happen.
+				/* fatal error,log format error happen. */
 				return 5;
 			}
 		}
@@ -357,25 +361,25 @@ int find_offset_from_start(FILE *fp,int number)
 			if(off_end == file_len){
 				if(number>0){
 					conf.print_file_number = number-1;
-					//at the end of tsar.data.%d have some data lost during data rotate. stat from previous log file";
+					/* at the end of tsar.data.%d have some data lost during data rotate. stat from previous log file";*/
 					return 2;
 				} else{
-					//researching tsar.data to end and not find log data you need.";
+					/* researching tsar.data to end and not find log data you need.";*/
 					return 3;
 				}
 			}
 			if(off_start == 0){
 				conf.print_file_number = number;
-				//need to research tsar.data.number+1;
+				/* need to research tsar.data.number+1; */
 				return 1;
 			}
-			//here should not be arrived.
+			/* here should not be arrived. */
 			return 6;
 		}
 
 		if (offset == (off_start + off_end)/2){
 			if(off_start != 0){
-				//tsar has been down for a while,so,the following time's stat we can provied only;
+				/* tsar has been down for a while,so,the following time's stat we can provied only; */
 				conf.print_file_number = number;
 				return 4;
 			}
@@ -724,13 +728,13 @@ void running_check(int check_type){
 	/* get file len */
 	memset(&line[0], 0, LEN_10240);
 	total_num =0;
-	//从后往前快速找到2个换行
+	/* find two \n from end*/
 	fseek(fp, -1, SEEK_END);
 	while(1){
 		if(fgetc(fp) == '\n') ++total_num;
 		if(total_num == 3) break;
 		if(fseek(fp, -2, SEEK_CUR) != 0){
-			//只有1行或者2行数据，直接重定向到文件头
+            /* just 1 or 2 line, goto file header */
 			fseek(fp, 0, SEEK_SET);
 			break;
 		}
@@ -746,7 +750,7 @@ void running_check(int check_type){
 		}
 		total_num = 0;
 		memset(&line[0], 0, 2 * LEN_10240);
-		//tsar.data.1的行数统计
+        /* count tsar.data.1 lines */
 		fseek(fp, -1, SEEK_END);
 		while(1){
 			if(fgetc(fp) == '\n') ++total_num;
@@ -775,11 +779,11 @@ void running_check(int check_type){
 			do_debug(LOG_FATAL, "unable to open the log file %s\n",filename);
 		}
 		total_num = 0;
-		//定位tsar.data.1的最后一行开头
+        /* go to the start of the last line at tsar.data.1 */
 		fseek(fp, -1, SEEK_END);
 		while(1){
 			if(fgetc(fp) == '\n') ++total_num;
-			//找到倒数第二个换行，读指针刚好指向倒数第一行
+            /* find the sencond \n from the end, read fp point to the last line */
 			if(total_num == 2) break;
 			if(fseek(fp, -2, SEEK_CUR) != 0){
 				fseek(fp, 0, SEEK_SET);
@@ -801,16 +805,14 @@ void running_check(int check_type){
 	/* set struct module fields */  
 	init_module_fields();
 
-	//printf("%s",line);
 	/* read one line to init module parameter */
 	read_line_to_module_record(line[0]);
 	collect_record_stat();
 
-	//printf("%s",line);
 	read_line_to_module_record(line[1]);
 	collect_record_stat();
 	/*display check detail*/
-	//---------------------------RUN_CHECK_NEW---------------------------------------
+	/* ---------------------------RUN_CHECK_NEW--------------------------------------- */
 	if(check_type == RUN_CHECK_NEW){
 		printf("%s\ttsar\t",host_name);
 		for (i = 0; i < statis.total_mod_num; i++) {
@@ -819,7 +821,7 @@ void running_check(int check_type){
 				continue;
 			}
 			struct mod_info *info = mod->info;
-			//get mod name
+			/* get mod name */
 			char *mod_name = strstr(mod->opt_line,"--");
 			if(mod_name){
 				mod_name += 2;
@@ -851,7 +853,6 @@ void running_check(int check_type){
 							if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[k].summary_bit))
 									|| ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[k].summary_bit))){
 								printf("%s:%s%s=",mod_name,opt,trim(info[k].hdr,LEN_128));
-								//printf_check_result(st_array[k]);
 								printf("%0.1f ",st_array[k]);
 							}
 						}
@@ -865,7 +866,6 @@ void running_check(int check_type){
 							if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[k].summary_bit))
 									|| ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[k].summary_bit))){
 								printf("%s:%s%s=",mod_name,opt,trim(info[k].hdr,LEN_128));
-								//printf_check_result(st_array[k]);
 								printf("%0.1f ",st_array[k]);
 							}
 						}
@@ -890,7 +890,7 @@ void running_check(int check_type){
 /*tsar -check output similar as:
   v014119.cm3   tsar   apache/qps=5.35 apache/rt=165.89 apache/busy=2 apache/idle=148 cpu=3.58 mem=74.93% load1=0.22 load5=0.27 load15=0.20 xvda=0.15 ifin=131.82 ifout=108.86 TCPretr=0.12 df/=4.04% df/home=10.00% df/opt=71.22% df/tmp=2.07% df/usr=21.27% df/var=5.19% 
  */
-	//------------------------------RUN_CHECK-------------------------------------------
+	/* ------------------------------RUN_CHECK------------------------------------------- */
 	if(check_type == RUN_CHECK){
 		for (i = 0; i < statis.total_mod_num; i++) {
 			mod = &mods[i];

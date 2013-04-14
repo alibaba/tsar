@@ -1,3 +1,4 @@
+
 /*
  * (C) 2010-2011 Alibaba Group Holding Limited
  *
@@ -15,8 +16,10 @@
  *
  */
 
+
 #ifndef _TSAR_H
 #define _TSAR_H
+
 
 #include <string.h>
 #include <unistd.h>
@@ -41,6 +44,7 @@
 #include "output_nagios.h"
 #include "common.h"
 
+
 struct statistic
 {
 	int	total_mod_num;
@@ -51,5 +55,6 @@ struct statistic
 extern struct configure conf;
 extern struct module	mods[MAX_MOD_NUM];
 extern struct statistic statis;
+
 
 #endif

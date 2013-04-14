@@ -1,3 +1,4 @@
+
 /*
  * (C) 2010-2011 Alibaba Group Holding Limited
  *
@@ -15,11 +16,13 @@
  *
  */
 
+
 #include "tsar.h"
+
 
 void do_debug(log_level_t level, const char *fmt, ...)
 {
-	//FIXME
+	/* FIXME */
 	if (level >= conf.debug_level) {
 		va_list	argp;
 		time_t	timep;

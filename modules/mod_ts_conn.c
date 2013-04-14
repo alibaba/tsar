@@ -92,9 +92,9 @@ void read_ts_conn_stats(struct module *mod)
 		strcpy(write_buf+6, info);
 		write(fd, write_buf, 2+4+strlen(info));
 
-		short int ret_status;
-		short int ret_type;
-		long ret_val;
+		short int ret_status = 0;
+		short int ret_type = 0;
+		long ret_val = 0;
 		int read_len = read(fd, buf, LINE_1024);
 		if (read_len != -1) {
 			ret_status = *((short int *)&buf[0]);
