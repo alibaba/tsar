@@ -21,7 +21,7 @@
  * Structure for rpi infomation.
  */
 struct stats_rpi {
-	unsigned int cpu_temp;
+	int cpu_temp;
 };
 
 #define STATS_TEST_SIZE (sizeof(struct stats_rpi))
@@ -44,6 +44,10 @@ static void read_rpi_stats(struct module *mod, char *parameter)
 	int cpu_temp;
 
 	fscanf(fp, "%d", &cpu_temp);
+    
+    if (cpu_temp == 85*1000 || cpu_temp < 1) {
+        return;
+    }
 
 	st_rpi.cpu_temp = cpu_temp;
 
