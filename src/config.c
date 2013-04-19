@@ -312,3 +312,14 @@ void set_special_field(char *s)
 		}
 	}
 }
+
+void set_special_item(char *s)
+{
+	int i = 0, j = 0;
+	struct module *mod = NULL;
+	for ( i = 0; i < statis.total_mod_num; i++ )
+	{
+		mod = &mods[i];
+        strcpy(mod->print_item, s);
+	}
+}

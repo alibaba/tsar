@@ -63,11 +63,13 @@ struct module
 	char    record[LEN_1024];
 	char    usage[LEN_256];
 	char    parameter[LEN_256];
+	char    print_item[LEN_32];
 
 	struct  mod_info *info;
 	void    *lib;
 	int     enable;
 	int     spec;
+	int     p_item;
 
 	/* private data used by framework*/
 	int     n_item;

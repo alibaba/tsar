@@ -76,6 +76,7 @@ void parse_config_file(const char *file_name);
 void get_include_conf();
 void get_threshold();
 void set_special_field(char *spec_field);
+void set_special_item(char *spec_field);
 
 
 #endif

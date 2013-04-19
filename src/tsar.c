@@ -50,6 +50,7 @@ void usage()
 			"    --merge/-m		merge multiply item to one\n"
 			"    --detail/-D	\tdo not conver data to K/M/G\n"
 			"    --spec/-s		show spec field data, tsar --cpu -s sys,util\n"
+			"    --item/-I      show spec item data, tsar --io -I sda"
 			"    --help/-h		help\n");
 
 	fprintf(stderr,
@@ -80,6 +81,7 @@ struct option longopts[] = {
 	{ "merge", no_argument, NULL, 'm' },
 	{ "detail", no_argument, NULL, 'D' },
 	{ "spec", required_argument, NULL, 's' },
+	{ "item", required_argument, NULL, 'I' },
 	{ "help", no_argument, NULL, 'h' },
 	{ 0, 0, 0, 0},
 };
@@ -102,7 +104,7 @@ static void main_init(int argc, char **argv)
 	}
 	/*end*/
 #endif
-	while ((opt = getopt_long(argc, argv, ":cCi:Llf:n:d:s:mhD", longopts, NULL)) != -1) {
+	while ((opt = getopt_long(argc, argv, ":cCi:Llf:n:d:s:I:mhD", longopts, NULL)) != -1) {
 		oind++;
 		switch (opt) {
 			case 'c':
@@ -126,6 +128,9 @@ static void main_init(int argc, char **argv)
 				break;
 			case 's':
 				set_special_field(optarg);
+				break;
+			case 'I':
+				set_special_item(optarg);
 				break;
 			case 'n':
 				conf.print_ndays = atoi(optarg);

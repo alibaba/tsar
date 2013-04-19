@@ -77,12 +77,19 @@ void print_header()
 			n_record = strdup(mod->record);
 			/* set print opt line */
 			token = strtok(n_record, ITEM_SPLIT);
+            int count = 0;
 			while (token) {
 				s_token = strstr(token, ITEM_SPSTART);
 				if (s_token) {
 					memset(opt, 0, sizeof(opt));
 					memset(n_opt, 0, sizeof(n_opt));
 					strncat(opt, token, s_token - token);
+                    if(*mod->print_item != 0 && strcmp(mod->print_item, opt)) {
+				       token = strtok(NULL, ITEM_SPLIT);
+                       count++;
+                       continue;
+                    }
+                    mod->p_item |= (1<<count);
 					adjust_print_opt_line(n_opt, opt, strlen(mod_hdr));
 					strcat(opt_line, n_opt);
 					strcat(opt_line, PRINT_SEC_SPLIT);
@@ -90,6 +97,7 @@ void print_header()
 					strcat(hdr_line, PRINT_SEC_SPLIT);
 				}
 				token = strtok(NULL, ITEM_SPLIT);
+                count++;
 			}
 
 			free(n_record);
@@ -203,13 +211,15 @@ void print_record()
 		mod = &mods[i];
 		if (!mod->enable)				
 			continue;
-
 		if (!mod->n_item) {
 			print_array_stat(mod, NULL);
 			printf("%s", PRINT_SEC_SPLIT);
 
 		} else {
 			for (j = 0; j < mod->n_item; j++) {
+                if(*mod->print_item != 0 && (mod->p_item & (1<<j)) == 0) {
+                    continue;
+                }
 				st_array = &mod->st_array[j * mod->n_col];
 				print_array_stat(mod, st_array);
 				printf("%s", PRINT_SEC_SPLIT);
@@ -498,6 +508,10 @@ void print_tail(int tail_type)
 
 		k = 0;
 		for (j = 0; j < mod->n_item; j++) {
+            if(*mod->print_item != 0 && (mod->p_item & (1<<j)) == 0) {
+                k += mod->n_col;
+                continue;
+            }
 			int i;
 			struct mod_info *info = mod->info;
 			for (i=0; i < mod->n_col; i++) {
