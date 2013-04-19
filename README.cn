@@ -28,10 +28,10 @@ Tsar配置
 Tsar刚安装完，还没有历史数据，想要check是否正常，执行tsar -l，查看是否有实时信息输出：
 
     [kongjian@v132172.sqa.cm4 tsar]$ tsar -l -i 1
-    Time              ---cpu-- ---mem-- ---tcp-- -----traffic---- --xvda-- -xvda1-- -xvda2-- -xvda3-- -xvda4-- -xvda5--  ---load- 
-    Time                util     util   retran    pktin  pktout     util     util     util     util     util     util     load1   
-    11/04/13-14:09:10   0.20    11.57     0.00     9.00    2.00     0.00     0.00     0.00     0.00     0.00     0.00      0.00   
-    11/04/13-14:09:11   0.20    11.57     0.00     4.00    2.00     0.00     0.00     0.00     0.00     0.00     0.00      0.00   
+    Time              ---cpu-- ---mem-- ---tcp-- -----traffic---- --xvda-- -xvda1-- -xvda2-- -xvda3-- -xvda4-- -xvda5--  ---load-
+    Time                util     util   retran    pktin  pktout     util     util     util     util     util     util     load1
+    11/04/13-14:09:10   0.20    11.57     0.00     9.00    2.00     0.00     0.00     0.00     0.00     0.00     0.00      0.00
+    11/04/13-14:09:11   0.20    11.57     0.00     4.00    2.00     0.00     0.00     0.00     0.00     0.00     0.00      0.00
 
 Tsar的配置主要都在`/etc/tsar/tsar.conf`中，常用的有：
 * 增加一个模块,添加 `mod_<yourmodname> on` 到配置文件中
@@ -42,7 +42,7 @@ Tsar的配置主要都在`/etc/tsar/tsar.conf`中，常用的有：
 
 Tsar使用
 -------------
-* 查看历史数据，tsar  
+* 查看历史数据，tsar
 * -l/--list 查看可用的模块列表
 * -l/--live 查看实时数据,tsar -l --cpu
 * -i/--interval 指定间隔，历史,tsar -i 1 --cpu
@@ -52,7 +52,6 @@ Tsar使用
 * -C/--check 查看最后一次的采集数据
 * -d/--detail 能够指定查看主要字段还是模块的所有字段
 * -h/--help 帮助功能
-* 
 
 高级功能
 -------------
@@ -69,17 +68,17 @@ Tsar使用
     server_port 8086
     ####The cycle of send alert to nagios
     cycle_time 300
-    
+
 由于是nagios的被动监控模式，需要制定nsca的位置和配置文件位置
 
     ####nsca client program
     send_nsca_cmd /usr/bin/send_nsca
     send_nsca_conf /home/a/conf/amon/send_nsca.conf
-    
+
 接下来制定哪些模块和字段需要进行监控，一共四个阀值对应nagios中的不同报警级别
 
     ####tsar mod alert config file
-    ####threshold [hostname.]servicename.key;w-min;w-max;c-min;cmax;
+    ####threshold servicename.key;w-min;w-max;c-min;cmax;
     threshold cpu.util;50;60;70;80;
 
 * 输出到mysql
@@ -94,7 +93,7 @@ Tsar使用
 然后配置sql语句发送的目的地址和端口
 
     output_db_addr console2:56677
-    
+
 目的地址在该端口监听tcp数据，并且把数据入库即可，可以参照tsar2db：https://github.com/kongjian/tsar2db
 
 模块开发
@@ -104,7 +103,7 @@ Tsar的一个比较好的功能是能够增加自己的采集，这时候需要�
 首先安装tsardevel，刚才安装时，如果执行`make tsardevel`，就会把模块开发的基本文件安装到系统
 然后执行tsardevel <yourmodname>，就能在当前模块生成一个模块目录：
 
-    [kongjian@v132172.sqa.cm4 tsar]$ tsardevel test 
+    [kongjian@v132172.sqa.cm4 tsar]$ tsardevel test
     build:make
     install:make install
     uninstall:make uninstall

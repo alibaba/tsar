@@ -16,7 +16,7 @@ or you can just download zip file and install it an follows:
     $wget -O tsar.zip https://github.com/alibaba/tsar/archive/master.zip
     $unzip tsar.zip
     $cd tsar
-    $make 
+    $make
     $make install
 
 after install, some major file is:
@@ -31,10 +31,10 @@ Tsar configure
 after install, it does not have any data,to check tsar, run `tsar -l`, see if real-time collection is normal:
 
     [kongjian@v132172.sqa.cm4 tsar]$ tsar -l -i 1
-    Time              ---cpu-- ---mem-- ---tcp-- -----traffic---- --xvda-- -xvda1-- -xvda2-- -xvda3-- -xvda4-- -xvda5--  ---load- 
-    Time                util     util   retran    pktin  pktout     util     util     util     util     util     util     load1   
-    11/04/13-14:09:10   0.20    11.57     0.00     9.00    2.00     0.00     0.00     0.00     0.00     0.00     0.00      0.00   
-    11/04/13-14:09:11   0.20    11.57     0.00     4.00    2.00     0.00     0.00     0.00     0.00     0.00     0.00      0.00   
+    Time              ---cpu-- ---mem-- ---tcp-- -----traffic---- --xvda-- -xvda1-- -xvda2-- -xvda3-- -xvda4-- -xvda5--  ---load-
+    Time                util     util   retran    pktin  pktout     util     util     util     util     util     util     load1
+    11/04/13-14:09:10   0.20    11.57     0.00     9.00    2.00     0.00     0.00     0.00     0.00     0.00     0.00      0.00
+    11/04/13-14:09:11   0.20    11.57     0.00     4.00    2.00     0.00     0.00     0.00     0.00     0.00     0.00      0.00
 
 Tsar main config is `/etc/tsar/tsar.conf`, Often used are;
 * add a module, add `mod_<yourmodname> on` to config
@@ -46,8 +46,8 @@ Tsar main config is `/etc/tsar/tsar.conf`, Often used are;
 
 Tsar usage
 -------------
-* see history :`tsar`  
-* -l/--list :list available moudule 
+* see history :`tsar`
+* -l/--list :list available moudule
 * -l/--live :show real-time info, `tsar -l --cpu`
 * -i/--interval :set interval for report, `tsar -i 1 --cpu`
 * --modname :specify module to show, `tsar --cpu`
@@ -73,7 +73,7 @@ configure nagios server address, port, and send interval time
     server_port 8086
     ####The cycle of send alert to nagios
     cycle_time 300
-    
+
 as tsar use nagios passive mode, it need nsca bin and config location
 
     ####nsca client program
@@ -83,7 +83,7 @@ as tsar use nagios passive mode, it need nsca bin and config location
 then specify module and field to be checked, there are 4 threshold corresponding to nagios different level
 
     ####tsar mod alert config file
-    ####threshold [hostname.]servicename.key;w-min;w-max;c-min;cmax;
+    ####threshold servicename.key;w-min;w-max;c-min;cmax;
     threshold cpu.util;50;60;70;80;
 
 * output to mysql
@@ -99,7 +99,7 @@ then specify which module will be output:
 configure destination address and port
 
     output_db_addr console2:56677
- 
+
 destination listen at specific port, it recv data and flush to mysql, you can use tsar2db: https://github.com/kongjian/tsar2db
 
 module develop
@@ -110,7 +110,7 @@ First install tsardevel，`make tsardevel` will do it
 
 run `tsardevel <yourmodname>`, you will have an yourmodname dir and init files.
 
-    [kongjian@v132172.sqa.cm4 tsar]$ tsardevel test 
+    [kongjian@v132172.sqa.cm4 tsar]$ tsardevel test
     build:make
     install:make install
     uninstall:make uninstall
