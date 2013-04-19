@@ -23,11 +23,11 @@
 
 typedef enum
 {
-	LOG_INFO,
-	LOG_DEBUG,
-	LOG_WARN,
-	LOG_ERR,
-	LOG_FATAL
+    LOG_INFO,
+    LOG_DEBUG,
+    LOG_WARN,
+    LOG_ERR,
+    LOG_FATAL
 } log_level_t;
 
 

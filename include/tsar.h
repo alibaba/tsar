@@ -47,8 +47,8 @@
 
 struct statistic
 {
-	int	total_mod_num;
-	time_t	cur_time;
+    int	total_mod_num;
+    time_t	cur_time;
 };
 
 

@@ -56,11 +56,11 @@
 
 #define COLOR(val, fmt, str, ret, color) do				\
 {							\
-	if ((val) > 100)				\
-	ret = sprintf(str,			\
-			color##_FMT(fmt), (val));	\
-	else						\
-	ret = sprintf(str, fmt, (val));		\
+    if ((val) > 100)				\
+    ret = sprintf(str,			\
+            color##_FMT(fmt), (val));	\
+    else						\
+    ret = sprintf(str, fmt, (val));		\
 } while(0)
 
 #define FALSE 0
@@ -115,184 +115,184 @@ enum {MIN, MEAN, MAX};
 #define KB 0x3E8
 
 #define __INDENT(f, idx, ret)				\
-	do {						\
-		if((f/1024.0) > GB) {			\
-			(ret) = (f) * 1.0/1024.0 / GB;	\
-			(idx) = 3;			\
-		}					\
-		else if((f) > GB) {			\
-			(ret) = (f) * 1.0 / GB;		\
-			(idx) = 2;			\
-		}					\
-		else if ((f) > MB){			\
-			(ret) = (f) * 1.0 / MB;		\
-			(idx) = 1;			\
-		}					\
-		else {					\
-			(ret) = (f) * 1.0 / KB;		\
-			(idx) = 0;			\
-		}					\
-	}while(0)
+    do {						\
+        if((f/1024.0) > GB) {			\
+            (ret) = (f) * 1.0/1024.0 / GB;	\
+            (idx) = 3;			\
+        }					\
+        else if((f) > GB) {			\
+            (ret) = (f) * 1.0 / GB;		\
+            (idx) = 2;			\
+        }					\
+        else if ((f) > MB){			\
+            (ret) = (f) * 1.0 / MB;		\
+            (idx) = 1;			\
+        }					\
+        else {					\
+            (ret) = (f) * 1.0 / KB;		\
+            (idx) = 0;			\
+        }					\
+    }while(0)
 
 
 #define __PRINT_S(buffer, val, ret) do {			\
-	int _i;						\
-	double _f;					\
-	char u[] = {'K', 'M', 'G', 'T'};		\
-	__INDENT((val), _i, _f);			\
-	(ret) += sprintf((buffer), FMT_S, _f, u[_i]);	\
+    int _i;						\
+    double _f;					\
+    char u[] = {'K', 'M', 'G', 'T'};		\
+    __INDENT((val), _i, _f);			\
+    (ret) += sprintf((buffer), FMT_S, _f, u[_i]);	\
 }while(0)
 
 #define __PRINT_SP(buffer, val, ret) do {			\
-	(ret) += sprintf(buffer, FMT_SP, (val));	\
+    (ret) += sprintf(buffer, FMT_SP, (val));	\
 }while(0)
 
 #define __PRINT_NAGIOS(buffer, val, ret) do {			\
-	(ret) += sprintf(buffer, FMT_NAGIOS, (val));	\
+    (ret) += sprintf(buffer, FMT_NAGIOS, (val));	\
 }while(0)
 
 #define PRINT(buffer, val, ret, type) do {			\
-	if (type == OUTPUT_NAGIOS) {			\
-		__PRINT_NAGIOS(buffer, val, ret);	\
-	}						\
-	else{						\
-		if ((val) < KB)	{			\
-			__PRINT_SP(buffer, val, ret);	\
-		}					\
-		else {					\
-			__PRINT_S(buffer, val, ret);	\
-		}					\
-	}						\
+    if (type == OUTPUT_NAGIOS) {			\
+        __PRINT_NAGIOS(buffer, val, ret);	\
+    }						\
+    else{						\
+        if ((val) < KB)	{			\
+            __PRINT_SP(buffer, val, ret);	\
+        }					\
+        else {					\
+            __PRINT_S(buffer, val, ret);	\
+        }					\
+    }						\
 } while(0)
 
 #define myalloc(p, type, size)					\
-	struct type * p = NULL;					\
+    struct type * p = NULL;					\
 p = (struct type *)malloc(size);			\
 if(!p) {						\
-	fprintf(stderr, "failed to alloc memory\n");	\
-	exit(EXIT_FAILURE);				\
+    fprintf(stderr, "failed to alloc memory\n");	\
+    exit(EXIT_FAILURE);				\
 }							\
 memset(p, 0, size)					\
 
 #define BUFFER_ROTATE(mod, size)					\
-	do {								\
-		memcpy(&s_st_##mod[PAST], &s_st_##mod[CURR], (size));	\
-		memset(&s_st_##mod[CURR], '\0', (size));		\
-	}while(0)
+    do {								\
+        memcpy(&s_st_##mod[PAST], &s_st_##mod[CURR], (size));	\
+        memset(&s_st_##mod[CURR], '\0', (size));		\
+    }while(0)
 
 inline void func_mod_free(struct module *mod)
 {
-	free(mod->detail);
-	free(mod->summary);
-	mod->detail = NULL;
-	mod->summary = NULL;
+    free(mod->detail);
+    free(mod->summary);
+    mod->detail = NULL;
+    mod->summary = NULL;
 }
 
 #define INIT_STRING_P(s, nr, len)				\
-	do {							\
-		int i;						\
-		s = (char **)malloc((nr) * sizeof(char *));	\
-		for(i = 0; i < (nr); i++)			\
-		s[i] = (char *)malloc(len);		\
-	} while(0)
+    do {							\
+        int i;						\
+        s = (char **)malloc((nr) * sizeof(char *));	\
+        for(i = 0; i < (nr); i++)			\
+        s[i] = (char *)malloc(len);		\
+    } while(0)
 
 
 #define DECLARE_TMP_MOD_STATISTICS(mod)		\
-	union mod##_statistics mod##_tmp_s;	\
+    union mod##_statistics mod##_tmp_s;	\
 
 #define SET_CURRENT_VALUE(mod, type, member, ret)	\
-	do {						\
-		mod##_tmp_s.mod##_##type.ret =		\
-		s_st_##mod[CURR].member;	\
-	}while(0)
+    do {						\
+        mod##_tmp_s.mod##_##type.ret =		\
+        s_st_##mod[CURR].member;	\
+    }while(0)
 
 #define __COMPUTE_MOD_VALUE(ret, ops, m1, m2, i)	\
-	do {						\
-		if (!(i)) {				\
-			(ret) = 0;			\
-		}					\
-		else if ((m1) == (m2))	{		\
-			(ret) = 0;			\
-		}					\
-		else {					\
-			(ret) = ops((m1), (m2), (i));	\
-		}					\
-	} while(0)
+    do {						\
+        if (!(i)) {				\
+            (ret) = 0;			\
+        }					\
+        else if ((m1) == (m2))	{		\
+            (ret) = 0;			\
+        }					\
+        else {					\
+            (ret) = ops((m1), (m2), (i));	\
+        }					\
+    } while(0)
 
 
 #define COMPUTE_MOD_VALUE(mod, ops, type, member, i, ret)		\
-	do {								\
-		/*printf("i = %ld\n", (i));*/				\
-		__COMPUTE_MOD_VALUE(					\
-				mod##_tmp_s.mod##_##type.ret,	\
-				ops,				\
-				s_st_##mod[1].member,		\
-				s_st_##mod[0].member,		\
-				(i));				\
-	} while(0)
+    do {								\
+        /*printf("i = %ld\n", (i));*/				\
+        __COMPUTE_MOD_VALUE(					\
+                mod##_tmp_s.mod##_##type.ret,	\
+                ops,				\
+                s_st_##mod[1].member,		\
+                s_st_##mod[0].member,		\
+                (i));				\
+    } while(0)
 
 
 /* Fix me */
 #define __SET_MOD_STATISTICS(val, mean, max, min, i)		\
-	do{							\
-		static int sw = 0;				\
-		if(!sw) {					\
-			(max) = (val);				\
-			(min) = (val);				\
-			sw = 1;					\
-		} else {					\
-			if (((val) - (max)) > 0.00001)		\
-			(max) = (val);			\
-			else if (((min) - (val)) > 0.00001) {	\
-				(min) = (val);			\
-			}					\
-		}						\
-		(mean) += (val);				\
-	} while(0)
+    do{							\
+        static int sw = 0;				\
+        if(!sw) {					\
+            (max) = (val);				\
+            (min) = (val);				\
+            sw = 1;					\
+        } else {					\
+            if (((val) - (max)) > 0.00001)		\
+            (max) = (val);			\
+            else if (((min) - (val)) > 0.00001) {	\
+                (min) = (val);			\
+            }					\
+        }						\
+        (mean) += (val);				\
+    } while(0)
 
 #define SET_MOD_STATISTICS(mod, member, i, type)	\
-	__SET_MOD_STATISTICS				\
+    __SET_MOD_STATISTICS				\
 (						\
-						mod##_tmp_s.mod##_##type.member,		\
-						mod##_statis[MEAN].mod##_##type.member,	\
-						mod##_statis[MAX].mod##_##type.member,		\
-						mod##_statis[MIN].mod##_##type.member,		\
-						i)
+                        mod##_tmp_s.mod##_##type.member,		\
+                        mod##_statis[MEAN].mod##_##type.member,	\
+                        mod##_statis[MAX].mod##_##type.member,		\
+                        mod##_statis[MIN].mod##_##type.member,		\
+                        i)
 
 #define __PRINT_AVG(buf, pos, val, member, idx, count, otype) do	\
 {							\
-	if ((idx) == MEAN)				\
-	val[(idx)].member =			\
-	val[(idx)].member / (count);	\
-	PRINT(buf[(idx)] + pos[(idx)],			\
-			val[(idx)].member,			\
-			pos[(idx)], (otype));			\
+    if ((idx) == MEAN)				\
+    val[(idx)].member =			\
+    val[(idx)].member / (count);	\
+    PRINT(buf[(idx)] + pos[(idx)],			\
+            val[(idx)].member,			\
+            pos[(idx)], (otype));			\
 }while(0)
 
 #define __PRINT_AVG_SEP(buf, pos, val, member, sep, idx, count, otype) do \
 {							\
-	if((idx) == MEAN)				\
-	val[(idx)].member =			\
-	(val[(idx)].member / (count));	\
-	PRINT(buf[(idx)] + pos[(idx)],			\
-			val[(idx)].member * (sep),		\
-			pos[(idx)], (otype));			\
+    if((idx) == MEAN)				\
+    val[(idx)].member =			\
+    (val[(idx)].member / (count));	\
+    PRINT(buf[(idx)] + pos[(idx)],			\
+            val[(idx)].member * (sep),		\
+            pos[(idx)], (otype));			\
 }while(0)
 
 inline char *getitem(char *r, char *mnt) 
 {
-	char *start, *end;
-	if (r == NULL || *r == '\0') {
-		return NULL;
-	}else  {
-		start = strstr(r, "=");
-		end = strstr(r, ";");
-		memcpy(mnt, start + 1, end - start -1);
-		r = end + 1;
-		mnt[end - start - 1] = '\0';
-	}
+    char *start, *end;
+    if (r == NULL || *r == '\0') {
+        return NULL;
+    }else  {
+        start = strstr(r, "=");
+        end = strstr(r, ";");
+        memcpy(mnt, start + 1, end - start -1);
+        r = end + 1;
+        mnt[end - start - 1] = '\0';
+    }
 
-	return r;
+    return r;
 }
 
 #define CALITV(pt, ct, i) ((i) = ((pt) < (ct)) ? (ct) - (pt) : 1)

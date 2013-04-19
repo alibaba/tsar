@@ -26,14 +26,14 @@
  */
 
 struct buffer {
-	char	*data;
-	int	len;
+    char	*data;
+    int	len;
 };
 
 struct file_header
 {
-	int	version;
-	time_t	t_start;	
+    int	version;
+    time_t	t_start;	
 };
 
 
