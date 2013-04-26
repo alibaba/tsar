@@ -1,6 +1,6 @@
 Introduction
 ------------
-Tsar(Taobao System Activity Reporter) is an system and application monitor tools, such as system info(cpu, load, io), or apps info(nginx,swift). The collect data can be stored at local disk, you can also send the data to nagios.
+Tsar(Taobao System Activity Reporter) is an system and application monitor tools, such as system info(cpu, load, io), or apps info(nginx, haproxy). The collect data can be stored at local disk, you can also send the data to nagios.
 It is very convenient to add custom modules for tsar, you just need to write collect function and report function as requested.
 
 Installation

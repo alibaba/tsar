@@ -35,23 +35,22 @@ void usage()
             "Options:\n"
 #ifdef OLDTSAR
             /*used for check alert*/
-            "    -check		display last record for alert\n"
-            //"    -current		display last record for alert\n"
+            "    -check         display last record for alert\n"
             /*end*/
 #endif
-            "    --check/-C		display last record for alert.example:tsar --check / tsar --check --cpu --io\n"
-            "    --cron/-c		run in cron mode, output data to file\n"
-            "    --interval/-i	specify intervals numbers, in minutes if with --live, it is in seconds\n"
-            "    --list/-L		list enabled modules\n"
-            "    --live/-l		running print live mode, which module will print\n"
-            "    --file/-f		specify a filepath as input\n"
-            "    --ndays/-n		show the value for the past days (default: 1)\n"
-            "    --date/-d		show the value for the specify day(n or YYYYMMDD)\n"
-            "    --merge/-m		merge multiply item to one\n"
-            "    --detail/-D	\tdo not conver data to K/M/G\n"
-            "    --spec/-s		show spec field data, tsar --cpu -s sys,util\n"
-            "    --item/-I      show spec item data, tsar --io -I sda"
-            "    --help/-h		help\n");
+            "    --check/-C     display last record for alert.example:tsar --check / tsar --check --cpu --io\n"
+            "    --cron/-c      run in cron mode, output data to file\n"
+            "    --interval/-i  specify intervals numbers, in minutes if with --live, it is in seconds\n"
+            "    --list/-L      list enabled modules\n"
+            "    --live/-l      running print live mode, which module will print\n"
+            "    --file/-f      specify a filepath as input\n"
+            "    --ndays/-n     show the value for the past days (default: 1)\n"
+            "    --date/-d      show the value for the specify day(n or YYYYMMDD)\n"
+            "    --merge/-m     merge multiply item to one\n"
+            "    --detail/-D    do not conver data to K/M/G\n"
+            "    --spec/-s      show spec field data, tsar --cpu -s sys,util\n"
+            "    --item/-I      show spec item data, tsar --io -I sda\n"
+            "    --help/-h      help\n");
 
     fprintf(stderr,
             "Modules Enabled:\n"
