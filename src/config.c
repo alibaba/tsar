@@ -93,17 +93,19 @@ void parse_string(char *var)
 void parse_add_string(char *var)
 {
     char    *token = strtok(NULL, W_SPACE);
+    /*
     if (var == NULL){
         if(token)
             strncpy(var, token, strlen(token));
     }else{
+    */
         if(token){
             strcat(token, ",");
             strncat(token, var, strlen(var));
         }
         if(token)
             strncpy(var, token, strlen(token));
-    }
+    //}
 }
 
 void set_debug_level()
@@ -185,7 +187,8 @@ void parse_config_file(const char *file_name)
     memset(&statis, '\0', sizeof(statis));
     conf.server_port = (int *)malloc(sizeof(int));
     conf.cycle_time = (int *)malloc(sizeof(int));
-    conf.debug_level = LOG_ERR;
+    //conf.debug_level = LOG_ERR;
+    conf.debug_level = LOG_INFO;
     conf.print_detail = FALSE;
     while (fgets(config_input_line, LEN_1024, fp)) {
         if ((token = strchr(config_input_line, '\n')))
