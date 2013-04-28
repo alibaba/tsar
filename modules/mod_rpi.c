@@ -21,7 +21,7 @@
  * Structure for rpi infomation.
  */
 struct stats_rpi {
-	int cpu_temp;
+    int cpu_temp;
 };
 
 #define STATS_TEST_SIZE (sizeof(struct stats_rpi))
@@ -29,48 +29,52 @@ struct stats_rpi {
 static char *rpi_usage = "    --rpi               Rapsberry Pi information (CPU temprature ...)";
 
 
-static void read_rpi_stats(struct module *mod, char *parameter)
+static void
+read_rpi_stats(struct module *mod, char *parameter)
 {
-	FILE *fp;
-	char buf[64];
-	memset(buf, 0, sizeof(buf));
-	struct stats_rpi st_rpi;
-	memset(&st_rpi, 0, sizeof(struct stats_rpi));
+    FILE   *fp;
+    char    buf[64];
+    struct  stats_rpi st_rpi;
 
-	if ((fp = fopen("/sys/class/thermal/thermal_zone0/temp", "r")) == NULL) {
-		return;
-	}
+    memset(buf, 0, sizeof(buf));
+    memset(&st_rpi, 0, sizeof(struct stats_rpi));
 
-	int cpu_temp;
+    if ((fp = fopen("/sys/class/thermal/thermal_zone0/temp", "r")) == NULL) {
+        return;
+    }
 
-	fscanf(fp, "%d", &cpu_temp);
-    
+    int    cpu_temp;
+
+    fscanf(fp, "%d", &cpu_temp);
+
     if (cpu_temp == 85*1000 || cpu_temp < 1) {
         return;
     }
 
-	st_rpi.cpu_temp = cpu_temp;
+    st_rpi.cpu_temp = cpu_temp;
 
-	int pos = sprintf(buf, "%u",
-			/* the store order is not same as read procedure */
-			st_rpi.cpu_temp);
-	buf[pos] = '\0';
-	set_mod_record(mod, buf);
-	fclose(fp);
-	return;
+    int pos = sprintf(buf, "%u",
+            /* the store order is not same as read procedure */
+            st_rpi.cpu_temp);
+    buf[pos] = '\0';
+    set_mod_record(mod, buf);
+    fclose(fp);
+    return;
 }
 
 static struct mod_info rpi_info[] = {
-	{"  temp", SUMMARY_BIT,  0,  STATS_NULL}
+    {"  temp", SUMMARY_BIT,  0,  STATS_NULL}
 };
 
-static void set_rpi_record(struct module *mod, double st_array[],
-		U_64 pre_array[], U_64 cur_array[], int inter)
+static void
+set_rpi_record(struct module *mod, double st_array[],
+    U_64 pre_array[], U_64 cur_array[], int inter)
 {
-	st_array[0] = cur_array[0]/1000.0;
+    st_array[0] = cur_array[0]/1000.0;
 }
 
-void mod_register(struct module *mod)
-{	
-	register_mod_fileds(mod, "--rpi", rpi_usage, rpi_info, 1, read_rpi_stats, set_rpi_record);
+void
+mod_register(struct module *mod)
+{
+    register_mod_fileds(mod, "--rpi", rpi_usage, rpi_info, 1, read_rpi_stats, set_rpi_record);
 }
