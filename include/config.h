@@ -24,34 +24,34 @@
 #include "define.h"
 
 
-struct configure
-{
-    /* from arg */
-    int	running_mode;	/* running mode */
-    char	config_file[LEN_128];
-    int	debug_level;
+struct configure {
 
-    char	output_interface[LEN_128];  /* which interface will enable*/
+    /* from arg */
+    int     running_mode;               /* running mode */
+    char    config_file[LEN_128];
+    int     debug_level;
+
+    char    output_interface[LEN_128];  /* which interface will enable*/
 
     /* output print */
-    char	output_print_mod[LEN_512];  /* which mod will print throught argv */
-    char	output_stdio_mod[LEN_512];  /* which mod will print throuhth conf file */
-    char    output_nagios_mod[LEN_512];  /* which mod will output to nagios */
-    int	print_interval;		 /* how many seconds will escape every print interval */
-    int	print_nline_interval;	 /* how many lines will skip every print interval */
-    int	print_mode;		/* data type will print: summary or detail */
-    int	print_merge;		/* mult items is merge */
-    int	print_detail;		/* conver data to K/M/G */
-    int	print_ndays;		 /* these days will print.default:1 */
-    int	print_day;		 /* which day will print*/
-    int	print_start_time;	/* the start of the print time*/
-    int	print_end_time;		 /* the end of the print time*/
-    int	print_tail;
-    int	print_file_number;	/* which tsar.data file used*/
+    char    output_print_mod[LEN_512];  /* which mod will print throught argv */
+    char    output_stdio_mod[LEN_512];  /* which mod will print throuhth conf file */
+    char    output_nagios_mod[LEN_512]; /* which mod will output to nagios */
+    int     print_interval;             /* how many seconds will escape every print interval */
+    int     print_nline_interval;       /* how many lines will skip every print interval */
+    int     print_mode;                 /* data type will print: summary or detail */
+    int     print_merge;                /* mult items is merge */
+    int     print_detail;               /* conver data to K/M/G */
+    int     print_ndays;                /* these days will print.default:1 */
+    int     print_day;                  /* which day will print*/
+    int     print_start_time;           /* the start of the print time*/
+    int     print_end_time;             /* the end of the print time*/
+    int     print_tail;
+    int     print_file_number;          /* which tsar.data file used*/
 
     /* output db */
-    char	output_db_mod[LEN_512];  /* which mod will output */
-    char	output_db_addr[LEN_512]; /* db addr */
+    char    output_db_mod[LEN_512];     /* which mod will output */
+    char    output_db_addr[LEN_512];    /* db addr */
 
     /* output nagios */
     char    server_addr[LEN_512];
@@ -68,7 +68,7 @@ struct configure
     int     mod_num;
 
     /* output file */
-    char	output_file_path[LEN_128];
+    char    output_file_path[LEN_128];
 };
 
 

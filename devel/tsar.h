@@ -35,29 +35,29 @@
 #include <sys/stat.h>
 
 
-#define	U_64		unsigned long long
+#define U_64        unsigned long long
 
-#define LEN_32		32
-#define LEN_64		64
-#define LEN_128		128
-#define LEN_256		256
-#define LEN_512		512
-#define LEN_1024	1024
-#define LEN_4096	4096
+#define LEN_32      32
+#define LEN_64      64
+#define LEN_128     128
+#define LEN_256     256
+#define LEN_512     512
+#define LEN_1024    1024
+#define LEN_4096    4096
 
 #define ITEM_SPLIT      ";"
 #define DATA_SPLIT      ","
 
 
 struct mod_info {
-    char    hdr[LEN_128];
-    int     summary_bit;    /* bit set indefi summary */
-    int     merge_mode;
-    int     stats_opt;
+    int    summary_bit;    /* bit set indefi summary */
+    int    merge_mode;
+    int    stats_opt;
+    char   hdr[LEN_128];
 };
 
-struct module
-{
+struct module {
+
     char    name[LEN_32];
     char    opt_line[LEN_32];
     char    record[LEN_1024];
@@ -66,7 +66,7 @@ struct module
     char    print_item[LEN_32];
 
     struct  mod_info *info;
-    void    *lib;
+    void   *lib;
     int     enable;
     int     spec;
     int     p_item;
@@ -79,12 +79,12 @@ struct module
     int     pre_flag:4;
     int     st_flag:4;
 
-    U_64    *pre_array;
-    U_64    *cur_array;
-    double  *st_array;
-    double  *max_array;
-    double  *mean_array;
-    double  *min_array;
+    U_64   *pre_array;
+    U_64   *cur_array;
+    double *st_array;
+    double *max_array;
+    double *mean_array;
+    double *min_array;
 
     /* callback function of module */
     void (*data_collect) (struct module *,char *);

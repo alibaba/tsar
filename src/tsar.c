@@ -22,12 +22,13 @@
 
 struct statistic statis;
 struct configure conf;
-struct module	mods[MAX_MOD_NUM];
+struct module   mods[MAX_MOD_NUM];
 
 
-void usage()
+void
+usage()
 {
-    int i;
+    int    i;
     struct module *mod;
 
     fprintf(stderr,
@@ -58,7 +59,7 @@ void usage()
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
-        if(mod->usage) {
+        if (mod->usage) {
             fprintf(stderr, "%s", mod->usage);
             fprintf(stderr, "\n");
         }
@@ -86,13 +87,14 @@ struct option longopts[] = {
 };
 
 
-static void main_init(int argc, char **argv)
+static void
+main_init(int argc, char **argv)
 {
-    int opt, oind = 0;
+    int    opt, oind = 0;
 #ifdef OLDTSAR
     /* check option for tsar1.0 */
-    if(argc >= 2){
-        if(!strcmp(argv[1],"-check") && argc == 2){
+    if (argc >= 2) {
+        if (!strcmp(argv[1],"-check") && argc == 2) {
             conf.running_mode = RUN_CHECK;
             conf.print_mode = DATA_DETAIL;
             conf.print_interval = 60;
@@ -154,30 +156,37 @@ static void main_init(int argc, char **argv)
                 if (argv[oind] && strstr(argv[oind], "--")) {
                     strcat(conf.output_print_mod, argv[oind]);
                     strcat(conf.output_print_mod, DATA_SPLIT);
-                } else
+
+                } else {
                     usage();
+                }
         }
     }
     /* set default parameter */
-    if (!conf.print_ndays)
+    if (!conf.print_ndays) {
         conf.print_ndays = 1;
+    }
 
-    if (!conf.print_interval)
+    if (!conf.print_interval) {
         conf.print_interval = DEFAULT_PRINT_INTERVAL;
+    }
 
-    if (RUN_NULL == conf.running_mode)
+    if (RUN_NULL == conf.running_mode) {
         conf.running_mode = RUN_PRINT;
+    }
 
-    if(conf.running_mode == RUN_CHECK_NEW){
+    if (conf.running_mode == RUN_CHECK_NEW) {
         conf.print_interval = 60;
         conf.print_tail = 0;
         conf.print_nline_interval = conf.print_interval;
     }
 
-    if (!strlen(conf.output_print_mod))
+    if (!strlen(conf.output_print_mod)) {
         conf.print_mode = DATA_SUMMARY;
-    else
+
+    } else {
         conf.print_mode = DATA_DETAIL;
+    }
 
     strcpy(conf.config_file, DEFAULT_CONF_FILE_PATH);
     if (access(conf.config_file, F_OK)) {
@@ -186,7 +195,8 @@ static void main_init(int argc, char **argv)
 }
 
 
-void shut_down()
+void
+shut_down()
 {
     free_modules();
 
@@ -196,23 +206,25 @@ void shut_down()
 }
 
 
-void running_list()
+void
+running_list()
 {
-    int i;
+    int    i;
     struct module *mod;
 
     printf("tsar enable follow modules:\n");
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
-        printf("	%s\n", mod->name + 4);
+        printf("    %s\n", mod->name + 4);
     }
 }
 
 
-void running_cron()
+void
+running_cron()
 {
-    int have_collect = 0;
+    int    have_collect = 0;
     /* output interface */
     if (strstr(conf.output_interface, "file")) {
         /* output data */
@@ -230,7 +242,8 @@ void running_cron()
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
     parse_config_file(DEFAULT_CONF_FILE_PATH);
 
