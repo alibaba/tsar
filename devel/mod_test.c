@@ -27,9 +27,9 @@ static char *test_usage = "    --test               test information";
  * temp structure for collection infomation.
  */
 struct stats_test {
-    unsigned long long value_1;
-    unsigned long long value_2;
-    unsigned long long value_3;
+    unsigned long long    value_1;
+    unsigned long long    value_2;
+    unsigned long long    value_3;
 };
 
 /* Structure for tsar */
@@ -39,11 +39,13 @@ static struct mod_info test_info[] = {
     {"value3", DETAIL_BIT,  0,  STATS_NULL}
 };
 
-static void read_test_stats(struct module *mod, char *parameter)
+static void
+read_test_stats(struct module *mod, char *parameter)
 {
-    char buf[256];
+    char               buf[256];
+    struct stats_test  st_test;
+
     memset(buf, 0, sizeof(buf));
-    struct stats_test st_test;
     memset(&st_test, 0, sizeof(struct stats_test));
 
     st_test.value_1 = 1;
@@ -62,8 +64,9 @@ static void read_test_stats(struct module *mod, char *parameter)
     return;
 }
 
-static void set_test_record(struct module *mod, double st_array[],
-        U_64 pre_array[], U_64 cur_array[], int inter)
+static void 
+set_test_record(struct module *mod, double st_array[],
+    U_64 pre_array[], U_64 cur_array[], int inter)
 {
     int i;
     /* set st record */
@@ -73,7 +76,8 @@ static void set_test_record(struct module *mod, double st_array[],
 }
 
 /* register mod to tsar */
-void mod_register(struct module *mod)
+void
+mod_register(struct module *mod)
 {
     register_mod_fileds(mod, "--test", test_usage, test_info, 3, read_test_stats, set_test_record);
 }

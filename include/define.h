@@ -24,39 +24,39 @@
 //-check & --check function for old tsar amon usage
 #define OLDTSAR
 
-#define U_BIT		3
+#define U_BIT       3
 
-#define	U_64		unsigned long long
+#define U_64        unsigned long long
 
-#define LEN_32		32
-#define LEN_64		64
-#define LEN_128		128
-#define LEN_256		256
-#define LEN_512		512
-#define LEN_1024	1024
-#define LEN_4096	4096
-#define LEN_10240	10240
+#define LEN_32      32
+#define LEN_64      64
+#define LEN_128     128
+#define LEN_256     256
+#define LEN_512     512
+#define LEN_1024    1024
+#define LEN_4096    4096
+#define LEN_10240   10240
 
-#define MAX_COL_NUM	64
-#define MAX_MOD_NUM	32
+#define MAX_COL_NUM 64
+#define MAX_MOD_NUM 32
 
 #define SECTION_SPLIT   "|"
 #define STRING_SPLIT    ":"
-#define ITEM_SPLIT	";"
-#define ITEM_SPSTART	"="
-#define DATA_SPLIT	","
-#define HDR_SPLIT	"#"
+#define ITEM_SPLIT  ";"
+#define ITEM_SPSTART    "="
+#define DATA_SPLIT  ","
+#define HDR_SPLIT   "#"
 #define PRINT_DATA_SPLIT "  "
-#define PRINT_SEC_SPLIT	" "
-#define W_SPACE		" \t\r\n"
+#define PRINT_SEC_SPLIT " "
+#define W_SPACE     " \t\r\n"
 
-#define DEFAULT_PRINT_NUM	20
-#define DEFAULT_PRINT_INTERVAL	5
+#define DEFAULT_PRINT_NUM   20
+#define DEFAULT_PRINT_INTERVAL  5
 
-#define MOD_INFO_SIZE		sizeof(strcut mod_info)
+#define MOD_INFO_SIZE       sizeof(strcut mod_info)
 
-#define DEFAULT_CONF_FILE_PATH		"/etc/tsar/tsar.conf"
-#define DEFAULT_OUTPUT_FILE_PATH	"/var/log/tsar.data" 
+#define DEFAULT_CONF_FILE_PATH      "/etc/tsar/tsar.conf"
+#define DEFAULT_OUTPUT_FILE_PATH    "/var/log/tsar.data" 
 #define MIN_STRING "MIN:        "
 #define MEAN_STRING "MEAN:       "
 #define MAX_STRING "MAX:        "

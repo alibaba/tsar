@@ -20,14 +20,15 @@
 #include "tsar.h"
 
 
-void output_file()
+void
+output_file()
 {
-    struct	module *mod;
-    FILE	*fp = NULL;
-    int	i, ret = 0;
-    char	line[LEN_10240] = {0};
-    char	detail[LEN_4096] = {0};
-    char	s_time[LEN_256] = {0};
+    int    i, ret = 0;
+    FILE  *fp = NULL;
+    char   line[LEN_10240] = {0};
+    char   detail[LEN_4096] = {0};
+    char   s_time[LEN_256] = {0};
+    struct module *mod;
 
     if (!(fp = fopen(conf.output_file_path, "a+"))) {
         if (!(fp = fopen(conf.output_file_path, "w")))
@@ -53,7 +54,7 @@ void output_file()
             do_debug(LOG_WARN, "write line error\n");
     }
     fclose(fp);
-    if(chmod(conf.output_file_path, 0666) < 0 )
+    if (chmod(conf.output_file_path, 0666) < 0 ) {
         do_debug(LOG_WARN, "chmod file %s error\n",conf.output_file_path);
+    }
 }
-

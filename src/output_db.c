@@ -24,13 +24,14 @@
 /*
  * send sql to remote db
  */
-void send_sql_txt(int fd, int have_collect)
+void
+send_sql_txt(int fd, int have_collect)
 {
-    struct	module *mod;
-    char	sqls[LEN_10240] = {0};
-    char	s_time[LEN_64] = {0};
-    char	host_name[LEN_64] = {0};
-    int	i = 0, j;
+    int    i = 0, j;
+    char   sqls[LEN_10240] = {0};
+    char   s_time[LEN_64] = {0};
+    char   host_name[LEN_64] = {0};
+    struct module *mod;
 
     /* get hostname */
     if (0 != gethostname(host_name, sizeof(host_name))) {
@@ -44,8 +45,9 @@ void send_sql_txt(int fd, int have_collect)
     }
 
     /* get st_array */
-    if (get_st_array_from_file(have_collect))
+    if (get_st_array_from_file(have_collect)) {
         return;
+    }
 
     /* only output from output_db_mod */
     reload_modules(conf.output_db_mod);
@@ -55,82 +57,92 @@ void send_sql_txt(int fd, int have_collect)
     /* print summary data */
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
-        if (!mod->enable)
+        if (!mod->enable) {
             continue;
-        else if (!mod->st_flag) {
-            char	sql_hdr[LEN_256] = {0};
-            /* set sql header */
-            memset(sql_hdr, '\0', sizeof(sql_hdr));
-            sprintf(sql_hdr, "insert into `%s` (host_name, time) VALUES ('%s', '%s');",
-                    mod->opt_line+2, host_name, s_time);
-            strcat(sqls, sql_hdr);
+
         } else {
-            char	str[LEN_32] = {0};
-            char	sql_hdr[LEN_256] = {0};
-            struct  mod_info *info = mod->info;
+            if (!mod->st_flag) {
+                char    sql_hdr[LEN_256] = {0};
+                /* set sql header */
+                memset(sql_hdr, '\0', sizeof(sql_hdr));
+                sprintf(sql_hdr, "insert into `%s` (host_name, time) VALUES ('%s', '%s');",
+                        mod->opt_line+2, host_name, s_time);
+                strcat(sqls, sql_hdr);
 
-            /* set sql header */
-            memset(sql_hdr, '\0', sizeof(sql_hdr));
-            sprintf(sql_hdr, "insert into `%s` (host_name, time", mod->opt_line+2);
+            } else {
+                char    str[LEN_32] = {0};
+                char    sql_hdr[LEN_256] = {0};
+                struct  mod_info *info = mod->info;
 
-            /* get value */
-            for (j = 0; j < mod->n_col; j++) {
-                strcat(sql_hdr, ", `");
-                char *p = info[j].hdr;
-                while(*p == ' ')
-                    p++;
-                strcat(sql_hdr, p);
-                strcat(sql_hdr, "`");
+                /* set sql header */
+                memset(sql_hdr, '\0', sizeof(sql_hdr));
+                sprintf(sql_hdr, "insert into `%s` (host_name, time", mod->opt_line+2);
+
+                /* get value */
+                for (j = 0; j < mod->n_col; j++) {
+                    strcat(sql_hdr, ", `");
+                    char *p = info[j].hdr;
+                    while (*p == ' ') {
+                        p++;
+                    }
+                    strcat(sql_hdr, p);
+                    strcat(sql_hdr, "`");
+                }
+                strcat(sql_hdr, ") VALUES ('");
+                strcat(sql_hdr, host_name);
+                strcat(sql_hdr, "', '");
+                strcat(sql_hdr, s_time);
+                strcat(sql_hdr, "'");
+                strcat(sqls, sql_hdr);
+
+                /* get value */
+                for (j = 0; j < mod->n_col; j++) {
+                    memset(str, 0, sizeof(str));
+                    sprintf(str, ", '%.1f'", mod->st_array[j]);
+                    strcat(sqls, str);
+                }
+                strcat(sqls, ");");
             }
-            strcat(sql_hdr, ") VALUES ('");
-            strcat(sql_hdr, host_name);
-            strcat(sql_hdr, "', '");
-            strcat(sql_hdr, s_time);
-            strcat(sql_hdr, "'");
-            strcat(sqls, sql_hdr);
-
-            /* get value */
-            for (j = 0; j < mod->n_col; j++) {
-                memset(str, 0, sizeof(str));
-                sprintf(str, ", '%.1f'", mod->st_array[j]);
-                strcat(sqls, str);
-            }
-            strcat(sqls, ");");
         }
+        write(fd, sqls, strlen(sqls));
     }
-    write(fd, sqls, strlen(sqls));
 }
 
-
-struct sockaddr_in *str2sa(char *str)
+struct sockaddr_in *
+str2sa(char *str)
 {
-    static	struct sockaddr_in sa;
-    char	*c;
-    int	port;
+    int                       port;
+    char                     *c;
+    static struct sockaddr_in sa;
 
     memset(&sa, 0, sizeof(sa));
     str = strdup(str);
-    if (str == NULL)
+    if (str == NULL) {
         goto out_nofree;
+    }
 
     if ((c = strrchr(str,':')) != NULL) {
         *c++ = '\0';
         port = atol(c);
-    }
-    else
+
+    } else {
         port = 0;
+    }
 
     if (*str == '*' || *str == '\0') { /* INADDR_ANY */
         sa.sin_addr.s_addr = INADDR_ANY;
-    }
-    else if (!inet_pton(AF_INET, str, &sa.sin_addr)) {
-        struct hostent *he;
 
-        if ((he = gethostbyname(str)) == NULL) {
-            do_debug(LOG_FATAL, "str2sa: Invalid server name, '%s'", str);
+    } else {
+        if (!inet_pton(AF_INET, str, &sa.sin_addr)) {
+            struct hostent *he;
+
+            if ((he = gethostbyname(str)) == NULL) {
+                do_debug(LOG_FATAL, "str2sa: Invalid server name, '%s'", str);
+
+            } else {
+                sa.sin_addr = *(struct in_addr *) *(he->h_addr_list);
+            }
         }
-        else
-            sa.sin_addr = *(struct in_addr *) *(he->h_addr_list);
     }
     sa.sin_port   = htons(port);
     sa.sin_family = AF_INET;
@@ -140,13 +152,13 @@ out_nofree:
     return &sa;
 }
 
-
-void output_db(int have_collect)
+void
+output_db(int have_collect)
 {
-    struct	sockaddr_in db_addr;
-    int	fd, flags, res;
-    fd_set	fdr, fdw;
-    struct	timeval timeout;
+    int        fd, flags, res;
+    fd_set     fdr, fdw;
+    struct     timeval timeout;
+    struct     sockaddr_in db_addr;
 
     fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd < 0) {
@@ -154,12 +166,12 @@ void output_db(int have_collect)
     }
 
     /* set socket fd noblock */
-    if((flags = fcntl(fd, F_GETFL, 0)) < 0) {
+    if ((flags = fcntl(fd, F_GETFL, 0)) < 0) {
         close(fd);
         return;
     }
 
-    if(fcntl(fd, F_SETFL, flags | O_NONBLOCK) < 0) {
+    if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) < 0) {
         close(fd);
         return;
     }
@@ -171,12 +183,14 @@ void output_db(int have_collect)
         if (errno != EINPROGRESS) { // EINPROGRESS
             close(fd);
             return;
-        }
-        else
+
+        } else {
             goto select;
-    }
-    else
+        }
+
+    } else {
         goto send;
+    }
 
 select:
     FD_ZERO(&fdr);
@@ -188,11 +202,11 @@ select:
     timeout.tv_usec = 0;
 
     res = select(fd + 1, &fdr, &fdw, NULL, &timeout);
-    if(res < 0) {
+    if (res < 0) {
         close(fd);
         return;
     }
-    if(res == 0) {
+    if (res == 0) {
         close(fd);
         return;
     }
