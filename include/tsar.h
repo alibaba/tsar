@@ -45,15 +45,14 @@
 #include "common.h"
 
 
-struct statistic
-{
-    int	total_mod_num;
-    time_t	cur_time;
+struct statistic {
+    int    total_mod_num;
+    time_t cur_time;
 };
 
 
 extern struct configure conf;
-extern struct module	mods[MAX_MOD_NUM];
+extern struct module    mods[MAX_MOD_NUM];
 extern struct statistic statis;
 
 

@@ -20,7 +20,8 @@
 #include "tsar.h"
 
 
-int is_digit(char *str)
+int
+is_digit(char *str)
 {
     /*dont handle minus value in tsar.data */
     while (*str) {
@@ -34,11 +35,12 @@ int is_digit(char *str)
 /*
  * convert record to array
  */
-int convert_record_to_array(U_64 *array, int l_array, char *record)
+int
+convert_record_to_array(U_64 *array, int l_array, char *record)
 {
-    char *token;
-    char n_str[LEN_4096] = {0};
-    int i = 0;
+    int     i = 0;
+    char   *token;
+    char    n_str[LEN_4096] = {0};
 
     if (!record || !strlen(record))
         return 0;
@@ -59,10 +61,11 @@ int convert_record_to_array(U_64 *array, int l_array, char *record)
 }
 
 
-int merge_one_string(U_64 *array, int l_array, char *string, struct module *mod, int n_item)
+int
+merge_one_string(U_64 *array, int l_array, char *string, struct module *mod, int n_item)
 {
-    int i, len;
-    U_64 array_2[MAX_COL_NUM] = {0};
+    int    i, len;
+    U_64   array_2[MAX_COL_NUM] = {0};
     struct mod_info *info = mod->info;
 
     if (!(len = convert_record_to_array(array_2, l_array, string)))
@@ -77,14 +80,15 @@ int merge_one_string(U_64 *array, int l_array, char *string, struct module *mod,
                 array[i] = (array[i] * (n_item - 1) + array_2[i])/n_item;
                 break;
             default:
-                ;	
+                ;
         }
     }
     return 1;
 }
 
 
-int strtok_next_item(char item[], char *record, int *start)
+int
+strtok_next_item(char item[], char *record, int *start)
 {
     char *s_token, *e_token, *n_record;
 
@@ -105,11 +109,12 @@ int strtok_next_item(char item[], char *record, int *start)
 }
 
 
-int merge_mult_item_to_array(U_64 *array, struct module *mod)
+int
+merge_mult_item_to_array(U_64 *array, struct module *mod)
 {
-    char item[LEN_128] = {0};
-    int pos = 0;
-    int n_item = 1;
+    int    pos = 0;
+    int    n_item = 1;
+    char   item[LEN_128] = {0};
 
     memset(array, 0, sizeof(U_64) * mod->n_col);
     while (strtok_next_item(item, mod->record, &pos)) {
@@ -122,10 +127,11 @@ int merge_mult_item_to_array(U_64 *array, struct module *mod)
 }
 
 
-int get_strtok_num(char *str, char *split)
+int
+get_strtok_num(char *str, char *split)
 {
-    int num = 0;
-    char *token, n_str[LEN_4096] = {0};
+    int    num = 0;
+    char  *token, n_str[LEN_4096] = {0};
 
     if (!str || !strlen(str))
         return 0;
@@ -145,9 +151,10 @@ int get_strtok_num(char *str, char *split)
 /*
  * get__mod_hdr;  hdr format:HDR_SPLIT"hdr1"HDR_SLIT"hdr2"
  */
-void get_mod_hdr(char hdr[], struct module *mod)
+void
+get_mod_hdr(char hdr[], struct module *mod)
 {
-    int i, pos = 0;
+    int    i, pos = 0;
     struct mod_info *info = mod->info;
     for (i = 0; i < mod->n_col; i++) {
         if(mod->spec) {
@@ -157,13 +164,16 @@ void get_mod_hdr(char hdr[], struct module *mod)
                 }
                 pos += sprintf(hdr + pos, "%s%s", info[i].hdr, PRINT_DATA_SPLIT);
             }
-        }
-        else if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[i].summary_bit))
-                || ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[i].summary_bit))) {
-            if (strlen(info[i].hdr) > 6) {
-                info[i].hdr[6] = '\0';
+
+        } else {
+            if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[i].summary_bit))
+                || ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[i].summary_bit)))
+            {
+                if (strlen(info[i].hdr) > 6) {
+                    info[i].hdr[6] = '\0';
+                }
+                pos += sprintf(hdr + pos, "%s%s", info[i].hdr, PRINT_DATA_SPLIT);
             }
-            pos += sprintf(hdr + pos, "%s%s", info[i].hdr, PRINT_DATA_SPLIT);
         }
     }
 }
@@ -172,16 +182,17 @@ void get_mod_hdr(char hdr[], struct module *mod)
 /*
    get data from tsar.data
  */
-int get_st_array_from_file(int have_collect)
+int
+get_st_array_from_file(int have_collect)
 {
-    struct  module *mod;
-    int  i, ret = 0;
-    char pre_line[LEN_10240] = {0};
-    char line[LEN_10240] = {0};
-    char detail[LEN_1024] = {0};
-    char pre_time[32] = {0};
-    char *s_token;
-    FILE *fp;
+    int    i, ret = 0;
+    char   pre_line[LEN_10240] = {0};
+    char   line[LEN_10240] = {0};
+    char   detail[LEN_1024] = {0};
+    char   pre_time[32] = {0};
+    char  *s_token;
+    FILE  *fp;
+    struct module *mod;
 
     if (!have_collect)
         collect_record(0);
@@ -210,6 +221,7 @@ int get_st_array_from_file(int have_collect)
             ret = -1;
             goto out;
         }
+
     } else {
         ret = -1;
         goto out;

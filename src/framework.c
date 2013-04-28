@@ -20,8 +20,9 @@
 #include "tsar.h"
 
 
-void register_mod_fileds(struct module *mod, char *opt, char *usage,
-        struct mod_info *info, int n_col, void *data_collect, void *set_st_record)
+void
+register_mod_fileds(struct module *mod, char *opt, char *usage,
+    struct mod_info *info, int n_col, void *data_collect, void *set_st_record)
 {
     sprintf(mod->opt_line, "%s", opt);
     sprintf(mod->usage, "%s", usage);
@@ -32,23 +33,25 @@ void register_mod_fileds(struct module *mod, char *opt, char *usage,
 }
 
 
-void set_mod_record(struct module *mod, char *record)
+void
+set_mod_record(struct module *mod, char *record)
 {
     if (record)
         sprintf(mod->record, "%s", record);
 }
 
 
-/* 
- * load module from dir 
+/*
+ * load module from dir
  */
-void load_modules()
+void
+load_modules()
 {
-    char	buff[LEN_128] = {0};
-    char	mod_path[LEN_128] = {0};
-    struct	module *mod = NULL;
-    int	(*mod_register)(struct module *);
-    int	i;
+    int     i;
+    char    buff[LEN_128] = {0};
+    char    mod_path[LEN_128] = {0};
+    struct  module *mod = NULL;
+    int    (*mod_register) (struct module *);
 
     /* get the full path of modules */
     sprintf(buff, "/usr/local/tsar/modules");
@@ -60,14 +63,14 @@ void load_modules()
             snprintf(mod_path, LEN_128, "%s/%s.so", buff, mod->name);
             if (!(mod->lib = dlopen(mod_path, RTLD_NOW|RTLD_GLOBAL))) {
                 do_debug(LOG_ERR, "load_modules: dlopen module %s err %s\n", mod->name, dlerror());
-            }
-            else {
+
+            } else {
                 mod_register = dlsym(mod->lib, "mod_register");
                 if (dlerror()) {
                     do_debug(LOG_ERR, "load_modules: dlsym module %s err %s\n", mod->name, dlerror());
                     break;
-                }
-                else {
+
+                } else {
                     mod_register(mod);
                     mod->enable = 1;
                     mod->spec = 0;
@@ -83,9 +86,10 @@ void load_modules()
  * module name must be composed by alpha/number/_
  * match return 1
  */
-int is_include_string(char *mods, char *mod)
+int
+is_include_string(char *mods, char *mod)
 {
-    char *token, n_str[LEN_512] = {0};
+    char   *token, n_str[LEN_512] = {0};
 
     memcpy(n_str, mods, strlen(mods));
 
@@ -101,15 +105,16 @@ int is_include_string(char *mods, char *mod)
 
 
 /*
- * reload modules by mods, if not find in mods, then set module disable 
+ * reload modules by mods, if not find in mods, then set module disable
  * return 1 if mod load ok
  * return 0 else
  */
-int reload_modules(char *s_mod)
+int
+reload_modules(char *s_mod)
 {
-    int	i;
-    int reload = 0;
-    struct	module *mod;
+    int    i;
+    int    reload = 0;
+    struct module *mod;
 
     if (!s_mod || !strlen(s_mod))
         return reload;
@@ -119,51 +124,68 @@ int reload_modules(char *s_mod)
         if (is_include_string(s_mod, mod->name) || is_include_string(s_mod, mod->opt_line)) {
             mod->enable = 1;
             reload = 1;
-        } else
+
+        } else {
             mod->enable = 0;
+        }
     }
     return reload;
 }
 
 #ifdef OLDTSAR
 /*
- * reload check modules by mods, if not find in mods, then set module disable 
+ * reload check modules by mods, if not find in mods, then set module disable
  */
-void reload_check_modules()
+void
+reload_check_modules()
 {
-    int     i;  
-    struct  module *mod;
+    int    i;
+    struct module *mod;
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
-        if (!strcmp(mod->name,"mod_apache") || !strcmp(mod->name,"mod_cpu") || !strcmp(mod->name,"mod_mem") || !strcmp(mod->name,"mod_load") || !strcmp(mod->name,"mod_partition") || !strcmp(mod->name,"mod_io") || !strcmp(mod->name,"mod_tcp") || !strcmp(mod->name,"mod_traffic") || !strcmp(mod->name,"mod_nginx")) {
+        if (!strcmp(mod->name,"mod_apache")
+             || !strcmp(mod->name,"mod_cpu")
+             || !strcmp(mod->name,"mod_mem")
+             || !strcmp(mod->name,"mod_load")
+             || !strcmp(mod->name,"mod_partition")
+             || !strcmp(mod->name,"mod_io")
+             || !strcmp(mod->name,"mod_tcp")
+             || !strcmp(mod->name,"mod_traffic")
+             || !strcmp(mod->name,"mod_nginx"))
+        {
             mod->enable = 1;
-        } else
+
+        } else {
             mod->enable = 0;
-    }   
+        }
+    }
 }
 /*end*/
 #endif
 
-/* 
+/*
  * 1. alloc or realloc store array
  * 2. set mod->n_item
  */
-void init_module_fields()
+void
+init_module_fields()
 {
+    int    i;
     struct module *mod = NULL;
-    int  i;
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
-        if (!mod->enable)	
+        if (!mod->enable)
             continue;
 
-        if (MERGE_ITEM == conf.print_merge)
+        if (MERGE_ITEM == conf.print_merge) {
             mod->n_item = 1;
-        else 
+
+        } else {
             /* get mod->n_item first, and mod->n_item will be reseted in reading next line */
             mod->n_item = get_strtok_num(mod->record, ITEM_SPLIT);
+        }
 
         if (mod->n_item) {
             mod->pre_array = (U_64 *)calloc(mod->n_item * mod->n_col, sizeof(U_64));
@@ -179,10 +201,11 @@ void init_module_fields()
 }
 
 
-/* 
+/*
  * 1. realloc store array when mod->n_item is modify
  */
-void realloc_module_array(struct module *mod, int n_n_item)
+void
+realloc_module_array(struct module *mod, int n_n_item)
 {
     if (n_n_item > mod->n_item) {
         if (mod->pre_array) {
@@ -194,6 +217,7 @@ void realloc_module_array(struct module *mod, int n_n_item)
                 mod->mean_array =(double *)realloc(mod->mean_array,n_n_item * mod->n_col *sizeof(double));
                 mod->min_array = (double *)realloc(mod->min_array, n_n_item * mod->n_col *sizeof(double));
             }
+
         } else {
             mod->pre_array = (U_64 *)calloc(n_n_item * mod->n_col, sizeof(U_64));
             mod->cur_array = (U_64 *)calloc(n_n_item * mod->n_col, sizeof(U_64));
@@ -210,9 +234,10 @@ void realloc_module_array(struct module *mod, int n_n_item)
 /*
  * set st result in st_array
  */
-void set_st_record(struct module *mod)
+void
+set_st_record(struct module *mod)
 {
-    int i, j, k = 0;	
+    int    i, j, k = 0;
     struct mod_info *info = mod->info;
 
     mod->st_flag = 1;
@@ -220,7 +245,7 @@ void set_st_record(struct module *mod)
     for (i = 0; i < mod->n_item; i++) {
         /* custom statis compute */
         if (mod->set_st_record) {
-            mod->set_st_record(mod, &mod->st_array[i * mod->n_col], 
+            mod->set_st_record(mod, &mod->st_array[i * mod->n_col],
                     &mod->pre_array[i * mod->n_col],
                     &mod->cur_array[i * mod->n_col],
                     conf.print_interval);
@@ -233,20 +258,22 @@ void set_st_record(struct module *mod)
                         if (mod->cur_array[k] < mod->pre_array[k]) {
                             mod->pre_array[k] = mod->cur_array[k];
                             mod->st_flag = 0;
-                        }
-                        else
+
+                        } else {
                             mod->st_array[k] = mod->cur_array[k] - mod->pre_array[k];
+                        }
                         break;
                     case STATS_SUB_INTER:
                         if (mod->cur_array[k] < mod->pre_array[k]) {
                             mod->pre_array[k] = mod->cur_array[k];
                             mod->st_flag = 0;
-                        }
-                        else
+
+                        } else {
                             mod->st_array[k] = (mod->cur_array[k] -mod->pre_array[k])/conf.print_interval;
+                        }
                         break;
                     default:
-                        mod->st_array[k] = mod->cur_array[k];	
+                        mod->st_array[k] = mod->cur_array[k];
                 }
                 mod->st_array[k] *= 1.0;
             }
@@ -254,6 +281,7 @@ void set_st_record(struct module *mod)
             if (conf.print_tail) {
                 if (0 == mod->n_record) {
                     mod->max_array[k] = mod->mean_array[k] = mod->min_array[k] = mod->st_array[k]*1.0;
+
                 } else {
                     if (mod->st_array[k] - mod->max_array[k] > 0.1)
                         mod->max_array[k] = mod->st_array[k];
@@ -272,12 +300,13 @@ void set_st_record(struct module *mod)
 
 
 /*
- * if diable = 1, then will disable module when record is null 
+ * if diable = 1, then will disable module when record is null
  */
-void collect_record()
+void
+collect_record()
 {
+    int    i;
     struct module *mod = NULL;
-    int  i;
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
@@ -294,17 +323,18 @@ void collect_record()
 /*
  * computer mod->st_array and swap cur_info to pre_info
  * return:  1 -> ok
- *	    0 -> some mod->n_item have modify will reprint header
+ *      0 -> some mod->n_item have modify will reprint header
  */
-int collect_record_stat()
+int
+collect_record_stat()
 {
+    int    i, n_item, ret, no_p_hdr = 1;
+    U_64  *tmp, array[MAX_COL_NUM] = {0};
     struct module *mod = NULL;
-    U_64 *tmp, array[MAX_COL_NUM] = {0};
-    int  i, n_item, ret, no_p_hdr = 1;
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
-        if (!mod->enable)				
+        if (!mod->enable)
             continue;
 
         memset(array, 0, sizeof(array));
@@ -315,7 +345,7 @@ int collect_record_stat()
             /* not merge mode, and last n_item != cur n_item, then reset mod->n_item and set reprint header flag */
             if (MERGE_ITEM != conf.print_merge && n_item && n_item != mod->n_item) {
                 no_p_hdr = 0;
-                /* reset struct module fields */	
+                /* reset struct module fields */
                 realloc_module_array(mod, n_item);
             }
 
@@ -326,6 +356,7 @@ int collect_record_stat()
                 if (MERGE_ITEM == conf.print_merge) {
                     mod->n_item = 1;
                     ret = merge_mult_item_to_array(mod->cur_array, mod);
+
                 } else {
                     char item[LEN_128] = {0};
                     int num = 0;
@@ -338,6 +369,7 @@ int collect_record_stat()
                         num++;
                     }
                 }
+
             } else { /* one item */
                 ret = convert_record_to_array(mod->cur_array, mod->n_col, mod->record);
             }
@@ -347,12 +379,16 @@ int collect_record_stat()
                 set_st_record(mod);
             }
 
-            if (!ret)
+            if (!ret) {
                 mod->pre_flag = 0;
-            else
+
+            } else {
                 mod->pre_flag = 1;
-        } else
+            }
+
+        } else {
             mod->pre_flag = 0;
+        }
         /* swap cur_array to pre_array */
         tmp = mod->pre_array;
         mod->pre_array = mod->cur_array;
@@ -366,10 +402,11 @@ int collect_record_stat()
 /*
  * free module info
  */
-void free_modules()
+void
+free_modules()
 {
-    int	i;
-    struct	module *mod;
+    int    i;
+    struct module *mod;
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
@@ -398,13 +435,14 @@ void free_modules()
 
 
 /*
- * read line from file to mod->record 
+ * read line from file to mod->record
  */
-void read_line_to_module_record(char *line)
+void
+read_line_to_module_record(char *line)
 {
-    int	i;
-    struct	module *mod;
-    char	*s_token, *e_token;
+    int    i;
+    struct module *mod;
+    char  *s_token, *e_token;
 
     line[strlen(line) - 1] = '\0';
     for (i = 0; i < statis.total_mod_num; i++) {
@@ -420,10 +458,12 @@ void read_line_to_module_record(char *line)
             s_token += strlen(mod->opt_line) + sizeof(STRING_SPLIT) - 1;
             e_token = strstr(s_token, SECTION_SPLIT);
 
-            if (e_token)
+            if (e_token) {
                 memcpy(mod->record, s_token, e_token - s_token);
-            else
+
+            } else {
                 memcpy(mod->record, s_token, strlen(line) - (s_token - line));
+            }
         }
     }
 }
@@ -432,32 +472,36 @@ void read_line_to_module_record(char *line)
 /*
  * if col num is zero then disable module
  */
-void disable_col_zero()
+void
+disable_col_zero()
 {
+    int    i, j;
     struct module *mod = NULL;
-    int  i, j;
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
-        if (!mod->enable)	
+        if (!mod->enable) {
             continue;
+        }
 
-        if (!mod->n_col)
+        if (!mod->n_col) {
             mod->enable = 0;
-        else {
+
+        } else {
+            int    p_col = 0;
             struct mod_info *info = mod->info;
-            int p_col = 0;
 
             for (j = 0; j < mod->n_col; j++) {
-                if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[j].summary_bit)) 
+                if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[j].summary_bit))
                         || ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[j].summary_bit))) {
                     p_col++;
                     break;
                 }
             }
 
-            if (!p_col)
+            if (!p_col) {
                 mod->enable = 0;
+            }
         }
     }
 }
