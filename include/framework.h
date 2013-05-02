@@ -61,8 +61,8 @@ struct module {
     double *min_array;
 
     /* callback function of module */
-    void (*data_collect) (struct module *,char *);
-    void (*set_st_record) (struct module *mod, double *, U_64 *, U_64 *, int );
+    void (*data_collect) (struct module *, char *);
+    void (*set_st_record) (struct module *, double *, U_64 *, U_64 *, int);
 
     /* mod manage */
     void (*mod_register) (struct module *);

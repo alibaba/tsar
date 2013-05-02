@@ -42,6 +42,7 @@ static struct mod_info test_info[] = {
 static void
 read_test_stats(struct module *mod, const char *parameter)
 {
+    /* parameter actually equals to mod->parameter */
     char               buf[256];
     struct stats_test  st_test;
 
@@ -70,7 +71,7 @@ set_test_record(struct module *mod, double st_array[],
 {
     int i;
     /* set st record */
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < mod->n_col; i++) {
         st_array[i] = cur_array[i];
     }
 }

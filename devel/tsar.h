@@ -60,7 +60,7 @@ struct module {
 
     char    name[LEN_32];
     char    opt_line[LEN_32];
-    char    record[LEN_1024];
+    char    record[LEN_4096];
     char    usage[LEN_256];
     char    parameter[LEN_256];
     char    print_item[LEN_32];
