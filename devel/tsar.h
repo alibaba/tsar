@@ -50,10 +50,10 @@
 
 
 struct mod_info {
+    char   hdr[LEN_128];
     int    summary_bit;    /* bit set indefi summary */
     int    merge_mode;
     int    stats_opt;
-    char   hdr[LEN_128];
 };
 
 struct module {
@@ -94,9 +94,9 @@ struct module {
     void (*mod_register) (struct module *);
 };
 
-void register_mod_fileds(struct module *mod, char *opt, char *usage,
+void register_mod_fileds(struct module *mod, const char *opt, const char *usage,
         struct mod_info *info, int n_col, void *data_collect, void *set_st_record);
-void set_mod_record(struct module *mod, char *record);
+void set_mod_record(struct module *mod, const char *record);
 
 enum {
     HIDE_BIT,

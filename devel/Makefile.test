@@ -1,4 +1,4 @@
-CFLAGS = -Wall -fPIC --shared -g
+CFLAGS = -Wall -fPIC --shared -g -O2
 CC = gcc
 INCLUDE_DIR = /usr/local/tsar/devel
 LINK = $(CC) -I$(INCLUDE_DIR) $(CFLAGS)
