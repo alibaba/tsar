@@ -22,7 +22,7 @@
 
 /* add mod to tsar */
 void
-parse_mod(char *mod_name)
+parse_mod(const char *mod_name)
 {
     /* check if the mod load already */
     int   i = 0;
@@ -50,7 +50,7 @@ parse_mod(char *mod_name)
 }
 
 void
-special_mod(char *spec_mod)
+special_mod(const char *spec_mod)
 {
     int       i = 0, j = 0;
     char      mod_name[32];
@@ -356,7 +356,7 @@ get_threshold()
 }
 
 void
-set_special_field(char *s)
+set_special_field(const char *s)
 {
     int i = 0, j = 0;
     struct module *mod = NULL;
@@ -378,7 +378,7 @@ set_special_field(char *s)
 }
 
 void
-set_special_item(char *s)
+set_special_item(const char *s)
 {
     int i = 0;
     struct module *mod = NULL;

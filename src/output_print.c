@@ -24,7 +24,7 @@
  * adjust print opt line
  */
 void
-adjust_print_opt_line(char *n_opt_line, char *opt_line, int hdr_len)
+adjust_print_opt_line(char *n_opt_line, const char *opt_line, int hdr_len)
 {
     int    pad_len;
     char   pad[LEN_128] = {0};
@@ -153,7 +153,7 @@ printf_result(double result)
 
 
 void
-print_array_stat(struct module *mod, double *st_array)
+print_array_stat(const struct module *mod, const double *st_array)
 {
     int    i;
     struct mod_info *info = mod->info;
@@ -440,7 +440,7 @@ find_offset_from_start(FILE *fp,int number)
  * set and print record time
  */
 long
-set_record_time(char *line)
+set_record_time(const char *line)
 {
     char        *token, s_time[LEN_32] = {0};
     static long  pre_time, c_time = 0;
@@ -468,7 +468,7 @@ set_record_time(char *line)
  * check time if corret for pirnt from tsar.data
  */
 int
-check_time(char *line)
+check_time(const char *line)
 {
     char       *token, s_time[LEN_32] = {0};
     long        now_time = 0;

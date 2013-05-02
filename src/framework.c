@@ -21,7 +21,7 @@
 
 
 void
-register_mod_fileds(struct module *mod, char *opt, char *usage,
+register_mod_fileds(struct module *mod, const char *opt, const char *usage,
     struct mod_info *info, int n_col, void *data_collect, void *set_st_record)
 {
     sprintf(mod->opt_line, "%s", opt);
@@ -34,7 +34,7 @@ register_mod_fileds(struct module *mod, char *opt, char *usage,
 
 
 void
-set_mod_record(struct module *mod, char *record)
+set_mod_record(struct module *mod, const char *record)
 {
     if (record) {
         sprintf(mod->record, "%s", record);
@@ -88,7 +88,7 @@ load_modules()
  * match return 1
  */
 int
-is_include_string(char *mods, char *mod)
+is_include_string(const char *mods, const char *mod)
 {
     char   *token, n_str[LEN_512] = {0};
 
@@ -111,7 +111,7 @@ is_include_string(char *mods, char *mod)
  * return 0 else
  */
 int
-reload_modules(char *s_mod)
+reload_modules(const char *s_mod)
 {
     int    i;
     int    reload = 0;

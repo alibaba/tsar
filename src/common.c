@@ -21,7 +21,7 @@
 
 
 int
-is_digit(char *str)
+is_digit(const char *str)
 {
     /*dont handle minus value in tsar.data */
     while (*str) {
@@ -37,7 +37,7 @@ is_digit(char *str)
  * convert record to array
  */
 int
-convert_record_to_array(U_64 *array, int l_array, char *record)
+convert_record_to_array(U_64 *array, int l_array, const char *record)
 {
     int     i = 0;
     char   *token;
@@ -138,7 +138,7 @@ merge_mult_item_to_array(U_64 *array, struct module *mod)
 
 
 int
-get_strtok_num(char *str, char *split)
+get_strtok_num(const char *str, const char *split)
 {
     int    num = 0;
     char  *token, n_str[LEN_4096] = {0};
@@ -163,7 +163,7 @@ get_strtok_num(char *str, char *split)
  * get__mod_hdr;  hdr format:HDR_SPLIT"hdr1"HDR_SLIT"hdr2"
  */
 void
-get_mod_hdr(char hdr[], struct module *mod)
+get_mod_hdr(char hdr[], const struct module *mod)
 {
     int    i, pos = 0;
     struct mod_info *info = mod->info;

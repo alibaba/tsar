@@ -26,11 +26,11 @@
 /*
  * convert data to array
  */
-int convert_record_to_array(U_64 *array, int l_array, char *record);
-void get_mod_hdr(char hdr[], struct module *mod);
+int convert_record_to_array(U_64 *array, int l_array, const char *record);
+void get_mod_hdr(char hdr[], const struct module *mod);
 int strtok_next_item(char item[], char *record, int *start);
 int merge_mult_item_to_array(U_64 *array, struct module *mod);
-int get_strtok_num(char *str, char *split);
+int get_strtok_num(const char *str, const char *split);
 int get_st_array_from_file(int have_collect);
 
 
