@@ -36,8 +36,9 @@ register_mod_fileds(struct module *mod, char *opt, char *usage,
 void
 set_mod_record(struct module *mod, char *record)
 {
-    if (record)
+    if (record) {
         sprintf(mod->record, "%s", record);
+    }
 }
 
 
@@ -116,8 +117,9 @@ reload_modules(char *s_mod)
     int    reload = 0;
     struct module *mod;
 
-    if (!s_mod || !strlen(s_mod))
+    if (!s_mod || !strlen(s_mod)) {
         return reload;
+    }
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
@@ -176,8 +178,9 @@ init_module_fields()
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
-        if (!mod->enable)
+        if (!mod->enable) {
             continue;
+        }
 
         if (MERGE_ITEM == conf.print_merge) {
             mod->n_item = 1;
@@ -283,12 +286,15 @@ set_st_record(struct module *mod)
                     mod->max_array[k] = mod->mean_array[k] = mod->min_array[k] = mod->st_array[k]*1.0;
 
                 } else {
-                    if (mod->st_array[k] - mod->max_array[k] > 0.1)
+                    if (mod->st_array[k] - mod->max_array[k] > 0.1) {
                         mod->max_array[k] = mod->st_array[k];
-                    if (mod->min_array[k] - mod->st_array[k] > 0.1 && mod->st_array[k] >= 0)
+                    }
+                    if (mod->min_array[k] - mod->st_array[k] > 0.1 && mod->st_array[k] >= 0) {
                         mod->min_array[k] = mod->st_array[k];
-                    if(mod->st_array[k] >= 0)
+                    }
+                    if (mod->st_array[k] >= 0) {
                         mod->mean_array[k] = ((mod->n_record-1) *mod->mean_array[k] + mod->st_array[k])/mod->n_record;
+                    }
                 }
             }
             k++;
@@ -310,12 +316,14 @@ collect_record()
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
-        if (!mod->enable)
+        if (!mod->enable) {
             continue;
+        }
 
         memset(mod->record, 0, sizeof(mod->record));
-        if (mod->data_collect)
+        if (mod->data_collect) {
             mod->data_collect(mod,mod->parameter);
+        }
     }
 }
 
@@ -334,8 +342,9 @@ collect_record_stat()
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
-        if (!mod->enable)
+        if (!mod->enable) {
             continue;
+        }
 
         memset(array, 0, sizeof(array));
         mod->st_flag = 0;
@@ -363,8 +372,9 @@ collect_record_stat()
                     int pos = 0;
 
                     while (strtok_next_item(item, mod->record, &pos)) {
-                        if (!(ret=convert_record_to_array(&mod->cur_array[num * mod->n_col],mod->n_col,item)))
+                        if (!(ret=convert_record_to_array(&mod->cur_array[num * mod->n_col],mod->n_col,item))) {
                             break;
+                        }
                         memset(item, 0, sizeof(item));
                         num++;
                     }
@@ -410,8 +420,9 @@ free_modules()
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
-        if (mod->lib)
+        if (mod->lib) {
             dlclose(mod->lib);
+        }
 
         if (mod->cur_array) {
             free(mod->cur_array);

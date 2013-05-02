@@ -277,7 +277,7 @@ main(int argc, char **argv)
             /*end*/
 #endif
         case RUN_CHECK_NEW:
-            if(reload_modules(conf.output_print_mod)){
+            if (reload_modules(conf.output_print_mod)) {
                 conf.print_mode = DATA_DETAIL;
             };
             /* disable module when n_col is zero */

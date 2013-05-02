@@ -67,7 +67,7 @@ output_nagios()
     /* print summary data */
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
-        if (!mod->enable){
+        if (!mod->enable) {
             continue;
 
         } else {
@@ -134,8 +134,8 @@ output_nagios()
                                     }
                                 }
                                 if (conf.wmin[l] != 0 && st_array[k] >= conf.wmin[l]) {
-                                    if(conf.wmax[l] == 0 || (conf.wmax[l] != 0 && st_array[k] <= conf.wmax[l]) ){
-                                        if(result != 2) {
+                                    if (conf.wmax[l] == 0 || (conf.wmax[l] != 0 && st_array[k] <= conf.wmax[l]) ) {
+                                        if (result != 2) {
                                             result = 1;
                                         }
                                         strcat(output_err, check_item);

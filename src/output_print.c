@@ -164,14 +164,16 @@ print_array_stat(struct module *mod, double *st_array)
             if (!st_array || !mod->st_flag || st_array[i] < 0) {
                 /* print record */
                 if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[i].summary_bit))
-                        || ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[i].summary_bit))) {
+                        || ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[i].summary_bit)))
+                {
                     printf("------%s", PRINT_DATA_SPLIT);
                 }
 
             } else {
                 /* print record */
                 if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[i].summary_bit))
-                        || ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[i].summary_bit))) {
+                        || ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[i].summary_bit)))
+                {
                     printf_result(st_array[i]);
                 }
             }
@@ -182,13 +184,17 @@ print_array_stat(struct module *mod, double *st_array)
                 /* print record */
                 if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[i].summary_bit))
                         || ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[i].summary_bit)))
+                {
                     printf("------%s", PRINT_DATA_SPLIT);
+                }
 
             } else {
                 /* print record */
                 if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[i].summary_bit))
                         || ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[i].summary_bit)))
+                {
                     printf_result(st_array[i]);
+                }
             }
         }
     }
@@ -234,7 +240,7 @@ print_record()
 
         } else {
             for (j = 0; j < mod->n_item; j++) {
-                if(*mod->print_item != 0 && (mod->p_item & (1<<j)) == 0) {
+                if (*mod->print_item != 0 && (mod->p_item & (1<<j)) == 0) {
                     continue;
                 }
                 st_array = &mod->st_array[j * mod->n_col];
@@ -342,7 +348,7 @@ find_offset_from_start(FILE *fp,int number)
         t_token = mktime(&stm);
         conf.print_day = (now - t_token) / (24 * 60 * 60);
     }
-    if ( conf.print_day >= 0) {
+    if (conf.print_day >= 0) {
         if (conf.print_day > 180) {
             conf.print_day = 180;
         }
@@ -558,7 +564,8 @@ print_tail(int tail_type)
                 /* print record */
                 if (mod->spec) {
                     if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[i].summary_bit))
-                            || ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[i].summary_bit))) {
+                            || ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[i].summary_bit)))
+                    {
                         printf_result(m_tail[k]);
                     }
 
@@ -623,7 +630,7 @@ init_running_print()
                 fp=fptmp;
                 break;
             }
-            if ( k== 2) {
+            if (k== 2) {
                 if (fseek(fp,0,SEEK_SET) != 0) {
                     do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
                 }
@@ -683,7 +690,7 @@ running_print()
     }
     while (1) {
         if (!fgets(line, LEN_10240, fp)) {
-            if(conf.print_file_number <= 0) {
+            if (conf.print_file_number <= 0) {
                 break;
 
             } else {
@@ -1121,10 +1128,10 @@ running_check(int check_type)
             if (!strcmp(mod->name,"mod_nginx")){
                 for (j = 0; j < mod->n_item; j++) {
                     st_array = &mod->st_array[j * mod->n_col];
-                    if(!st_array || !mod->st_flag){
+                    if (!st_array || !mod->st_flag) {
                         sprintf(tmp[8]," nginx/qps=- nginx/rt=-");
 
-                    }else{
+                    } else {
                         sprintf(tmp[8]," nginx/qps=%0.2f nginx/rt=%0.2f",st_array[7],st_array[8]);
                     }
                 }

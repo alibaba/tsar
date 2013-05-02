@@ -29,8 +29,9 @@ parse_mod(char *mod_name)
     for ( i = 0; i < statis.total_mod_num; i++ )
     {
         struct module *mod = &mods[i];
-        if (!strcmp(mod->name,mod_name))
+        if (!strcmp(mod->name,mod_name)) {
             return;
+        }
     }
     struct module *mod = &mods[statis.total_mod_num++];
     char    *token = strtok(NULL, W_SPACE);
@@ -67,7 +68,9 @@ special_mod(char *spec_mod)
             struct mod_info *info = mod->info;
             for (j=0; j < mod->n_col; j++) {
                 char *p = info[j].hdr;
-                while ( *p  == ' ') p++;
+                while (*p  == ' ') {
+                    p++;
+                }
                 if (strstr(token, p)) {
                     info[j].summary_bit = SPEC_BIT;
                     mod->spec = 1;
@@ -81,8 +84,9 @@ void
 parse_int(int *var)
 {
     char   *token = strtok(NULL, W_SPACE);
-    if (token == NULL)
+    if (token == NULL) {
         do_debug(LOG_FATAL, "Bungled line");
+    }
     *var = strtol(token,NULL,0);
 }
 
@@ -91,8 +95,9 @@ parse_string(char *var)
 {
     char   *token = strtok(NULL, W_SPACE);
 
-    if (token)
+    if (token) {
         strncpy(var, token, strlen(token));
+    }
 }
 
 void
@@ -100,16 +105,18 @@ parse_add_string(char *var)
 {
     char   *token = strtok(NULL, W_SPACE);
     if (var == NULL) {
-        if (token)
+        if (token) {
             strncpy(var, token, strlen(token));
+        }
 
     } else {
         if (token) {
             strcat(token, ",");
             strncat(token, var, strlen(var));
         }
-        if (token)
+        if (token) {
             strncpy(var, token, strlen(token));
+        }
     }
 }
 
@@ -222,16 +229,19 @@ parse_config_file(const char *file_name)
     conf.debug_level = LOG_ERR;
     conf.print_detail = FALSE;
     while (fgets(config_input_line, LEN_1024, fp)) {
-        if ((token = strchr(config_input_line, '\n')))
+        if ((token = strchr(config_input_line, '\n'))) {
             *token = '\0';
-        if ((token = strchr(config_input_line, '\r')))
+        }
+        if ((token = strchr(config_input_line, '\r'))) {
             *token = '\0';
+        }
         if (config_input_line[0] == '#') {
             memset(config_input_line, '\0', LEN_1024);
             continue;
         }
-        if (config_input_line[0] == '\0')
+        if (config_input_line[0] == '\0') {
             continue;
+        }
         /* FIXME can't supprot wrap line */
         if (!parse_line(config_input_line)) {
             do_debug(LOG_INFO, "parse_config_file: unknown keyword in '%s' \n", config_input_line);
@@ -255,8 +265,9 @@ get_include_conf()
     if (token) {
         memset(cmd, '\0', LEN_1024);
         sprintf(cmd, "ls %s 2>/dev/null", token);
-        if (strchr(cmd, ';') != NULL || strchr(cmd, '|') != NULL || strchr(cmd, '&') != NULL)
+        if (strchr(cmd, ';') != NULL || strchr(cmd, '|') != NULL || strchr(cmd, '&') != NULL) {
             do_debug(LOG_ERR, "include formart Error:%s\n", cmd);
+        }
         stream = popen(cmd, "r");
         if (stream == NULL) {
             do_debug(LOG_ERR, "popen failed. Error:%s\n", strerror(errno));
@@ -267,7 +278,7 @@ get_include_conf()
             do_debug(LOG_INFO, "parse file %s", buf);
             p = buf;
             while (p) {
-                if(*p == '\r' || *p == '\n'){
+                if (*p == '\r' || *p == '\n') {
                     *p = '\0';
                     break;
                 }
@@ -279,16 +290,19 @@ get_include_conf()
             }
             memset(config_input_line, '\0', LEN_1024);
             while (fgets(config_input_line, LEN_1024, fp)) {
-                if ((tmp = strchr(config_input_line, '\n')))
+                if ((tmp = strchr(config_input_line, '\n'))) {
                     *tmp= '\0';
-                if ((tmp = strchr(config_input_line, '\r')))
+                }
+                if ((tmp = strchr(config_input_line, '\r'))) {
                     *tmp = '\0';
+                }
                 if (config_input_line[0] == '#') {
                     memset(config_input_line, '\0', LEN_1024);
                     continue;
                 }
-                if (config_input_line[0] == '\0')
+                if (config_input_line[0] == '\0') {
                     continue;
+                }
                 /* FIXME can't supprot wrap line */
                 if (!parse_line(config_input_line)) {
                     do_debug(LOG_INFO, "parse_config_file: unknown keyword in '%s' at file %s\n", config_input_line, buf);
@@ -310,7 +324,7 @@ get_threshold()
     char   *token = strtok(NULL, W_SPACE);
     char    tmp[4][LEN_32];
 
-    if ( conf.mod_num >= MAX_MOD_NUM) {
+    if (conf.mod_num >= MAX_MOD_NUM) {
         do_debug(LOG_FATAL, "Too many mod threshold\n");
     }
     sscanf(token, "%[^;];%[.N0-9];%[.N0-9];%[.N0-9];%[.N0-9];", conf.check_name[conf.mod_num], tmp[0], tmp[1], tmp[2], tmp[3]);
@@ -352,8 +366,10 @@ set_special_field(char *s)
         struct mod_info *info = mod->info;
         for (j=0; j < mod->n_col; j++) {
             char *p = info[j].hdr;
-            while( *p  == ' ') p++;
-            if(strstr(s,p)){
+            while (*p  == ' ') {
+                p++;
+            }
+            if (strstr(s,p)) {
                 info[j].summary_bit = SPEC_BIT;
                 mod->spec = 1;
             }

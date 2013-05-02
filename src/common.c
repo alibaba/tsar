@@ -25,8 +25,9 @@ is_digit(char *str)
 {
     /*dont handle minus value in tsar.data */
     while (*str) {
-        if (!isdigit(*str++))
+        if (!isdigit(*str++)) {
             return 0;
+        }
     }
     return 1;
 }
@@ -42,21 +43,25 @@ convert_record_to_array(U_64 *array, int l_array, char *record)
     char   *token;
     char    n_str[LEN_4096] = {0};
 
-    if (!record || !strlen(record))
+    if (!record || !strlen(record)) {
         return 0;
+    }
     memcpy(n_str, record, strlen(record));
 
     token = strtok(n_str, DATA_SPLIT);
     while (token) {
-        if (!is_digit(token))
+        if (!is_digit(token)) {
             return 0;
-        if(i < l_array)
+        }
+        if (i < l_array) {
             *(array + i) = strtoull(token,NULL,10);
+        }
         token = strtok(NULL, DATA_SPLIT);
         i++;
     }
-    if (i != l_array)
+    if (i != l_array) {
         return 0;
+    }
     return i;
 }
 
@@ -68,8 +73,9 @@ merge_one_string(U_64 *array, int l_array, char *string, struct module *mod, int
     U_64   array_2[MAX_COL_NUM] = {0};
     struct mod_info *info = mod->info;
 
-    if (!(len = convert_record_to_array(array_2, l_array, string)))
+    if (!(len = convert_record_to_array(array_2, l_array, string))) {
         return 0;
+    }
 
     for (i=0; i < len; i++) {
         switch (info[i].merge_mode) {
@@ -92,16 +98,19 @@ strtok_next_item(char item[], char *record, int *start)
 {
     char *s_token, *e_token, *n_record;
 
-    if (!record || !strlen(record) || strlen(record) <= *start)
+    if (!record || !strlen(record) || strlen(record) <= *start) {
         return 0;
+    }
 
     n_record = record + *start;
     e_token = strstr(n_record, ITEM_SPLIT);
-    if (!e_token)
+    if (!e_token) {
         return 0;
+    }
     s_token = strstr(n_record, ITEM_SPSTART);
-    if (!s_token)
+    if (!s_token) {
         return 0;
+    }
 
     memcpy(item, s_token + sizeof(ITEM_SPSTART) - 1, e_token - s_token - 1);
     *start = e_token - record + sizeof(ITEM_SPLIT);
@@ -118,8 +127,9 @@ merge_mult_item_to_array(U_64 *array, struct module *mod)
 
     memset(array, 0, sizeof(U_64) * mod->n_col);
     while (strtok_next_item(item, mod->record, &pos)) {
-        if(!merge_one_string(array, mod->n_col, item, mod, n_item))
+        if (!merge_one_string(array, mod->n_col, item, mod, n_item)) {
             return 0;
+        }
         n_item++;
         memset(&item, 0, sizeof(item));
     }
@@ -133,8 +143,9 @@ get_strtok_num(char *str, char *split)
     int    num = 0;
     char  *token, n_str[LEN_4096] = {0};
 
-    if (!str || !strlen(str))
+    if (!str || !strlen(str)) {
         return 0;
+    }
 
     memcpy(n_str, str, strlen(str));
     /* set print opt line */
@@ -157,8 +168,8 @@ get_mod_hdr(char hdr[], struct module *mod)
     int    i, pos = 0;
     struct mod_info *info = mod->info;
     for (i = 0; i < mod->n_col; i++) {
-        if(mod->spec) {
-            if(SPEC_BIT == info[i].summary_bit){
+        if (mod->spec) {
+            if (SPEC_BIT == info[i].summary_bit) {
                 if (strlen(info[i].hdr) > 6) {
                     info[i].hdr[6] = '\0';
                 }
@@ -194,8 +205,9 @@ get_st_array_from_file(int have_collect)
     FILE  *fp;
     struct module *mod;
 
-    if (!have_collect)
+    if (!have_collect) {
         collect_record(0);
+    }
 
     /* update module parameter */
     conf.print_merge = MERGE_ITEM;
@@ -211,8 +223,9 @@ get_st_array_from_file(int have_collect)
         }
     }
 
-    if (strlen(line))
+    if (strlen(line)) {
         strcat(line, "\n");
+    }
 
     /* if fopen PRE_RECORD_FILE sucess then store data to pre_record */
     if ((fp = fopen(PRE_RECORD_FILE, "r"))) {
@@ -234,8 +247,9 @@ get_st_array_from_file(int have_collect)
         goto out;
     }
     memcpy(pre_time, pre_line, s_token - pre_line);
-    if (!(conf.print_interval = statis.cur_time - atol(pre_time)))
+    if (!(conf.print_interval = statis.cur_time - atol(pre_time))) {
         goto out;
+    }
 
     /* read pre_line to mod->record and store to pre_array */
     read_line_to_module_record(pre_line);

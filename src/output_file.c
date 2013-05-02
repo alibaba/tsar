@@ -31,8 +31,9 @@ output_file()
     struct module *mod;
 
     if (!(fp = fopen(conf.output_file_path, "a+"))) {
-        if (!(fp = fopen(conf.output_file_path, "w")))
+        if (!(fp = fopen(conf.output_file_path, "w"))) {
             do_debug(LOG_FATAL, "output_file: can't create data file = %s  err=%d\n", conf.output_file_path, errno);
+        }
     }
 
     sprintf(s_time, "%ld", statis.cur_time);
@@ -50,8 +51,9 @@ output_file()
     strcat(line, "\n");
 
     if (ret) {
-        if(fputs(line, fp) < 0)
+        if (fputs(line, fp) < 0) {
             do_debug(LOG_ERR, "write line error\n");
+        }
     }
     fclose(fp);
     if (chmod(conf.output_file_path, 0666) < 0 ) {
