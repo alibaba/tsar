@@ -95,7 +95,7 @@ set_cgblkio_record(struct module *mod, double st_array[],
 void
 print_cgblkio_stats(struct module *mod)
 {
-    int    pos = 0,i = 0;
+    int    pos = 0, i = 0;
     char   buf[LEN_4096];
     /*set n group's data to buf*/
     for(i = 0; i < n_group; i++){

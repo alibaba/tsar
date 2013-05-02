@@ -148,7 +148,7 @@ initialize()
                     p++);
 
             if (p == n_partitions && p < MAX_PARTITIONS) {
-                if (reads && printable(curr.major,curr.minor)) {
+                if (reads && printable(curr.major, curr.minor)) {
                     partition[p] = curr;
                     n_partitions = p + 1;
                 }

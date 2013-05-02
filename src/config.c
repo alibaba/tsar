@@ -29,7 +29,7 @@ parse_mod(const char *mod_name)
     for ( i = 0; i < statis.total_mod_num; i++ )
     {
         struct module *mod = &mods[i];
-        if (!strcmp(mod->name,mod_name)) {
+        if (!strcmp(mod->name, mod_name)) {
             return;
         }
     }
@@ -56,12 +56,12 @@ special_mod(const char *spec_mod)
     char      mod_name[32];
     struct    module *mod = NULL;
 
-    memset(mod_name,0,LEN_32);
-    sprintf(mod_name,"mod_%s",spec_mod+5);
+    memset(mod_name, 0, LEN_32);
+    sprintf(mod_name,"mod_%s", spec_mod+5);
     for ( i = 0; i < statis.total_mod_num; i++ )
     {
         mod = &mods[i];
-        if (!strcmp(mod->name,mod_name)) {
+        if (!strcmp(mod->name, mod_name)) {
             /* set special field */
             load_modules();
             char    *token = strtok(NULL, W_SPACE);
@@ -87,7 +87,7 @@ parse_int(int *var)
     if (token == NULL) {
         do_debug(LOG_FATAL, "Bungled line");
     }
-    *var = strtol(token,NULL,0);
+    *var = strtol(token, NULL, 0);
 }
 
 void
@@ -369,7 +369,7 @@ set_special_field(const char *s)
             while (*p  == ' ') {
                 p++;
             }
-            if (strstr(s,p)) {
+            if (strstr(s, p)) {
                 info[j].summary_bit = SPEC_BIT;
                 mod->spec = 1;
             }

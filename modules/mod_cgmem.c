@@ -49,7 +49,7 @@ set_cgmem_record(struct module *mod, double st_array[],
 void
 print_cgmem_stats(struct module *mod)
 {
-    int    pos = 0,i = 0;
+    int    pos = 0, i = 0;
     char   buf[LEN_4096];
 
     /*set n group's data to buf*/

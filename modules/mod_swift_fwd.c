@@ -51,7 +51,7 @@ my_swift_fwd_net_connect(const char *host_name, int port, int *sd, char* proto)
     struct sockaddr_in servaddr;
     struct protoent *ptrp;
 
-    bzero((char *)&servaddr,sizeof(servaddr));
+    bzero((char *)&servaddr, sizeof(servaddr));
     servaddr.sin_family=AF_INET;
     servaddr.sin_port=htons(port);
     inet_pton(AF_INET, host_name, &servaddr.sin_addr);
@@ -59,13 +59,13 @@ my_swift_fwd_net_connect(const char *host_name, int port, int *sd, char* proto)
     /* map transport protocol name to protocol number */
     if (((ptrp = getprotobyname(proto)))==NULL) {
         if (DEBUG) {
-            printf("Cannot map \"%s\" to protocol number\n",proto);
+            printf("Cannot map \"%s\" to protocol number\n", proto);
         }
         return 3;
     }
 
     /* create a socket */
-    *sd = socket(PF_INET,(!strcmp(proto,"udp"))?SOCK_DGRAM:SOCK_STREAM,ptrp->p_proto);
+    *sd = socket(PF_INET,(!strcmp(proto,"udp"))?SOCK_DGRAM:SOCK_STREAM, ptrp->p_proto);
     if (*sd < 0) {
         close(*sd);
         if (DEBUG) {
@@ -74,7 +74,7 @@ my_swift_fwd_net_connect(const char *host_name, int port, int *sd, char* proto)
         return 3;
     }
     /* open a connection */
-    result = connect(*sd,(struct sockaddr *)&servaddr,sizeof(servaddr));
+    result = connect(*sd,(struct sockaddr *)&servaddr, sizeof(servaddr));
     if (result < 0) {
         close(*sd);
         switch (errno) {
@@ -239,7 +239,7 @@ read_swift_fwd_stat()
 void
 read_swift_fwd_stats(struct module *mod, char *parameter)
 {
-    int    retry = 0 ,pos = 0;
+    int    retry = 0, pos = 0;
     char   buf[LEN_1024];
     memset(&stats, 0, sizeof(stats));
     mgrport = atoi(parameter);

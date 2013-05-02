@@ -61,7 +61,7 @@ my_swift_store_net_connect(const char *host_name, int port, int *sd, char* proto
     struct protoent    *ptrp;
     struct sockaddr_in  servaddr;
 
-    bzero((char *)&servaddr,sizeof(servaddr));
+    bzero((char *)&servaddr, sizeof(servaddr));
     servaddr.sin_family=AF_INET;
     servaddr.sin_port=htons(port);
     inet_pton(AF_INET, host_name, &servaddr.sin_addr);
@@ -69,13 +69,13 @@ my_swift_store_net_connect(const char *host_name, int port, int *sd, char* proto
     /* map transport protocol name to protocol number */
     if (((ptrp=getprotobyname(proto))) == NULL) {
         if (DEBUG) {
-            printf("Cannot map \"%s\" to protocol number\n",proto);
+            printf("Cannot map \"%s\" to protocol number\n", proto);
         }
         return 3;
     }
 
     /* create a socket */
-    *sd = socket(PF_INET,(!strcmp(proto,"udp"))?SOCK_DGRAM:SOCK_STREAM,ptrp->p_proto);
+    *sd = socket(PF_INET,(!strcmp(proto,"udp"))?SOCK_DGRAM:SOCK_STREAM, ptrp->p_proto);
     if (*sd < 0) {
         close(*sd);
         if (DEBUG) {
@@ -84,7 +84,7 @@ my_swift_store_net_connect(const char *host_name, int port, int *sd, char* proto
         return 3;
     }
     /* open a connection */
-    result = connect(*sd,(struct sockaddr *)&servaddr,sizeof(servaddr));
+    result = connect(*sd,(struct sockaddr *)&servaddr, sizeof(servaddr));
     if (result < 0) {
         close(*sd);
         switch (errno) {
@@ -162,13 +162,13 @@ parse_swift_store_info(char *buf)
         }
         /*Request Memory Hit Ratios:      5min: 71.3%, 60min: 71.8% */
         if (strstr(line,"Request Memory Hit Ratios:") != NULL) {
-            float a,b;
+            float a, b;
             sscanf(line,"        Request Memory Hit Ratios:      5min: %f%%, 60min: %f%%",&a,&b);
             stats.m_hit = a * 1000;
         }
         /*Request Filesystem Hit Ratios(5min):    coss: 9.8%, tcoss: 13.8%*/
         if (strstr(line,"Request Filesystem Hit Ratios(5min):") != NULL) {
-            float a,b;
+            float a, b;
             sscanf(line,"        Request Filesystem Hit Ratios(5min):    coss: %f%%, tcoss: %f%%",&a,&b);
             stats.coss= a * 1000;
             stats.tcoss = b * 1000;
@@ -260,7 +260,7 @@ read_swift_store_stat()
 void
 read_swift_store_stats(struct module *mod, char *parameter)
 {
-    int    retry = 0 ,pos = 0;
+    int    retry = 0, pos = 0;
     char   buf[LEN_1024];
     memset(&stats, 0, sizeof(stats));
     mgrport = atoi(parameter);

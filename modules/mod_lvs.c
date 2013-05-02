@@ -42,12 +42,12 @@ read_lvs(struct module *mod)
     st_lvs.bytin = 0;
     st_lvs.bytout = 0;
 
-    int    i=0,pos=0;
+    int    i=0, pos=0;
     char   buf[512];
     FILE  *fp;
     char   line[MAX_LINE_LEN];
 
-    if (access(KEEPALIVE,0) == 0) {
+    if (access(KEEPALIVE, 0) == 0) {
         if ((fp = fopen(LVS_STATS, "r")) != NULL) {
             while (fgets(line, MAX_LINE_LEN, fp) != NULL) {
                 i++;

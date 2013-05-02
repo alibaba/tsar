@@ -125,7 +125,7 @@ main_init(int argc, char **argv)
                 conf.running_mode = RUN_PRINT_LIVE;
                 break;
             case 'f':
-                strcpy(conf.output_file_path ,optarg);
+                strcpy(conf.output_file_path, optarg);
                 break;
             case 's':
                 set_special_field(optarg);

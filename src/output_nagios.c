@@ -72,7 +72,7 @@ output_nagios()
 
         } else {
             if (!mod->st_flag) {
-                printf("name %s\n",mod->name);
+                printf("name %s\n", mod->name);
                 printf("do nothing\n");
 
             } else {
@@ -112,10 +112,10 @@ output_nagios()
                         while (*p == ' ') {
                             p++;
                         }
-                        strcat(check_item,p);
+                        strcat(check_item, p);
                         for (l = 0; l < conf.mod_num; l++){
                             /* cmp tsar item with naigos item*/
-                            if (!strcmp(conf.check_name[l],check_item)) {
+                            if (!strcmp(conf.check_name[l], check_item)) {
                                 char    value[LEN_32];
                                 memset(value, 0, sizeof(value));
                                 sprintf(value, "%0.2f", st_array[k]);

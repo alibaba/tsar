@@ -217,7 +217,7 @@ realloc_module_array(struct module *mod, int n_n_item)
             mod->st_array = (double *)realloc(mod->st_array, n_n_item * mod->n_col * sizeof(double));
             if (conf.print_tail) {
                 mod->max_array = (double *)realloc(mod->max_array, n_n_item * mod->n_col *sizeof(double));
-                mod->mean_array =(double *)realloc(mod->mean_array,n_n_item * mod->n_col *sizeof(double));
+                mod->mean_array =(double *)realloc(mod->mean_array, n_n_item * mod->n_col *sizeof(double));
                 mod->min_array = (double *)realloc(mod->min_array, n_n_item * mod->n_col *sizeof(double));
             }
 
@@ -322,7 +322,7 @@ collect_record()
 
         memset(mod->record, 0, sizeof(mod->record));
         if (mod->data_collect) {
-            mod->data_collect(mod,mod->parameter);
+            mod->data_collect(mod, mod->parameter);
         }
     }
 }
@@ -372,7 +372,7 @@ collect_record_stat()
                     int pos = 0;
 
                     while (strtok_next_item(item, mod->record, &pos)) {
-                        if (!(ret=convert_record_to_array(&mod->cur_array[num * mod->n_col],mod->n_col,item))) {
+                        if (!(ret=convert_record_to_array(&mod->cur_array[num * mod->n_col], mod->n_col, item))) {
                             break;
                         }
                         memset(item, 0, sizeof(item));

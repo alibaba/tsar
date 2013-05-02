@@ -315,7 +315,7 @@ running_print_live()
  * 6 other error
  */
 int
-find_offset_from_start(FILE *fp,int number)
+find_offset_from_start(FILE *fp, int number)
 {
     char    line[LEN_10240] = {0};
     long    fset, fend, file_len, off_start, off_end, offset, line_len;
@@ -399,7 +399,7 @@ find_offset_from_start(FILE *fp,int number)
                 }
 
             } else {
-                /* fatal error,log format error happen. */
+                /* fatal error, log format error happen. */
                 return 5;
             }
 
@@ -426,7 +426,7 @@ find_offset_from_start(FILE *fp,int number)
 
         if (offset == (off_start + off_end) / 2) {
             if (off_start != 0) {
-                /* tsar has been down for a while,so,the following time's stat we can provied only; */
+                /* tsar has been down for a while, so the following time's stat we can provied only; */
                 conf.print_file_number = number;
                 return 4;
             }
@@ -597,7 +597,7 @@ print_tail(int tail_type)
 FILE *
 init_running_print()
 {
-    int    i=0,k=0;
+    int    i=0, k=0;
     FILE  *fp,*fptmp;
     char   line[LEN_10240] = {0};
     char   filename[LEN_128] = {0};
@@ -607,31 +607,31 @@ init_running_print()
 
     fp = fopen(conf.output_file_path, "r");
     if (!fp) {
-        do_debug(LOG_FATAL, "unable to open the log file %s\n",conf.output_file_path);
+        do_debug(LOG_FATAL, "unable to open the log file %s\n", conf.output_file_path);
     }
     /*log number to use for print*/
     conf.print_file_number = -1;
     /* find start offset will print from tsar.data */
-    k=find_offset_from_start(fp,i);
+    k=find_offset_from_start(fp, i);
     if (k == 1) {
         /*find all possible record*/
         for (i=1; ; i++) {
-            memset(filename,0,sizeof(filename));
-            sprintf(filename,"%s.%d",conf.output_file_path,i);
+            memset(filename, 0, sizeof(filename));
+            sprintf(filename,"%s.%d", conf.output_file_path, i);
             fptmp = fopen(filename, "r");
             if (!fptmp) {
                 conf.print_file_number = i - 1;
                 break;
             }
 
-            k=find_offset_from_start(fptmp,i);
+            k=find_offset_from_start(fptmp, i);
             if (k==0 || k==4) {
                 fclose(fp);
                 fp=fptmp;
                 break;
             }
             if (k== 2) {
-                if (fseek(fp,0,SEEK_SET) != 0) {
+                if (fseek(fp, 0, SEEK_SET) != 0) {
                     do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
                 }
                 fclose(fptmp);
@@ -643,13 +643,13 @@ init_running_print()
                 continue;
             }
             if (k == 5 || k == 6) {
-                do_debug(LOG_FATAL, "log format error or find_offset_from_start have a bug. error code=%d\n",k);
+                do_debug(LOG_FATAL, "log format error or find_offset_from_start have a bug. error code=%d\n", k);
             }
         }
     }
 
     if (k == 5 || k == 6) {
-        do_debug(LOG_FATAL, "log format error or find_offset_from_start have a bug. error code=%d\n",k);
+        do_debug(LOG_FATAL, "log format error or find_offset_from_start have a bug. error code=%d\n", k);
     }
     /* get record */
     if (!fgets(line, LEN_10240, fp)) {
@@ -695,17 +695,17 @@ running_print()
 
             } else {
                 conf.print_file_number = conf.print_file_number - 1;
-                memset(filename,0,sizeof(filename));
+                memset(filename, 0, sizeof(filename));
                 if (conf.print_file_number == 0) {
-                    sprintf(filename,"%s",conf.output_file_path);
+                    sprintf(filename,"%s", conf.output_file_path);
 
                 } else {
-                    sprintf(filename,"%s.%d",conf.output_file_path,conf.print_file_number);
+                    sprintf(filename,"%s.%d", conf.output_file_path, conf.print_file_number);
                 }
                 fclose(fp);
                 fp = fopen(filename,"r");
                 if (!fp) {
-                    do_debug(LOG_FATAL, "unable to open the log file %s.\n",filename);
+                    do_debug(LOG_FATAL, "unable to open the log file %s.\n", filename);
                 }
                 continue;
             }
@@ -759,7 +759,7 @@ running_print()
 }
 
 char *
-trim(char* src,int max_len)
+trim(char* src, int max_len)
 {
     int    cur_len = 0;
     char  *index=src;
@@ -773,7 +773,7 @@ trim(char* src,int max_len)
 void
 running_check(int check_type)
 {
-    int        total_num=0,i,j,k;
+    int        total_num=0, i, j, k;
     FILE      *fp;
     char       line[2][LEN_10240];
     char       filename[LEN_128] = {0};
@@ -795,11 +795,11 @@ running_check(int check_type)
         }
     }
     memset(tmp, 0, 9 * LEN_256);
-    sprintf(check,"%s\ttsar\t",host_name);
-    sprintf(filename,"%s",conf.output_file_path);
+    sprintf(check,"%s\ttsar\t", host_name);
+    sprintf(filename,"%s", conf.output_file_path);
     fp = fopen(filename,"r");
     if (!fp) {
-        do_debug(LOG_FATAL, "unable to open the log file %s.\n",filename);
+        do_debug(LOG_FATAL, "unable to open the log file %s.\n", filename);
     }
     /* get file len */
     memset(&line[0], 0, LEN_10240);
@@ -826,11 +826,11 @@ running_check(int check_type)
     /*FIX ME*/
     if (total_num == 0) {
         fclose(fp);
-        memset(filename,0,sizeof(filename));
-        sprintf(filename,"%s.1",conf.output_file_path);
+        memset(filename, 0, sizeof(filename));
+        sprintf(filename,"%s.1", conf.output_file_path);
         fp = fopen(filename,"r");
         if (!fp) {
-            do_debug(LOG_FATAL, "unable to open the log file %s.\n",filename);
+            do_debug(LOG_FATAL, "unable to open the log file %s.\n", filename);
         }
         total_num = 0;
         memset(&line[0], 0, 2 * LEN_10240);
@@ -853,7 +853,7 @@ running_check(int check_type)
             }
         }
         if (total_num < 2) {
-            do_debug(LOG_FATAL, "not enough lines at log file %s.\n",filename);
+            do_debug(LOG_FATAL, "not enough lines at log file %s.\n", filename);
         }
 
         memset(&line[0], 0, LEN_10240);
@@ -865,10 +865,10 @@ running_check(int check_type)
         memset(&line[1], 0, LEN_10240);
         fgets(line[1], LEN_10240, fp);
         fclose(fp);
-        sprintf(filename,"%s.1",conf.output_file_path);
+        sprintf(filename,"%s.1", conf.output_file_path);
         fp = fopen(filename,"r");
         if (!fp) {
-            do_debug(LOG_FATAL, "unable to open the log file %s\n",filename);
+            do_debug(LOG_FATAL, "unable to open the log file %s\n", filename);
         }
         total_num = 0;
         /* go to the start of the last line at tsar.data.1 */
@@ -892,7 +892,7 @@ running_check(int check_type)
         }
 
         if (total_num < 1) {
-            do_debug(LOG_FATAL, "not enough lines at log file %s\n",filename);
+            do_debug(LOG_FATAL, "not enough lines at log file %s\n", filename);
         }
         memset(&line[0], 0, LEN_10240);
         fgets(line[0], LEN_10240, fp);
@@ -915,7 +915,7 @@ running_check(int check_type)
     /*display check detail*/
     /* ---------------------------RUN_CHECK_NEW--------------------------------------- */
     if (check_type == RUN_CHECK_NEW) {
-        printf("%s\ttsar\t",host_name);
+        printf("%s\ttsar\t", host_name);
         for (i = 0; i < statis.total_mod_num; i++) {
             mod = &mods[i];
             if (!mod->enable) {
@@ -949,15 +949,15 @@ running_check(int check_type)
                             if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[k].summary_bit))
                                     || ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[k].summary_bit)))
                             {
-                                printf("%s:%s%s=-%s",mod_name,opt,trim(info[k].hdr,LEN_128), " ");
+                                printf("%s:%s%s=-%s", mod_name, opt, trim(info[k].hdr, LEN_128), " ");
                             }
 
                         } else {
                             if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[k].summary_bit))
                                     || ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[k].summary_bit)))
                             {
-                                printf("%s:%s%s=",mod_name,opt,trim(info[k].hdr,LEN_128));
-                                printf("%0.1f ",st_array[k]);
+                                printf("%s:%s%s=", mod_name, opt, trim(info[k].hdr, LEN_128));
+                                printf("%0.1f ", st_array[k]);
                             }
                         }
 
@@ -966,15 +966,15 @@ running_check(int check_type)
                             if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[k].summary_bit))
                                     || ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[k].summary_bit)))
                             {
-                                printf("%s:%s%s=-%s",mod_name,opt,trim(info[k].hdr,LEN_128), " ");
+                                printf("%s:%s%s=-%s", mod_name, opt, trim(info[k].hdr, LEN_128), " ");
                             }
 
                         } else {
                             if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[k].summary_bit))
                                     || ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[k].summary_bit)))
                             {
-                                printf("%s:%s%s=",mod_name,opt,trim(info[k].hdr,LEN_128));
-                                printf("%0.1f ",st_array[k]);
+                                printf("%s:%s%s=", mod_name, opt, trim(info[k].hdr, LEN_128));
+                                printf("%0.1f ", st_array[k]);
                             }
                         }
 
@@ -1012,7 +1012,7 @@ running_check(int check_type)
                         sprintf(tmp[0]," apache/qps=- apache/rt=- apache/busy=- apache/idle=-");
 
                     } else {
-                        sprintf(tmp[0]," apache/qps=%0.2f apache/rt=%0.2f apache/busy=%0.0f apache/idle=%0.0f",st_array[0],st_array[1],st_array[3],st_array[4]);
+                        sprintf(tmp[0]," apache/qps=%0.2f apache/rt=%0.2f apache/busy=%0.0f apache/idle=%0.0f", st_array[0], st_array[1], st_array[3], st_array[4]);
                     }
                 }
             }
@@ -1023,7 +1023,7 @@ running_check(int check_type)
                         sprintf(tmp[1]," cpu=-");
 
                     } else {
-                        sprintf(tmp[1]," cpu=%0.2f",st_array[5]);
+                        sprintf(tmp[1]," cpu=%0.2f", st_array[5]);
                     }
                 }
             }
@@ -1034,7 +1034,7 @@ running_check(int check_type)
                         sprintf(tmp[2]," mem=-");
 
                     } else {
-                        sprintf(tmp[2]," mem=%0.2f%%",st_array[5]);
+                        sprintf(tmp[2]," mem=%0.2f%%", st_array[5]);
                     }
                 }
             }
@@ -1045,7 +1045,7 @@ running_check(int check_type)
                         sprintf(tmp[3]," load1=- load5=- load15=-");
 
                     } else {
-                        sprintf(tmp[3]," load1=%0.2f load5=%0.2f load15=%0.2f",st_array[0],st_array[1],st_array[2]);
+                        sprintf(tmp[3]," load1=%0.2f load5=%0.2f load15=%0.2f", st_array[0], st_array[1], st_array[2]);
                     }
                 }
             }
@@ -1062,12 +1062,12 @@ running_check(int check_type)
                         strncat(opt, token, s_token - token);
                         st_array = &mod->st_array[j * mod->n_col];
                         if (!st_array || !mod->st_flag) {
-                            sprintf(item," %s=-",opt);
+                            sprintf(item," %s=-", opt);
 
                         } else {
-                            sprintf(item," %s=%0.2f",opt,st_array[10]);
+                            sprintf(item," %s=%0.2f", opt, st_array[10]);
                         }
-                        strcat(tmp[4],item);
+                        strcat(tmp[4], item);
                     }
                     token = strtok(NULL, ITEM_SPLIT);
                 }
@@ -1083,7 +1083,7 @@ running_check(int check_type)
                         sprintf(tmp[5]," ifin=- ifout=-");
 
                     } else {
-                        sprintf(tmp[5]," ifin=%0.2f ifout=%0.2f",st_array[0]/1000,st_array[1]/1000);
+                        sprintf(tmp[5]," ifin=%0.2f ifout=%0.2f", st_array[0]/1000, st_array[1]/1000);
                     }
                 }
             }
@@ -1094,7 +1094,7 @@ running_check(int check_type)
                         sprintf(tmp[6]," TCPretr=-");
 
                     } else {
-                        sprintf(tmp[6]," TCPretr=%0.2f",st_array[4]);
+                        sprintf(tmp[6]," TCPretr=%0.2f", st_array[4]);
                     }
                 }
             }
@@ -1111,12 +1111,12 @@ running_check(int check_type)
                         strncat(opt, token, s_token - token);
                         st_array = &mod->st_array[j * mod->n_col];
                         if (!st_array || !mod->st_flag) {
-                            sprintf(item," df%s=-",opt);
+                            sprintf(item," df%s=-", opt);
 
                         } else {
-                            sprintf(item," df%s=%0.2f%%",opt,st_array[3]);
+                            sprintf(item," df%s=%0.2f%%", opt, st_array[3]);
                         }
-                        strcat(tmp[7],item);
+                        strcat(tmp[7], item);
                     }
                     token = strtok(NULL, ITEM_SPLIT);
                 }
@@ -1132,15 +1132,15 @@ running_check(int check_type)
                         sprintf(tmp[8]," nginx/qps=- nginx/rt=-");
 
                     } else {
-                        sprintf(tmp[8]," nginx/qps=%0.2f nginx/rt=%0.2f",st_array[7],st_array[8]);
+                        sprintf(tmp[8]," nginx/qps=%0.2f nginx/rt=%0.2f", st_array[7], st_array[8]);
                     }
                 }
             }
         }
         for (j = 0; j < 9; j++) {
-            strcat(check,tmp[j]);
+            strcat(check, tmp[j]);
         }
-        printf("%s\n",check);
+        printf("%s\n", check);
         fclose(fp);
         fp = NULL;
     }

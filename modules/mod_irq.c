@@ -35,7 +35,7 @@ union __irq_statistics {
 static union __irq_statistics irq_statistics[MAXIRQ][NR_ARRAY];
 
 #define IRQ_STRING_OPS(str, ops, fmt, stat, d)  \
-    ops(str, fmt,stat d irq_nr)
+    ops(str, fmt, stat d irq_nr)
 
 
 #define SET_IRQ_STATISTICS(val, target, member, i)  \
@@ -212,7 +212,7 @@ __irq_ops(char *_detail_last, char *_detail_curr, int dtype, int otype, stats_ir
 
     if (dtype == DATA_DETAIL) {
         /* write each record to buffer */
-        PRINT(_buf + len,tmp.irq_detail.intr , len, otype);
+        PRINT(_buf + len, tmp.irq_detail.intr, len, otype);
 
     } else if (dtype == DATA_SUMMARY) {
         PRINT(_buf + len, tmp.irq_detail.intr, len, otype);

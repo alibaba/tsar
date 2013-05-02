@@ -59,12 +59,12 @@ struct stats_haproxy st_haproxy;
 static void
 read_haproxy(struct module *mod)
 {
-    int i,pos=0;
+    int i, pos=0;
     char buf[512];
 
     memset(&st_haproxy, 0, sizeof(struct stats_haproxy));
     for (i = 0;i < RETRY;i++) {
-        if (get_http_status() == 0 && access(HAPROXY,0) == 0) {
+        if (get_http_status() == 0 && access(HAPROXY, 0) == 0) {
             st_haproxy.stat = 1;
             break;
         }
@@ -81,7 +81,7 @@ read_haproxy(struct module *mod)
     }
     if (st_haproxy.stat == 1) {
         pos = sprintf(buf, HAPROXY_STORE_FMT(DATA_SPLIT), st_haproxy.stat, st_haproxy.uptime,
-                      st_haproxy.conns,st_haproxy.qps, st_haproxy.hit, st_haproxy.rt);
+                      st_haproxy.conns, st_haproxy.qps, st_haproxy.hit, st_haproxy.rt);
     }
     buf[pos] = '\0';
     set_mod_record(mod, buf);
@@ -138,14 +138,14 @@ get_http_status()
     if (my_tcp_connect (server_address, server_port, &sd) == 0) {
         close(sd);
         if (DEBUG) {
-            printf("connect host %s at %d\n",server_address,server_port);
+            printf("connect host %s at %d\n", server_address, server_port);
         }
         return 0;
     } else {
         close(sd);
         return -1;
         if (DEBUG) {
-            printf("cat't connect host %s at %d\n",server_address,server_port);
+            printf("cat't connect host %s at %d\n", server_address, server_port);
         }
     }
     int     i = 0;
@@ -179,7 +179,7 @@ get_http_status()
         }
     }
     if (DEBUG) {
-        printf("%s\n",full_page);
+        printf("%s\n", full_page);
     }
     if (i < 0 && errno != ECONNRESET) {
         printf("HTTP CRITICAL - Error on receive\n");
@@ -216,7 +216,7 @@ np_net_connect (const char *host_name, int port, int *sd, char* proto)
     struct protoent    *ptrp;
     struct sockaddr_in  servaddr;
 
-    bzero((char *)&servaddr,sizeof(servaddr));
+    bzero((char *)&servaddr, sizeof(servaddr));
     servaddr.sin_family=AF_INET;
     servaddr.sin_port=htons(port);
     inet_pton(AF_INET, server_address, &servaddr.sin_addr);
@@ -224,13 +224,13 @@ np_net_connect (const char *host_name, int port, int *sd, char* proto)
     /* map transport protocol name to protocol number */
     if (((ptrp = getprotobyname(proto))) == NULL) {
         if (DEBUG) {
-            printf("Cannot map \"%s\" to protocol number\n",proto);
+            printf("Cannot map \"%s\" to protocol number\n", proto);
         }
         return 3;
     }
 
     /* create a socket */
-    *sd = socket(PF_INET,(!strcmp(proto,"udp"))?SOCK_DGRAM:SOCK_STREAM,ptrp->p_proto);
+    *sd = socket(PF_INET,(!strcmp(proto,"udp"))?SOCK_DGRAM:SOCK_STREAM, ptrp->p_proto);
     if (*sd < 0) {
         close(*sd);
         if (DEBUG) {
@@ -239,7 +239,7 @@ np_net_connect (const char *host_name, int port, int *sd, char* proto)
         return 3;
     }
     /* open a connection */
-    result = connect(*sd,(struct sockaddr *)&servaddr,sizeof(servaddr));
+    result = connect(*sd,(struct sockaddr *)&servaddr, sizeof(servaddr));
     if (result < 0) {
         close(*sd);
         switch(errno) {
@@ -382,7 +382,7 @@ get_haproxy_detail(void)
             sscanf(p_split, "total request num/total hit request num/ total conns num: %ld/", &st_haproxy.qps);
         }
         if (strstr(p_split, "mean rt:")) {
-            int a ,b;
+            int a, b;
             sscanf(p_split, "mean rt: %d.%d (ms)", &a, &b);
             st_haproxy.rt = a*100+b;
         }

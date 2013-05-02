@@ -498,7 +498,7 @@ __get_squid_info(char *squidoption, char *squidcmd, int port, int index)
 }
 
 int
-__read_squid_stat(int port,int index)
+__read_squid_stat(int port, int index)
 {
     int i;
     /* fullfil the raw infomation here
@@ -565,7 +565,7 @@ read_squid_stat(struct module *mod)
     for (i = 0; i < squid_nr; i++) {
         int retry = 0;
         /* read on each port and retry to get squidclient for 3 times*/
-        while (__read_squid_stat(port_list[i],i) < 0 && retry < RETRY_NUM) {
+        while (__read_squid_stat(port_list[i], i) < 0 && retry < RETRY_NUM) {
             retry++;
         }
         if (retry == RETRY_NUM) {

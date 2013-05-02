@@ -54,7 +54,7 @@ convert_record_to_array(U_64 *array, int l_array, const char *record)
             return 0;
         }
         if (i < l_array) {
-            *(array + i) = strtoull(token,NULL,10);
+            *(array + i) = strtoull(token, NULL, 10);
         }
         token = strtok(NULL, DATA_SPLIT);
         i++;
