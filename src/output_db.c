@@ -27,7 +27,7 @@
 void
 send_sql_txt(int fd, int have_collect)
 {
-    int    i = 0, j;
+    int    i = 0, j, len;
     char   sqls[LEN_10240] = {0};
     char   s_time[LEN_64] = {0};
     char   host_name[LEN_64] = {0};
@@ -104,7 +104,10 @@ send_sql_txt(int fd, int have_collect)
                 strcat(sqls, ");");
             }
         }
-        write(fd, sqls, strlen(sqls));
+        len = strlen(sqls);
+        if (write(fd, sqls, len) != len) {
+            do_debug(LOG_ERR, "output_db write error:%s", strerror(errno));
+        }
     }
 }
 

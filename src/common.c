@@ -251,7 +251,9 @@ out:
     /* store current record to PRE_RECORD_FILE */
     if ((fp = fopen(PRE_RECORD_FILE, "w"))) {
         strcat(line, "\n");
-        fputs(line, fp);
+        if (fputs(line, fp) < 0) {
+            do_debug(LOG_ERR, "fputs error:%s", strerror(errno));
+        }
         fclose(fp);
         chmod(PRE_RECORD_FILE, 0666);
     }

@@ -51,7 +51,7 @@ output_file()
 
     if (ret) {
         if(fputs(line, fp) < 0)
-            do_debug(LOG_WARN, "write line error\n");
+            do_debug(LOG_ERR, "write line error\n");
     }
     fclose(fp);
     if (chmod(conf.output_file_path, 0666) < 0 ) {

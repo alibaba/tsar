@@ -318,9 +318,13 @@ find_offset_from_start(FILE *fp,int number)
     struct  tm stm;
 
     /* get file len */
-    fseek(fp, 0, SEEK_END);
+    if (fseek(fp, 0, SEEK_END) != 0 ) {
+        do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
+    }
     fend = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
+    if (fseek(fp, 0, SEEK_SET) != 0) {
+        do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
+    }
     fset = ftell(fp);
     file_len = fend - fset;
 
@@ -364,7 +368,9 @@ find_offset_from_start(FILE *fp,int number)
     while (1) {
         offset = (off_start + off_end) / 2;
         memset(&line, 0, LEN_10240);
-        fseek(fp, offset, SEEK_SET);
+        if (fseek(fp, offset, SEEK_SET) != 0) {
+            do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
+        }
         fgets(line, LEN_10240, fp);
         memset(&line, 0, LEN_10240);
         fgets(line, LEN_10240, fp);
@@ -618,7 +624,9 @@ init_running_print()
                 break;
             }
             if ( k== 2) {
-                fseek(fp,0,SEEK_SET);
+                if (fseek(fp,0,SEEK_SET) != 0) {
+                    do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
+                }
                 fclose(fptmp);
                 break;
             }
@@ -790,7 +798,9 @@ running_check(int check_type)
     memset(&line[0], 0, LEN_10240);
     total_num =0;
     /* find two \n from end*/
-    fseek(fp, -1, SEEK_END);
+    if (fseek(fp, -1, SEEK_END) != 0) {
+        do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
+    }
     while (1) {
         if (fgetc(fp) == '\n') {
             ++total_num;
@@ -800,7 +810,9 @@ running_check(int check_type)
         }
         if (fseek(fp, -2, SEEK_CUR) != 0) {
             /* just 1 or 2 line, goto file header */
-            fseek(fp, 0, SEEK_SET);
+            if (fseek(fp, 0, SEEK_SET) != 0) {
+                do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
+            }
             break;
         }
     }
@@ -816,7 +828,9 @@ running_check(int check_type)
         total_num = 0;
         memset(&line[0], 0, 2 * LEN_10240);
         /* count tsar.data.1 lines */
-        fseek(fp, -1, SEEK_END);
+        if (fseek(fp, -1, SEEK_END) != 0) {
+            do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
+        }
         while (1) {
             if (fgetc(fp) == '\n') {
                 ++total_num;
@@ -825,7 +839,9 @@ running_check(int check_type)
                 break;
             }
             if (fseek(fp, -2, SEEK_CUR) != 0) {
-                fseek(fp, 0, SEEK_SET);
+                if (fseek(fp, 0, SEEK_SET) != 0) {
+                    do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
+                }
                 break;
             }
         }
@@ -849,7 +865,9 @@ running_check(int check_type)
         }
         total_num = 0;
         /* go to the start of the last line at tsar.data.1 */
-        fseek(fp, -1, SEEK_END);
+        if (fseek(fp, -1, SEEK_END) != 0) {
+            do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
+        }
         while (1) {
             if (fgetc(fp) == '\n') {
                 ++total_num;
@@ -859,7 +877,9 @@ running_check(int check_type)
                 break;
             }
             if (fseek(fp, -2, SEEK_CUR) != 0) {
-                fseek(fp, 0, SEEK_SET);
+                if (fseek(fp, 0, SEEK_SET) != 0) {
+                    do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
+                }
                 break;
             }
         }
