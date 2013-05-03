@@ -32,7 +32,7 @@ struct stats_ts {
     unsigned long long req_per_con;
 };
 
-static char *ts_usage = "    --ts_client         trafficserver client statistics";
+static char *ts_usage = "    --ts                trafficserver client statistics";
 
 static struct mod_info ts_info[] = {
     {"   qps", DETAIL_BIT, 0, STATS_NULL},
@@ -151,5 +151,5 @@ done:
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--ts_client", ts_usage, ts_info, 7, read_ts_stats, set_ts_record);
+    register_mod_fileds(mod, "--ts", ts_usage, ts_info, 7, read_ts_stats, set_ts_record);
 }

@@ -459,14 +459,16 @@ read_line_to_module_record(char *line)
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
         if (mod->enable) {
+            char mod_opt[LEN_64];
+            sprintf(mod_opt, "%s%s%s", SECTION_SPLIT, mod->opt_line, STRING_SPLIT);
             memset(mod->record, 0, sizeof(mod->record));
 
-            s_token = strstr(line, mod->opt_line);
+            s_token = strstr(line, mod_opt);
             if (!s_token) {
                 continue;
             }
 
-            s_token += strlen(mod->opt_line) + sizeof(STRING_SPLIT) - 1;
+            s_token += sizeof(SECTION_SPLIT) + strlen(mod->opt_line) + sizeof(STRING_SPLIT) - 2;
             e_token = strstr(s_token, SECTION_SPLIT);
 
             if (e_token) {
