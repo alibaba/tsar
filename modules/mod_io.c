@@ -44,7 +44,7 @@ int print_device = 1;
 
 unsigned int n_partitions;  /* Number of partitions */
 
-static struct mod_info io_info[] = { 
+static struct mod_info io_info[] = {
     {" rrqms", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
     {" wrqms", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
     {"    rs", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
