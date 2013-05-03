@@ -257,7 +257,9 @@ print_partition_stats(struct module *mod)
     }
     rewind(iofp);
     if (NULL != iofp) {
-        fclose(iofp);
+        if (fclose(iofp) < 0) {
+            return;
+        }
         iofp =NULL;
     }
     return;

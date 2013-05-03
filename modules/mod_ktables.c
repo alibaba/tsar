@@ -61,13 +61,17 @@ read_kernel_tables(struct module *mod, int data_type)
     /* Open /proc/sys/fs/dentry-state file */
     if ((fp = fopen(FDENTRY_STATE, "r")) != NULL) {
         fscanf(fp, "%*d %u", &st_ktables->dentry_stat);
-        fclose(fp);
+        if (fclose(fp) < 0) {
+            return;
+        }
     }
 
     /* Open /proc/sys/fs/file-nr file */
     if ((fp = fopen(FFILE_NR, "r")) != NULL) {
         fscanf(fp, "%u %u", &st_ktables->file_used, &parm);
-        fclose(fp);
+        if (fclose(fp) < 0) {
+            return;
+        }
         /*
          * The number of used handles is the number of allocated ones
          * minus the number of free ones.
@@ -78,7 +82,9 @@ read_kernel_tables(struct module *mod, int data_type)
     /* Open /proc/sys/fs/inode-state file */
     if ((fp = fopen(FINODE_STATE, "r")) != NULL) {
         fscanf(fp, "%u %u", &st_ktables->inode_used, &parm);
-        fclose(fp);
+        if (fclose(fp) < 0) {
+            return;
+        }
         /*
          * The number of inuse inodes is the number of allocated ones
          * minus the number of free ones.
@@ -89,7 +95,9 @@ read_kernel_tables(struct module *mod, int data_type)
     /* Open /proc/sys/kernel/pty/nr file */
     if ((fp = fopen(PTY_NR, "r")) != NULL) {
         fscanf(fp, "%u", &st_ktables->pty_nr);
-        fclose(fp);
+        if (fclose(fp) < 0) {
+            return;
+        }
     }
     int pos = KTABLES_STRING_OPS(buf, sprintf, 
                                  KTABLES_STORE_FMT(DATA_SPLIT), st_ktables, ->);

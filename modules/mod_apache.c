@@ -41,20 +41,24 @@ read_apache_stats(struct module *mod)
     FILE *stream = NULL;
     /* FIX me */
     char *cmd = "server-status?auto";
-    struct hostinfo hinfo;
-    init_host_info(&hinfo);
     struct stats_apache st_apache;
     memset(&st_apache, 0, sizeof(struct stats_apache));
+    struct hostinfo hinfo;
+
     if ((fd = open(APACHERT, O_RDONLY , 0644)) < 0 ){
         return;
     }
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+        goto last;
+    }
     if ((n = read(fd, buff, 16)) != 16) {
-        return;
+        goto last;
     }
     st_apache.query = * (unsigned long long *)buff;
     st_apache.response_time = * (unsigned long long *)&buff[8];
     /*fullfil another member int the structure*/
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    init_host_info(&hinfo);
     bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(hinfo.port);
@@ -76,6 +80,9 @@ read_apache_stats(struct module *mod)
         goto writebuf;
     }
     stream = fdopen(sockfd, "r");
+    if (!stream) {
+        goto last;
+    }
     while(fgets(line, LEN_4096, stream) != NULL) {
         if(!strncmp(line, "Total kBytes:", 13)) {
             sscanf(line + 14, "%llu", &st_apache.kBytes_sent);
@@ -99,10 +106,17 @@ writebuf:
             st_apache.busy_proc,
             st_apache.idle_proc);
     buf[pos] = '\0';
-    if (stream)
-        fclose(stream);
-    close(fd);
+    if (stream) {
+        if (fclose(stream) < 0) {
+            goto last;
+        }
+    }
     set_mod_record(mod, buf);
+last:
+    close(fd);
+    if (sockfd) {
+        close(sockfd);
+    }
     free(hinfo.host);
 }
 

@@ -71,8 +71,9 @@ read_cpu_stats(struct module *mod)
 
     buf[pos] = '\0';
     set_mod_record(mod, buf);
-    fclose(fp);
-    return;
+    if (fclose(fp) < 0) {
+        return;
+    }
 }
 
 static void 
