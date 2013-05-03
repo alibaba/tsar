@@ -20,7 +20,7 @@ struct stats_partition {
 };
 #define STATS_PARTITION_SIZE (sizeof(struct stats_partition))
 
-int 
+int
 __read_partition_stat(char *fsname, struct stats_partition *sp)
 {
     struct statfs fsbuf;
@@ -36,7 +36,7 @@ __read_partition_stat(char *fsname, struct stats_partition *sp)
 }
 
 int
-store_single_partition(char *buf, char *mntpath, struct stats_partition *sp) 
+store_single_partition(char *buf, char *mntpath, struct stats_partition *sp)
 {
     int                 len = 0;
     float               util;

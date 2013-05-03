@@ -279,7 +279,7 @@ inline void func_mod_free(struct module *mod)
             pos[(idx)], (otype));           \
 }while(0)
 
-inline char *getitem(char *r, char *mnt) 
+inline char *getitem(char *r, char *mnt)
 {
     char *start, *end;
     if (r == NULL || *r == '\0') {

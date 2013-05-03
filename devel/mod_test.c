@@ -65,7 +65,7 @@ read_test_stats(struct module *mod, const char *parameter)
     return;
 }
 
-static void 
+static void
 set_test_record(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {

@@ -29,7 +29,7 @@ static struct mod_info tmd_info[] = {
 };
 
 
-static void 
+static void
 set_tmd_record(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {

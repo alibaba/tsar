@@ -134,7 +134,7 @@ a_trim(char *str, int len)
     return dest;
 }
 
-int 
+int
 read_a_int_value(char *buf, char *key, unsigned int *ret, int type)
 {
     int    k;
@@ -155,7 +155,7 @@ read_a_int_value(char *buf, char *key, unsigned int *ret, int type)
     }
 }
 
-int 
+int
 read_a_long_long_value(char *buf, char *key, unsigned long long *ret, int type)
 {
     int    k;

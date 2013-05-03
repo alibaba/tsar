@@ -63,7 +63,7 @@ union paging_statistics {
  *
  *******************************************
  */
-void 
+void
 read_vmstat_paging(struct module *mod, int data_type)
 {
     int            ok = FALSE;
@@ -124,7 +124,7 @@ read_vmstat_paging(struct module *mod, int data_type)
             st_paging->pgscan_direct += pgtmp;
         }
     }
-    int pos = PAGING_STRING_OPS(buf, sprintf, 
+    int pos = PAGING_STRING_OPS(buf, sprintf,
             PAGING_STORE_FMT(DATA_SPLIT), st_paging, ->);
     buf[pos] = '\0';
     mod->detail = strdup(buf);
@@ -207,7 +207,7 @@ get_paging_avg(int data_type, int count)
             __PRINT_AVG(statis, pos, paging_statis, paging_detail.kswapd, i, count, OUTPUT_PRINT);
             __PRINT_AVG(statis, pos, paging_statis, paging_detail.direct, i, count, OUTPUT_PRINT);
             __PRINT_AVG(statis, pos, paging_statis, paging_detail.steal, i, count, OUTPUT_PRINT);
-        } 
+        }
 
         else if(data_type == DATA_SUMMARY)  {
             __PRINT_AVG(statis, pos, paging_statis, paging_summary.in, i, count, OUTPUT_PRINT);

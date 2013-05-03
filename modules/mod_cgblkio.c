@@ -215,9 +215,9 @@ read_cgblkio_stats(struct module *mod)
             }
             while (fgets(buffer, 128, iofd) != NULL) {
                 if (sscanf(buffer, "%s %s %llu", curr.disk, curr.type, &curr.num) == 3) {
-                    if (!strncmp(curr.type, "Read", 4)) 
+                    if (!strncmp(curr.type, "Read", 4))
                         blkio_groups[n_group].svctm += (unsigned long long)(curr.num / 1000000); //in ms
-                    if (!strncmp(curr.type, "Write", 5)) 
+                    if (!strncmp(curr.type, "Write", 5))
                         blkio_groups[n_group].svctm += (unsigned long long )(curr.num / 1000000);
                 }
             }

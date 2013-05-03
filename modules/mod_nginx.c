@@ -99,7 +99,7 @@ read_nginx_stats(struct module *mod, char *parameter)
 
     init_nginx_host_info(&hinfo);
     if (atoi(parameter) != 0) {
-       hinfo.port = atoi(parameter); 
+       hinfo.port = atoi(parameter);
     }
     struct stats_nginx st_nginx;
     memset(&st_nginx, 0, sizeof(struct stats_nginx));

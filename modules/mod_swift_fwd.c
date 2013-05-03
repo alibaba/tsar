@@ -44,7 +44,7 @@ struct mod_info swift_fwd_info[] = {
     {"    rt", DETAIL_BIT,  0,  STATS_NULL}
 };
 /* opens a tcp or udp connection to a remote host or local socket */
-int 
+int
 my_swift_fwd_net_connect(const char *host_name, int port, int *sd, char* proto)
 {
     int    result;

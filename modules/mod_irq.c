@@ -1,7 +1,7 @@
 #include "public.h"
 
 #define IRQ_DETAIL_HDR "  intr"
-#define IRQ_STORE_FMT(d) "%lld"         
+#define IRQ_STORE_FMT(d) "%lld"
 #define IRQ_SUMMARY_HDR "intr/s"
 
 char * irq_usage = "    --irq               Interrupts statistics";
@@ -44,12 +44,12 @@ static union __irq_statistics irq_statistics[MAXIRQ][NR_ARRAY];
  target[MEAN].irq_detail.member,        \
  target[MAX].irq_detail.member,         \
  target[MIN].irq_detail.member,         \
- (i))                   
+ (i))
 
 static int f_init = FALSE;
 
 char word[12];              // reocrd the word read from textline
-char textline[256];         //record a line of text 
+char textline[256];         //record a line of text
 unsigned char  text_index = 0;  //the index of textline above
 
 static void
@@ -154,7 +154,7 @@ count_irq_nr(char *record)
     return n;
 }
 
-void 
+void
 read_irq_stat(struct module *mod, int data_type)
 {
     int                 i, pos = 0;
@@ -202,7 +202,7 @@ read_irq_stat(struct module *mod, int data_type)
 }
 
 
-void 
+void
 __irq_ops(char *_detail_last, char *_detail_curr, int dtype, int otype, stats_irq si,
     char *_buf, int *pos, unsigned long itv, unsigned int idx)
 {
@@ -238,7 +238,7 @@ irq_ops(char *last_record, char *curr_record, time_t last_time,
     char           buf[MAX_LINE_LEN];
     unsigned int   i = 0;
     unsigned long  itv;
-    /* if statistic structure is not inited, 
+    /* if statistic structure is not inited,
        we will alloc space here */
     int nr = count_irq_nr(last_record);
     if (!f_init) {

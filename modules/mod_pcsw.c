@@ -46,7 +46,7 @@ read_stat_pcsw(struct module *mod)
             sscanf(line + 10, "%lu", &st_pcsw.processes);
         }
     }
-    int pos = sprintf(buf, "%lld,%ld", 
+    int pos = sprintf(buf, "%lld,%ld",
             st_pcsw.context_switch,
             st_pcsw.processes);
     buf[pos] = '\0';

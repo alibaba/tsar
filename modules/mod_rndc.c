@@ -150,7 +150,7 @@ read_rndc_stats(struct module *mod)
 {
     memset(g_buf, 0, sizeof(g_buf));
     create_script();
-    exec_script();  
+    exec_script();
     parse_stat_file(g_buf);
     set_mod_record(mod, g_buf);
 }

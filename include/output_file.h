@@ -32,7 +32,7 @@ struct buffer {
 
 struct file_header {
     int    version;
-    time_t t_start; 
+    time_t t_start;
 };
 
 

@@ -136,8 +136,8 @@ set_ts_cache_record(struct module *mod, double st_array[],
 
     } else {
         if (cur_array[3] > pre_array[3]) {
-            st_array[1] = (cur_array[4] - pre_array[4]) * 100.0 / (cur_array[3] - pre_array[3]); 
-            st_array[6] = (cur_array[5] - pre_array[5]) * 100.0 / (cur_array[3] - pre_array[3]); 
+            st_array[1] = (cur_array[4] - pre_array[4]) * 100.0 / (cur_array[3] - pre_array[3]);
+            st_array[6] = (cur_array[5] - pre_array[5]) * 100.0 / (cur_array[3] - pre_array[3]);
         }
     }
 }

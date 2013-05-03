@@ -45,7 +45,7 @@ read_stat_tcpx(struct module *mod)
     fp_netstat = fopen(NETSTAT, "r");
     if (fp_netstat == NULL) {
         return;
-    }   
+    }
     st_tcpx.tcplistenq = 0;
     st_tcpx.tcplistenincq = 0;
 
@@ -53,7 +53,7 @@ read_stat_tcpx(struct module *mod)
     while (fgets(line, LEN_4096, fp_netstat) !=NULL) {
         if (!strncmp(line, "TcpExt:", 7)) {
             if (!sw) {sw = 1; continue;}
-            sscanf(line + 7, 
+            sscanf(line + 7,
                     "%*u %*u %*u %*u %*u %*u %*u %*u %*u "
                     "%*u %*u %*u %*u %*u %*u %*u %*u %*u "
                     "%*u %llu %*u %*u %*u %*u %*u %*u %*u "
@@ -85,7 +85,7 @@ read_stat_tcpx(struct module *mod)
     st_tcpx.tcppersistdrop = 0;
     st_tcpx.tcpkadrop = 0;
 
-    int pos = sprintf(buf, 
+    int pos = sprintf(buf,
             "%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,"
             "%llu,%llu,%llu,%llu,%llu,%llu,%llu",
             st_tcpx.tcprecvq,

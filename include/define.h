@@ -56,7 +56,7 @@
 #define MOD_INFO_SIZE       sizeof(strcut mod_info)
 
 #define DEFAULT_CONF_FILE_PATH      "/etc/tsar/tsar.conf"
-#define DEFAULT_OUTPUT_FILE_PATH    "/var/log/tsar.data" 
+#define DEFAULT_OUTPUT_FILE_PATH    "/var/log/tsar.data"
 #define MIN_STRING "MIN:        "
 #define MEAN_STRING "MEAN:       "
 #define MAX_STRING "MAX:        "

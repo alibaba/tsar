@@ -1,7 +1,7 @@
 #include "tsar.h"
 
 #define UDP_DETAIL_HDR(d)           \
-    "  idgm"d"  odgm"d"noport"d"idmerr" 
+    "  idgm"d"  odgm"d"noport"d"idmerr"
 
 char *udp_usage =
 "    --udp               UDP traffic     (v4)";
@@ -10,7 +10,7 @@ char *udp_usage =
 struct stats_udp {
     unsigned long long InDatagrams;
     unsigned long long OutDatagrams;
-    unsigned long long NoPorts;     
+    unsigned long long NoPorts;
     unsigned long long InErrors;
 };
 

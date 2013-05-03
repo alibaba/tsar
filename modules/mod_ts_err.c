@@ -50,7 +50,7 @@ static struct mod_info ts_err_info[] = {
     {"hangup", SUMMARY_BIT, 0, STATS_NULL}
 };
 
-void 
+void
 set_ts_err_record(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {

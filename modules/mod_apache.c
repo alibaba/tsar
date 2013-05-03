@@ -63,7 +63,7 @@ read_apache_stats(struct module *mod)
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(hinfo.port);
     inet_pton(AF_INET, hinfo.host, &servaddr.sin_addr);
-    sprintf(request, 
+    sprintf(request,
             "GET /%s HTTP/1.0\r\n"
             "User-Agent: Wget/1.9\r\n"
             "Host: %s\r\n"

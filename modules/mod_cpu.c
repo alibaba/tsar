@@ -76,7 +76,7 @@ read_cpu_stats(struct module *mod)
     }
 }
 
-static void 
+static void
 set_cpu_record(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {

@@ -99,7 +99,7 @@ read_kernel_tables(struct module *mod, int data_type)
             return;
         }
     }
-    int pos = KTABLES_STRING_OPS(buf, sprintf, 
+    int pos = KTABLES_STRING_OPS(buf, sprintf,
                                  KTABLES_STORE_FMT(DATA_SPLIT), st_ktables, ->);
     buf[pos] = '\0';
     mod->detail = strdup(buf);
@@ -129,10 +129,10 @@ ktables_ops(char *last_record, char *curr_record, time_t last_time,
 
     CALITV(last_time, curr_time, itv);
 
-    KTABLES_STRING_OPS(last_record, sscanf, 
+    KTABLES_STRING_OPS(last_record, sscanf,
             KTABLES_STORE_FMT(DATA_SPLIT), &s_st_ktables[1], .);
 
-    KTABLES_STRING_OPS(curr_record, sscanf, 
+    KTABLES_STRING_OPS(curr_record, sscanf,
             KTABLES_STORE_FMT(DATA_SPLIT), &s_st_ktables[0], .);
 
     DECLARE_TMP_MOD_STATISTICS(ktables);

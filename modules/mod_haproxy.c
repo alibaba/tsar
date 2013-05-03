@@ -24,7 +24,7 @@ int np_net_connect(const char *address, int port, int *sd, char* proto);
 int get_http_status();
 int StrToInt(const char* str);
 int get_haproxy_detail();
-int sd; 
+int sd;
 int was_refused = 0;
 int econn_refuse_state = 2;
 int address_family = AF_INET;
