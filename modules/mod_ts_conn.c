@@ -34,7 +34,7 @@ struct stats_ts_conn {
     unsigned long long t_server;
 };
 
-static char *ts_conn_usage = "    --ts                trafficserver connection statistics";
+static char *ts_conn_usage = "    --ts_conn           trafficserver connection statistics";
 
 static struct mod_info ts_conn_info[] = {
     {"client", DETAIL_BIT, 0, STATS_NULL},
