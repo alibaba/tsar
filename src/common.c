@@ -230,7 +230,9 @@ get_st_array_from_file(int have_collect)
     /* if fopen PRE_RECORD_FILE sucess then store data to pre_record */
     if ((fp = fopen(PRE_RECORD_FILE, "r"))) {
         if (!fgets(pre_line, LEN_10240, fp)) {
-            fclose(fp);
+            if (fclose(fp) < 0) {
+                do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
+            }
             ret = -1;
             goto out;
         }
@@ -268,7 +270,9 @@ out:
         if (fputs(line, fp) < 0) {
             do_debug(LOG_ERR, "fputs error:%s", strerror(errno));
         }
-        fclose(fp);
+        if (fclose(fp) < 0) {
+            do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
+        }
         chmod(PRE_RECORD_FILE, 0666);
     }
 

@@ -72,7 +72,7 @@ read_ts_os_stats(struct module *mod)
         goto done;
     }
 
-    int          i;
+    int          i, len;
     int          record_len = sizeof(RECORDS_NAME) / sizeof(RECORDS_NAME[0]);
     const char  *info;
     for ( i = 0; i < record_len; ++i) {
@@ -83,8 +83,12 @@ read_ts_os_stats(struct module *mod)
 
         *((short int *)&write_buf[0]) = command;
         *((long int *)&write_buf[2]) = info_len;
-        strcpy(write_buf+6, info);
-        write(fd, write_buf, 2+4+strlen(info));
+        strcpy(write_buf + 6, info);
+        len = 2 + 4 + strlen(info);
+        if (write(fd, write_buf, len) != len) {
+            close(fd);
+            return;
+        }
 
         short int ret_status = 0;
         short int ret_type = 0;
@@ -93,6 +97,10 @@ read_ts_os_stats(struct module *mod)
         if (read_len != -1) {
             ret_status = *((short int *)&buf[0]);
             ret_type = *((short int *)&buf[6]);
+
+        } else {
+            close(fd);
+            return;
         }
         if (0 == ret_status) {
             if (ret_type < 2) {
@@ -110,8 +118,9 @@ read_ts_os_stats(struct module *mod)
         ((unsigned long long *)&st_ts)[i] = ret_val;
     }
 done:
-    if (-1 != fd)
+    if (-1 != fd) {
         close(fd);
+    }
     pos = sprintf(buf, "%lld,%lld,%lld,%lld",
             st_ts.os_qps,
             st_ts.os_cons,

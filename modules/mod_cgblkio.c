@@ -153,7 +153,9 @@ read_cgblkio_stats(struct module *mod)
                         blkio_groups[n_group].wr_merges += curr.num;
                 }
             }
-            fclose(iofd);
+            if (fclose(iofd) < 0) {
+                return;
+            }
 
             snprintf(path, 128, "%s/%s/blkio.io_serviced", CGBLKIO_PATH, ent->d_name);
             if ((iofd = fopen(path, "r")) == NULL) {
@@ -168,7 +170,9 @@ read_cgblkio_stats(struct module *mod)
                         blkio_groups[n_group].wr_ios += curr.num;
                 }
             }
-            fclose(iofd);
+            if (fclose(iofd) < 0) {
+                return;
+            }
 
             snprintf(path, 128, "%s/%s/blkio.io_service_bytes", CGBLKIO_PATH, ent->d_name);
             if ((iofd = fopen(path, "r")) == NULL) {
@@ -183,7 +187,9 @@ read_cgblkio_stats(struct module *mod)
                         blkio_groups[n_group].wr_secs += curr.num / SECTOR_SIZE;
                 }
             }
-            fclose(iofd);
+            if (fclose(iofd) < 0) {
+                return;
+            }
 
             snprintf(path, 128, "%s/%s/blkio.io_queued", CGBLKIO_PATH, ent->d_name);
             if ((iofd = fopen(path, "r")) == NULL) {
@@ -198,7 +204,9 @@ read_cgblkio_stats(struct module *mod)
                         blkio_groups[n_group].qusize += curr.num;
                 }
             }
-            fclose(iofd);
+            if (fclose(iofd) < 0) {
+                return;
+            }
 
             snprintf(path, 128, "%s/%s/blkio.io_service_time", CGBLKIO_PATH, ent->d_name);
             if ((iofd = fopen(path, "r")) == NULL) {
@@ -213,7 +221,9 @@ read_cgblkio_stats(struct module *mod)
                         blkio_groups[n_group].svctm += (unsigned long long )(curr.num / 1000000);
                 }
             }
-            fclose(iofd);
+            if (fclose(iofd) < 0) {
+                return;
+            }
 
             snprintf(path, 128, "%s/%s/blkio.io_wait_time", CGBLKIO_PATH, ent->d_name);
             if ((iofd = fopen(path, "r")) == NULL) {
@@ -228,7 +238,9 @@ read_cgblkio_stats(struct module *mod)
                         blkio_groups[n_group].wait += (unsigned long long)(curr.num / 1000000);
                 }
             }
-            fclose(iofd);
+            if (fclose(iofd) < 0) {
+                return;
+            }
 
             n_group ++;
         }

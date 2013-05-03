@@ -123,12 +123,16 @@ read_cgmem_stats(struct module *mod)
                 }
             }
 
-            fclose(memfd);
+            if (fclose(memfd) < 0) {
+                return;
+            }
             n_group ++;
         }
     }
 
-    closedir(dir);
+    if (closedir(dir) < 0) {
+        return;
+    }
     print_cgmem_stats(mod);
 }
 

@@ -327,15 +327,21 @@ find_offset_from_start(FILE *fp, int number)
     if (fseek(fp, 0, SEEK_END) != 0 ) {
         do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
     }
-    fend = ftell(fp);
+    if ((fend = ftell(fp)) < 0) {
+        do_debug(LOG_FATAL, "ftell error:%s", strerror(errno));
+    }
     if (fseek(fp, 0, SEEK_SET) != 0) {
         do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
     }
-    fset = ftell(fp);
+    if ((fset = ftell(fp)) < 0) {
+        do_debug(LOG_FATAL, "ftell error:%s", strerror(errno));
+    }
     file_len = fend - fset;
 
     memset(&line, 0, LEN_10240);
-    fgets(line, LEN_10240, fp);
+    if (!fgets(line, LEN_10240, fp)) {
+        do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
+    }
     line_len = strlen(line);
 
     /* get time token */
@@ -377,9 +383,13 @@ find_offset_from_start(FILE *fp, int number)
         if (fseek(fp, offset, SEEK_SET) != 0) {
             do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
         }
-        fgets(line, LEN_10240, fp);
+        if (!fgets(line, LEN_10240, fp)) {
+            do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
+        }
         memset(&line, 0, LEN_10240);
-        fgets(line, LEN_10240, fp);
+        if (!fgets(line, LEN_10240, fp)) {
+            do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
+        }
         if (0 != line[0] && offset > line_len) {
             p_sec_token = strstr(line, SECTION_SPLIT);
             if (p_sec_token) {
@@ -626,7 +636,9 @@ init_running_print()
 
             k=find_offset_from_start(fptmp, i);
             if (k==0 || k==4) {
-                fclose(fp);
+                if (fclose(fp) < 0) {
+                    do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
+                }
                 fp=fptmp;
                 break;
             }
@@ -634,11 +646,15 @@ init_running_print()
                 if (fseek(fp, 0, SEEK_SET) != 0) {
                     do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
                 }
-                fclose(fptmp);
+                if (fclose(fptmp) < 0) {
+                    do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
+                }
                 break;
             }
             if (k == 1) {
-                fclose(fp);
+                if (fclose(fp) < 0) {
+                    do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
+                }
                 fp=fptmp;
                 continue;
             }
@@ -702,7 +718,9 @@ running_print()
                 } else {
                     sprintf(filename,"%s.%d", conf.output_file_path, conf.print_file_number);
                 }
-                fclose(fp);
+                if (fclose(fp) < 0) {
+                    do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
+                }
                 fp = fopen(filename,"r");
                 if (!fp) {
                     do_debug(LOG_FATAL, "unable to open the log file %s.\n", filename);
@@ -754,7 +772,9 @@ running_print()
         print_tail(TAIL_MIN);
     }
 
-    fclose(fp);
+    if (fclose(fp) < 0) {
+        do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
+    }
     fp = NULL;
 }
 
@@ -825,7 +845,9 @@ running_check(int check_type)
     }
     /*FIX ME*/
     if (total_num == 0) {
-        fclose(fp);
+        if (fclose(fp) < 0) {
+            do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
+        }
         memset(filename, 0, sizeof(filename));
         sprintf(filename,"%s.1", conf.output_file_path);
         fp = fopen(filename,"r");
@@ -857,14 +879,22 @@ running_check(int check_type)
         }
 
         memset(&line[0], 0, LEN_10240);
-        fgets(line[0], LEN_10240, fp);
+        if (!fgets(line[0], LEN_10240, fp)) {
+            do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
+        }
         memset(&line[1], 0, LEN_10240);
-        fgets(line[1], LEN_10240, fp);
+        if (!fgets(line[1], LEN_10240, fp)) {
+            do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
+        }
 
     } else if (total_num == 1) {
         memset(&line[1], 0, LEN_10240);
-        fgets(line[1], LEN_10240, fp);
-        fclose(fp);
+        if (!fgets(line[1], LEN_10240, fp)) {
+            do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
+        }
+        if (fclose(fp) < 0) {
+            do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
+        }
         sprintf(filename,"%s.1", conf.output_file_path);
         fp = fopen(filename,"r");
         if (!fp) {
@@ -895,13 +925,19 @@ running_check(int check_type)
             do_debug(LOG_FATAL, "not enough lines at log file %s\n", filename);
         }
         memset(&line[0], 0, LEN_10240);
-        fgets(line[0], LEN_10240, fp);
+        if (!fgets(line[0], LEN_10240, fp)) {
+            do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
+        }
 
     } else {
         memset(&line[0], 0, LEN_10240);
-        fgets(line[0], LEN_10240, fp);
+        if (!fgets(line[0], LEN_10240, fp)) {
+            do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
+        }
         memset(&line[1], 0, LEN_10240);
-        fgets(line[1], LEN_10240, fp);
+        if (!fgets(line[1], LEN_10240, fp)) {
+            do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
+        }
     }
     /* set struct module fields */
     init_module_fields();
@@ -990,7 +1026,9 @@ running_check(int check_type)
             }
         }
         printf("\n");
-        fclose(fp);
+        if (fclose(fp) < 0) {
+            do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
+        }
         fp = NULL;
         return;
     }
@@ -1141,7 +1179,9 @@ running_check(int check_type)
             strcat(check, tmp[j]);
         }
         printf("%s\n", check);
-        fclose(fp);
+        if (fclose(fp) < 0) {
+            do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
+        }
         fp = NULL;
     }
 #endif

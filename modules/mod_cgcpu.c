@@ -107,7 +107,9 @@ read_cgcpu_stats(struct module *mod)
                 }
             }
             n_task --;
-            fclose(taskfd);
+            if (fclose(taskfd) < 0) {
+                return;
+            }
 
             assert(n_task + 1 <= MAX_TASK);
 
@@ -130,7 +132,9 @@ read_cgcpu_stats(struct module *mod)
                         break;
                     }
                 }
-                fclose(schedfd);
+                if (fclose(schedfd) < 0) {
+                    return;
+                }
             }
             n_group ++;
         }

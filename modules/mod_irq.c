@@ -148,7 +148,9 @@ count_irq_nr(char *record)
             sw = FALSE;
         }
     }
-    fclose(fp);
+    if (fclose(fp) < 0) {
+        exit(-1);
+    }
     return n;
 }
 
@@ -169,7 +171,12 @@ read_irq_stat(struct module *mod, int data_type)
         exit(-1);
     }
 
-    fgets(textline, 256, fp);
+    if (!fgets(textline, 256, fp)) {
+        if (fclose(fp) < 0) {
+            exit(-1);
+        }
+        return;
+    }
 
     cpu_nr = countCPUNumber();
 
@@ -187,7 +194,9 @@ read_irq_stat(struct module *mod, int data_type)
         }
         pos += sprintf(buf + pos, "in%d=%lld;", inter_num, inter_sum);
     }
-    fclose(fp);
+    if (fclose(fp) < 0) {
+        return;
+    }
     buf[pos] = '\0';
     mod->detail = strdup(buf);
 }

@@ -56,7 +56,9 @@ read_lvs(struct module *mod)
                 }
                 st_lvs.stat = 1;
             }
-            fclose(fp);
+            if (fclose(fp) < 0) {
+                return;
+            }
         }
     }
     if (st_lvs.stat == 1) {
