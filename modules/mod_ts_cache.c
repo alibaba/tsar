@@ -64,7 +64,7 @@ read_ts_cache_stats(struct module *mod)
         goto done;
     }
 
-    int          i;
+    int          i, len;
     int          record_len = sizeof(RECORDS_NAME) / sizeof(RECORDS_NAME[0]);
     const char  *info;
     for ( i = 0; i < record_len; ++i) {
@@ -75,8 +75,12 @@ read_ts_cache_stats(struct module *mod)
 
         *((short int *)&write_buf[0]) = command;
         *((long int *)&write_buf[2]) = info_len;
-        strcpy(write_buf+6, info);
-        write(fd, write_buf, 2+4+strlen(info));
+        strcpy(write_buf + 6, info);
+        len = 2 + 4 + strlen(info);
+        if (write(fd, write_buf, len) != len) {
+            close(fd);
+            return;
+        }
 
         short int ret_status;
         short int ret_type;
@@ -95,11 +99,16 @@ read_ts_cache_stats(struct module *mod)
                     ((unsigned long long *)&st_ts)[i] = (int)(ret_val_float * 1000);
                 }
             }
+
+        } else {
+            close(fd);
+            return;
         }
     }
 done:
-    if (-1 != fd)
+    if (-1 != fd) {
         close(fd);
+    }
     pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,0",
             st_ts.hit,
             st_ts.ram_hit,

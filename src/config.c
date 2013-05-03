@@ -248,7 +248,9 @@ parse_config_file(const char *file_name)
         }
         memset(config_input_line, '\0', LEN_1024);
     }
-    fclose(fp);
+    if (fclose(fp) < 0) {
+        do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
+    }
 }
 
 /* deal with the include statment */
@@ -309,7 +311,9 @@ get_include_conf()
                 }
                 memset(config_input_line, '\0', LEN_1024);
             }
-            fclose(fp);
+            if (fclose(fp) < 0) {
+                do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
+            }
         }
         if (pclose(stream) == -1)
             do_debug(LOG_WARN, "pclose error\n");
