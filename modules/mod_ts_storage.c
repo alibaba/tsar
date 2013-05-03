@@ -44,7 +44,7 @@ set_ts_storage_record(struct module *mod, double st_array[],
         st_array[i] = cur_array[i];
     }
     if (cur_array[2] != 0) {
-        st_array[3] = st_array[1]/st_array[2];
+        st_array[3] = st_array[1] / st_array[2];
     }
 }
 

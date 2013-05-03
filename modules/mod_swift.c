@@ -80,7 +80,7 @@ my_swift_net_connect(const char *host_name, int port, int *sd, char* proto)
     }
 
     /* create a socket */
-    *sd = socket(PF_INET,(!strcmp(proto,"udp"))?SOCK_DGRAM:SOCK_STREAM, ptrp->p_proto);
+    *sd = socket(PF_INET, (!strcmp(proto, "udp"))?SOCK_DGRAM:SOCK_STREAM, ptrp->p_proto);
     if (*sd < 0) {
         close(*sd);
         if (DEBUG) {
@@ -89,7 +89,7 @@ my_swift_net_connect(const char *host_name, int port, int *sd, char* proto)
         return 3;
     }
     /* open a connection */
-    result = connect(*sd,(struct sockaddr *)&servaddr, sizeof(servaddr));
+    result = connect(*sd, (struct sockaddr *)&servaddr, sizeof(servaddr));
     if (result < 0) {
         close(*sd);
         switch (errno) {
@@ -172,7 +172,7 @@ parse_swift_info(char *buf)
             stats.r_hit = a * 1000;
         }
         /* Byte Hit Ratios:        5min: 96.6%, 60min: 96.6% */
-        if (strstr(line,"Byte Hit Ratios") != NULL) {
+        if (strstr(line, "Byte Hit Ratios") != NULL) {
             float a, b;
             sscanf(line, "        Byte Hit Ratios:        5min: %f%%, 60min: %f%%", &a, &b);
             stats.b_hit = a * 1000 + b;
@@ -180,7 +180,7 @@ parse_swift_info(char *buf)
         /* UP Time:        247256.904 seconds */
         if (strstr(line, "UP Time") != NULL) {
             float a;
-            sscanf(line, "        UP Time:        %f seconds",&a);
+            sscanf(line, "        UP Time:        %f seconds", &a);
             stats.t_cpu = a * 1000;
         }
         /* CPU Time:       23487.042 seconds */
@@ -205,10 +205,10 @@ set_swift_record(struct module *mod, double st_array[],
         st_array[0] = -1;
     }
     /* rt */
-    st_array[1] = cur_array[1]*1.0/1000;
+    st_array[1] = cur_array[1] * 1.0 / 1000;
     /* r_hit b_hit */
-    st_array[2] = cur_array[2]*1.0/1000;
-    st_array[3] = cur_array[3]*1.0/1000;
+    st_array[2] = cur_array[2] * 1.0 / 1000;
+    st_array[3] = cur_array[3] * 1.0 / 1000;
     /* objs */
     st_array[4] = cur_array[4];
     /* in_bw out_bw */

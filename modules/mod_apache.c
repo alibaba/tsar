@@ -99,7 +99,7 @@ read_apache_stats(struct module *mod)
         memset(line, 0, LEN_4096);
     }
 writebuf:
-    pos = sprintf(buf,"%lld,%lld,%lld,%d,%d",
+    pos = sprintf(buf, "%lld,%lld,%lld,%d,%d",
             st_apache.query,
             st_apache.response_time / 1000,
             st_apache.kBytes_sent,

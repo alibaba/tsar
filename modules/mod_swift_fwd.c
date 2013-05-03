@@ -65,7 +65,7 @@ my_swift_fwd_net_connect(const char *host_name, int port, int *sd, char* proto)
     }
 
     /* create a socket */
-    *sd = socket(PF_INET,(!strcmp(proto,"udp"))?SOCK_DGRAM:SOCK_STREAM, ptrp->p_proto);
+    *sd = socket(PF_INET, (!strcmp(proto, "udp"))?SOCK_DGRAM:SOCK_STREAM, ptrp->p_proto);
     if (*sd < 0) {
         close(*sd);
         if (DEBUG) {
@@ -74,7 +74,7 @@ my_swift_fwd_net_connect(const char *host_name, int port, int *sd, char* proto)
         return 3;
     }
     /* open a connection */
-    result = connect(*sd,(struct sockaddr *)&servaddr, sizeof(servaddr));
+    result = connect(*sd, (struct sockaddr *)&servaddr, sizeof(servaddr));
     if (result < 0) {
         close(*sd);
         switch (errno) {
@@ -155,7 +155,7 @@ set_swift_fwd_record(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {
     int i;
-    for (i = 0; i < mod->n_col-1; i++) {
+    for (i = 0; i < mod->n_col - 1; i++) {
         if (cur_array[i] >= pre_array[i]) {
             st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
 

@@ -92,7 +92,7 @@ read_cgmem_stats(struct module *mod)
 
     while ((ent = readdir(dir))) {
         if (ent->d_type == DT_DIR && !ISDOT(ent->d_name)) {  //for each group
-            memcpy(&cgmem_groups[n_group].group_name, ent->d_name, strlen(ent->d_name)+1);
+            memcpy(&cgmem_groups[n_group].group_name, ent->d_name, strlen(ent->d_name) + 1);
             snprintf(path, 128, "%s/%s/memory.stat", CGMEM_PATH, ent->d_name);
             if ((memfd = fopen(path, "r")) == NULL) {
                 closedir(dir);

@@ -52,7 +52,7 @@ read_lvs(struct module *mod)
             while (fgets(line, MAX_LINE_LEN, fp) != NULL) {
                 i++;
                 if (i == 6) {
-                    sscanf(line, "%lx %lx %lx %lx %lx", &st_lvs.conns, &st_lvs.pktin, &st_lvs.pktout,&st_lvs.bytin,&st_lvs.bytout);
+                    sscanf(line, "%lx %lx %lx %lx %lx", &st_lvs.conns, &st_lvs.pktin, &st_lvs.pktout, &st_lvs.bytin, &st_lvs.bytout);
                 }
                 st_lvs.stat = 1;
             }

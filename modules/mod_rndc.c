@@ -173,7 +173,7 @@ set_rndc_stats(struct module *mod, double st_array[],
 }
 
 static struct mod_info rndc_info[] = {
-    {"   qps", SUMMARY_BIT,MERGE_NULL,  STATS_NULL},
+    {"   qps", SUMMARY_BIT, MERGE_NULL,  STATS_NULL},
     {" rt_05", DETAIL_BIT, MERGE_NULL,  STATS_NULL},
     {" rt_10", DETAIL_BIT, MERGE_NULL,  STATS_NULL},
     {" rt_20", DETAIL_BIT, MERGE_NULL,  STATS_NULL},

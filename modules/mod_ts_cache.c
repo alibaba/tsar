@@ -127,12 +127,12 @@ void
 set_ts_cache_record(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {
-    st_array[0] = cur_array[0]/10.0;
-    st_array[2] = cur_array[2]/10.0;
+    st_array[0] = cur_array[0] / 10.0;
+    st_array[2] = cur_array[2] / 10.0;
 
     /* not ssd and sas */
     if (cur_array[5] == 0 && cur_array[1]) {
-        st_array[1] = cur_array[1]/10.0;
+        st_array[1] = cur_array[1] / 10.0;
 
     } else {
         if (cur_array[3] > pre_array[3]) {

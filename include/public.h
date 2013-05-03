@@ -87,9 +87,9 @@ enum {MIN, MEAN, MAX};
  */
 #define _S(a, b) (((b) == 0) ? 0 : ((a) / (b)))
 
-#define S_VALUE(m,n,p)  (((double) ((n) - (m))) / (p) )
+#define S_VALUE(m, n, p)  (((double) ((n) - (m))) / (p) )
 
-#define SP_VALUE(m,n,p) (((double) ((n) - (m))) / (p) * 100)
+#define SP_VALUE(m, n, p) (((double) ((n) - (m))) / (p) * 100)
 
 #define SK(K, shift) (((unsigned long long)(K) << 10) >> shift)
 #define SB(B, shift) ((unsigned long long)(B) >> shift)

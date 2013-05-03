@@ -136,17 +136,17 @@ printf_result(double result)
     if ((1000 - result) > 0.1) {
         printf("%6.2f", result);
 
-    } else if ( (1000 - result/1024) > 0.1) {
-        printf("%5.1f%s", result/1024, "K");
+    } else if ( (1000 - result / 1024) > 0.1) {
+        printf("%5.1f%s", result / 1024, "K");
 
-    } else if ((1000 - result/1024/1024) > 0.1) {
-        printf("%5.1f%s", result/1024/1024, "M");
+    } else if ((1000 - result / 1024 / 1024) > 0.1) {
+        printf("%5.1f%s", result / 1024 / 1024, "M");
 
-    } else if ((1000 - result/1024/1024/1024) > 0.1) {
-        printf("%5.1f%s", result/1024/1024/1024, "G");
+    } else if ((1000 - result / 1024 / 1024 / 1024) > 0.1) {
+        printf("%5.1f%s", result / 1024 / 1024 / 1024, "G");
 
-    } else if ((1000 - result/1024/1024/1024/1024) > 0.1) {
-        printf("%5.1f%s", result/1024/1024/1024/1024, "T");
+    } else if ((1000 - result / 1024 / 1024 / 1024 / 1024) > 0.1) {
+        printf("%5.1f%s", result / 1024 / 1024 / 1024 / 1024, "T");
     }
     printf("%s", PRINT_DATA_SPLIT);
 }
@@ -608,7 +608,7 @@ FILE *
 init_running_print()
 {
     int    i=0, k=0;
-    FILE  *fp,*fptmp;
+    FILE  *fp, *fptmp;
     char   line[LEN_10240] = {0};
     char   filename[LEN_128] = {0};
 
@@ -627,7 +627,7 @@ init_running_print()
         /*find all possible record*/
         for (i=1; ; i++) {
             memset(filename, 0, sizeof(filename));
-            sprintf(filename,"%s.%d", conf.output_file_path, i);
+            sprintf(filename, "%s.%d", conf.output_file_path, i);
             fptmp = fopen(filename, "r");
             if (!fptmp) {
                 conf.print_file_number = i - 1;
@@ -713,15 +713,15 @@ running_print()
                 conf.print_file_number = conf.print_file_number - 1;
                 memset(filename, 0, sizeof(filename));
                 if (conf.print_file_number == 0) {
-                    sprintf(filename,"%s", conf.output_file_path);
+                    sprintf(filename, "%s", conf.output_file_path);
 
                 } else {
-                    sprintf(filename,"%s.%d", conf.output_file_path, conf.print_file_number);
+                    sprintf(filename, "%s.%d", conf.output_file_path, conf.print_file_number);
                 }
                 if (fclose(fp) < 0) {
                     do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
                 }
-                fp = fopen(filename,"r");
+                fp = fopen(filename, "r");
                 if (!fp) {
                     do_debug(LOG_FATAL, "unable to open the log file %s.\n", filename);
                 }
@@ -815,9 +815,9 @@ running_check(int check_type)
         }
     }
     memset(tmp, 0, 9 * LEN_256);
-    sprintf(check,"%s\ttsar\t", host_name);
-    sprintf(filename,"%s", conf.output_file_path);
-    fp = fopen(filename,"r");
+    sprintf(check, "%s\ttsar\t", host_name);
+    sprintf(filename, "%s", conf.output_file_path);
+    fp = fopen(filename, "r");
     if (!fp) {
         do_debug(LOG_FATAL, "unable to open the log file %s.\n", filename);
     }
@@ -849,8 +849,8 @@ running_check(int check_type)
             do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
         }
         memset(filename, 0, sizeof(filename));
-        sprintf(filename,"%s.1", conf.output_file_path);
-        fp = fopen(filename,"r");
+        sprintf(filename, "%s.1", conf.output_file_path);
+        fp = fopen(filename, "r");
         if (!fp) {
             do_debug(LOG_FATAL, "unable to open the log file %s.\n", filename);
         }
@@ -895,8 +895,8 @@ running_check(int check_type)
         if (fclose(fp) < 0) {
             do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
         }
-        sprintf(filename,"%s.1", conf.output_file_path);
-        fp = fopen(filename,"r");
+        sprintf(filename, "%s.1", conf.output_file_path);
+        fp = fopen(filename, "r");
         if (!fp) {
             do_debug(LOG_FATAL, "unable to open the log file %s\n", filename);
         }
@@ -959,7 +959,7 @@ running_check(int check_type)
             }
             struct mod_info *info = mod->info;
             /* get mod name */
-            char *mod_name = strstr(mod->opt_line,"--");
+            char *mod_name = strstr(mod->opt_line, "--");
             if (mod_name) {
                 mod_name += 2;
             }
@@ -975,7 +975,7 @@ running_check(int check_type)
                     s_token = strstr(token, ITEM_SPSTART);
                     if (s_token) {
                         strncat(opt, token, s_token - token);
-                        strcat(opt,":");
+                        strcat(opt, ":");
                     }
                 }
                 st_array = &mod->st_array[j * mod->n_col];
@@ -1043,51 +1043,51 @@ running_check(int check_type)
             if (!mod->enable){
                 continue;
             }
-            if (!strcmp(mod->name,"mod_apache")) {
+            if (!strcmp(mod->name, "mod_apache")) {
                 for (j = 0; j < mod->n_item; j++) {
                     st_array = &mod->st_array[j * mod->n_col];
                     if (!st_array || !mod->st_flag) {
-                        sprintf(tmp[0]," apache/qps=- apache/rt=- apache/busy=- apache/idle=-");
+                        sprintf(tmp[0], " apache/qps=- apache/rt=- apache/busy=- apache/idle=-");
 
                     } else {
-                        sprintf(tmp[0]," apache/qps=%0.2f apache/rt=%0.2f apache/busy=%0.0f apache/idle=%0.0f", st_array[0], st_array[1], st_array[3], st_array[4]);
+                        sprintf(tmp[0], " apache/qps=%0.2f apache/rt=%0.2f apache/busy=%0.0f apache/idle=%0.0f", st_array[0], st_array[1], st_array[3], st_array[4]);
                     }
                 }
             }
-            if (!strcmp(mod->name,"mod_cpu")) {
+            if (!strcmp(mod->name, "mod_cpu")) {
                 for (j = 0; j < mod->n_item; j++) {
                     st_array = &mod->st_array[j * mod->n_col];
                     if (!st_array || !mod->st_flag) {
-                        sprintf(tmp[1]," cpu=-");
+                        sprintf(tmp[1], " cpu=-");
 
                     } else {
-                        sprintf(tmp[1]," cpu=%0.2f", st_array[5]);
+                        sprintf(tmp[1], " cpu=%0.2f", st_array[5]);
                     }
                 }
             }
-            if (!strcmp(mod->name,"mod_mem")) {
+            if (!strcmp(mod->name, "mod_mem")) {
                 for (j = 0; j < mod->n_item; j++) {
                     st_array = &mod->st_array[j * mod->n_col];
                     if (!st_array || !mod->st_flag) {
-                        sprintf(tmp[2]," mem=-");
+                        sprintf(tmp[2], " mem=-");
 
                     } else {
-                        sprintf(tmp[2]," mem=%0.2f%%", st_array[5]);
+                        sprintf(tmp[2], " mem=%0.2f%%", st_array[5]);
                     }
                 }
             }
-            if (!strcmp(mod->name,"mod_load")) {
+            if (!strcmp(mod->name, "mod_load")) {
                 for (j = 0; j < mod->n_item; j++) {
                     st_array = &mod->st_array[j * mod->n_col];
                     if (!st_array || !mod->st_flag) {
-                        sprintf(tmp[3]," load1=- load5=- load15=-");
+                        sprintf(tmp[3], " load1=- load5=- load15=-");
 
                     } else {
-                        sprintf(tmp[3]," load1=%0.2f load5=%0.2f load15=%0.2f", st_array[0], st_array[1], st_array[2]);
+                        sprintf(tmp[3], " load1=%0.2f load5=%0.2f load15=%0.2f", st_array[0], st_array[1], st_array[2]);
                     }
                 }
             }
-            if (!strcmp(mod->name,"mod_io")) {
+            if (!strcmp(mod->name, "mod_io")) {
                 char    opt[LEN_128] = {0};
                 char    item[LEN_128] = {0};
                 char   *n_record = strdup(mod->record);
@@ -1100,10 +1100,10 @@ running_check(int check_type)
                         strncat(opt, token, s_token - token);
                         st_array = &mod->st_array[j * mod->n_col];
                         if (!st_array || !mod->st_flag) {
-                            sprintf(item," %s=-", opt);
+                            sprintf(item, " %s=-", opt);
 
                         } else {
-                            sprintf(item," %s=%0.2f", opt, st_array[10]);
+                            sprintf(item, " %s=%0.2f", opt, st_array[10]);
                         }
                         strcat(tmp[4], item);
                     }
@@ -1114,29 +1114,29 @@ running_check(int check_type)
                     n_record = NULL;
                 }
             }
-            if (!strcmp(mod->name,"mod_traffic")) {
+            if (!strcmp(mod->name, "mod_traffic")) {
                 for (j = 0; j < mod->n_item; j++) {
                     st_array = &mod->st_array[j * mod->n_col];
                     if (!st_array || !mod->st_flag) {
-                        sprintf(tmp[5]," ifin=- ifout=-");
+                        sprintf(tmp[5], " ifin=- ifout=-");
 
                     } else {
-                        sprintf(tmp[5]," ifin=%0.2f ifout=%0.2f", st_array[0]/1000, st_array[1]/1000);
+                        sprintf(tmp[5], " ifin=%0.2f ifout=%0.2f", st_array[0] / 1000, st_array[1] / 1000);
                     }
                 }
             }
-            if (!strcmp(mod->name,"mod_tcp")) {
+            if (!strcmp(mod->name, "mod_tcp")) {
                 for (j = 0; j < mod->n_item; j++) {
                     st_array = &mod->st_array[j * mod->n_col];
                     if (!st_array || !mod->st_flag) {
-                        sprintf(tmp[6]," TCPretr=-");
+                        sprintf(tmp[6], " TCPretr=-");
 
                     } else {
-                        sprintf(tmp[6]," TCPretr=%0.2f", st_array[4]);
+                        sprintf(tmp[6], " TCPretr=%0.2f", st_array[4]);
                     }
                 }
             }
-            if (!strcmp(mod->name,"mod_partition")) {
+            if (!strcmp(mod->name, "mod_partition")) {
                 char    opt[LEN_128] = {0};
                 char    item[LEN_128] = {0};
                 char   *n_record = strdup(mod->record);
@@ -1149,10 +1149,10 @@ running_check(int check_type)
                         strncat(opt, token, s_token - token);
                         st_array = &mod->st_array[j * mod->n_col];
                         if (!st_array || !mod->st_flag) {
-                            sprintf(item," df%s=-", opt);
+                            sprintf(item, " df%s=-", opt);
 
                         } else {
-                            sprintf(item," df%s=%0.2f%%", opt, st_array[3]);
+                            sprintf(item, " df%s=%0.2f%%", opt, st_array[3]);
                         }
                         strcat(tmp[7], item);
                     }
@@ -1163,14 +1163,14 @@ running_check(int check_type)
                     n_record = NULL;
                 }
             }
-            if (!strcmp(mod->name,"mod_nginx")){
+            if (!strcmp(mod->name, "mod_nginx")){
                 for (j = 0; j < mod->n_item; j++) {
                     st_array = &mod->st_array[j * mod->n_col];
                     if (!st_array || !mod->st_flag) {
-                        sprintf(tmp[8]," nginx/qps=- nginx/rt=-");
+                        sprintf(tmp[8], " nginx/qps=- nginx/rt=-");
 
                     } else {
-                        sprintf(tmp[8]," nginx/qps=%0.2f nginx/rt=%0.2f", st_array[7], st_array[8]);
+                        sprintf(tmp[8], " nginx/qps=%0.2f nginx/rt=%0.2f", st_array[7], st_array[8]);
                     }
                 }
             }

@@ -83,7 +83,7 @@ merge_one_string(U_64 *array, int l_array, char *string, struct module *mod, int
                 array[i] += array_2[i];
                 break;
             case MERGE_AVG:
-                array[i] = (array[i] * (n_item - 1) + array_2[i])/n_item;
+                array[i] = (array[i] * (n_item - 1) + array_2[i]) / n_item;
                 break;
             default:
                 ;

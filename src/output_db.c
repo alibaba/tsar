@@ -66,7 +66,7 @@ send_sql_txt(int fd, int have_collect)
                 /* set sql header */
                 memset(sql_hdr, '\0', sizeof(sql_hdr));
                 sprintf(sql_hdr, "insert into `%s` (host_name, time) VALUES ('%s', '%s');",
-                        mod->opt_line+2, host_name, s_time);
+                        mod->opt_line + 2, host_name, s_time);
                 strcat(sqls, sql_hdr);
 
             } else {
@@ -76,7 +76,7 @@ send_sql_txt(int fd, int have_collect)
 
                 /* set sql header */
                 memset(sql_hdr, '\0', sizeof(sql_hdr));
-                sprintf(sql_hdr, "insert into `%s` (host_name, time", mod->opt_line+2);
+                sprintf(sql_hdr, "insert into `%s` (host_name, time", mod->opt_line + 2);
 
                 /* get value */
                 for (j = 0; j < mod->n_col; j++) {
@@ -124,7 +124,7 @@ str2sa(char *str)
         goto out_nofree;
     }
 
-    if ((c = strrchr(str,':')) != NULL) {
+    if ((c = strrchr(str, ':')) != NULL) {
         *c++ = '\0';
         port = atol(c);
 

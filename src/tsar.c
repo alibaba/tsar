@@ -94,7 +94,7 @@ main_init(int argc, char **argv)
 #ifdef OLDTSAR
     /* check option for tsar1.0 */
     if (argc >= 2) {
-        if (!strcmp(argv[1],"-check") && argc == 2) {
+        if (!strcmp(argv[1], "-check") && argc == 2) {
             conf.running_mode = RUN_CHECK;
             conf.print_mode = DATA_DETAIL;
             conf.print_interval = 60;

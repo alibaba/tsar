@@ -49,7 +49,7 @@ store_single_partition(char *buf, char *mntpath, struct stats_partition *sp)
         util = 0;
     }
     len += sprintf(buf, "%s=", mntpath);
-    len += sprintf(buf+len, "%d,%lld,%lld,%lld",
+    len += sprintf(buf + len, "%d,%lld,%lld,%lld",
             sp->bsize,
             sp->bfree,
             sp->blocks,

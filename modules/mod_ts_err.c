@@ -89,7 +89,7 @@ read_ts_err_stats(struct module *mod)
     }
 
     int          i, len;
-    int          record_len = sizeof(RECORDS_NAME)/sizeof(RECORDS_NAME[0]);
+    int          record_len = sizeof(RECORDS_NAME) / sizeof(RECORDS_NAME[0]);
     const char  *info;
     for ( i = 0; i < record_len; ++i) {
         info = RECORDS_NAME[i];

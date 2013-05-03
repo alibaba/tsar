@@ -41,7 +41,7 @@ read_cpu_stats(struct module *mod)
              * (user, nice, etc.) among all proc. CPU usage is not reduced
              * to one processor to avoid rounding problems.
              */
-            sscanf(line+5, "%llu %llu %llu %llu %llu %llu %llu %llu %llu",
+            sscanf(line + 5, "%llu %llu %llu %llu %llu %llu %llu %llu %llu",
                     &st_cpu.cpu_user,
                     &st_cpu.cpu_nice,
                     &st_cpu.cpu_sys,

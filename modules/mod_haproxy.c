@@ -110,7 +110,7 @@ set_haproxy_record(struct module *mod, double st_array[],
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--haproxy", haproxy_usage, info, sizeof(info)/sizeof(struct mod_info), read_haproxy, set_haproxy_record);
+    register_mod_fileds(mod, "--haproxy", haproxy_usage, info, sizeof(info) / sizeof(struct mod_info), read_haproxy, set_haproxy_record);
 }
 
 
@@ -230,7 +230,7 @@ np_net_connect (const char *host_name, int port, int *sd, char* proto)
     }
 
     /* create a socket */
-    *sd = socket(PF_INET,(!strcmp(proto,"udp"))?SOCK_DGRAM:SOCK_STREAM, ptrp->p_proto);
+    *sd = socket(PF_INET, (!strcmp(proto, "udp"))?SOCK_DGRAM:SOCK_STREAM, ptrp->p_proto);
     if (*sd < 0) {
         close(*sd);
         if (DEBUG) {
@@ -239,7 +239,7 @@ np_net_connect (const char *host_name, int port, int *sd, char* proto)
         return 3;
     }
     /* open a connection */
-    result = connect(*sd,(struct sockaddr *)&servaddr, sizeof(servaddr));
+    result = connect(*sd, (struct sockaddr *)&servaddr, sizeof(servaddr));
     if (result < 0) {
         close(*sd);
         switch(errno) {
@@ -336,7 +336,7 @@ get_haproxy_detail(void)
         }
         return -1;
     }
-    if (!strstr(str,"Uptime_sec")) {
+    if (!strstr(str, "Uptime_sec")) {
         if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
             close(s);
             if (DEBUG) {
@@ -384,7 +384,7 @@ get_haproxy_detail(void)
         if (strstr(p_split, "mean rt:")) {
             int a, b;
             sscanf(p_split, "mean rt: %d.%d (ms)", &a, &b);
-            st_haproxy.rt = a*100+b;
+            st_haproxy.rt = a * 100 + b;
         }
         if (strstr(p_split, "req hit ratio:")) {
             int a, b;
@@ -395,7 +395,7 @@ get_haproxy_detail(void)
             char *p = strstr(p_split, " ");
             st_haproxy.uptime = StrToInt(p + 1);
         }
-        if (strstr(p_split,"CurrConns")) {
+        if (strstr(p_split, "CurrConns")) {
             char *p = strstr(p_split, " ");
             st_haproxy.conns = StrToInt(p + 1);
         }

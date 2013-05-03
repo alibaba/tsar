@@ -138,7 +138,7 @@ read_cgblkio_stats(struct module *mod)
 
     while ((ent = readdir(dir))) {
         if (ent->d_type == DT_DIR && !ISDOT(ent->d_name)) {
-            memcpy(&blkio_groups[n_group].group_name, ent->d_name, strlen(ent->d_name)+1);
+            memcpy(&blkio_groups[n_group].group_name, ent->d_name, strlen(ent->d_name) + 1);
 
             snprintf(path, 128, "%s/%s/blkio.io_merged", CGBLKIO_PATH, ent->d_name);
             if ((iofd = fopen(path, "r")) == NULL) {

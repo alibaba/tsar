@@ -75,7 +75,7 @@ read_stat_tcpx(struct module *mod)
         if (!strncmp(line, "Tcp:", 4)) {
             if (!sw) {sw = 1; continue;}
             sscanf(line + 4, "%*u %*u %*u %*d %lu %lu",
-                    &activeopen,&passiveopen);
+                    &activeopen, &passiveopen);
             break;
         }
     }

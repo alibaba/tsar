@@ -49,7 +49,7 @@ set_ts_os_record(struct module *mod, double st_array[],
         }
     }
     if (cur_array[0] >= pre_array[0] && cur_array[1] > pre_array[1]) {
-        st_array[3] = st_array[0]/st_array[1];
+        st_array[3] = st_array[0] / st_array[1];
     }
 }
 

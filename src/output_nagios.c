@@ -88,7 +88,7 @@ output_nagios()
                 /* get mod_name.(item_name).col_name value */
                 while (token) {
                     memset(check, 0, sizeof(check));
-                    strcat(check, mod->name+4);
+                    strcat(check, mod->name + 4);
                     strcat(check, ".");
                     s_token = strstr(token, ITEM_SPSTART);
                     /* multi item */

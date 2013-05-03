@@ -57,7 +57,7 @@ special_mod(const char *spec_mod)
     struct    module *mod = NULL;
 
     memset(mod_name, 0, LEN_32);
-    sprintf(mod_name,"mod_%s", spec_mod+5);
+    sprintf(mod_name, "mod_%s", spec_mod + 5);
     for ( i = 0; i < statis.total_mod_num; i++ )
     {
         mod = &mods[i];
@@ -125,19 +125,19 @@ set_debug_level()
 {
     char   *token = strtok(NULL, W_SPACE);
     if (token) {
-        if (!strcmp(token,"INFO")) {
+        if (!strcmp(token, "INFO")) {
             conf.debug_level = LOG_INFO;
 
-        } else if (!strcmp(token,"WARN")) {
+        } else if (!strcmp(token, "WARN")) {
             conf.debug_level = LOG_WARN;
 
-        } else if (!strcmp(token,"DEBUG")) {
+        } else if (!strcmp(token, "DEBUG")) {
             conf.debug_level = LOG_DEBUG;
 
-        } else if (!strcmp(token,"ERROR")) {
+        } else if (!strcmp(token, "ERROR")) {
             conf.debug_level = LOG_ERR;
 
-        } else if (!strcmp(token,"FATAL")) {
+        } else if (!strcmp(token, "FATAL")) {
             conf.debug_level = LOG_FATAL;
 
         } else {

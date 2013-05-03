@@ -90,7 +90,7 @@ read_cgcpu_stats(struct module *mod)
     while ((ent = readdir(dir))) {
         if (ent->d_type == DT_DIR && !ISDOT(ent->d_name)) {
             n_task = 0;
-            memcpy(&cgcpu_groups[n_group].group_name, ent->d_name, strlen(ent->d_name)+1);
+            memcpy(&cgcpu_groups[n_group].group_name, ent->d_name, strlen(ent->d_name) + 1);
 
             snprintf(path, 128, "%s/%s/tasks", CGCPU_PATH, ent->d_name);
             if ((taskfd = fopen(path, "r")) == NULL) {
@@ -116,7 +116,7 @@ read_cgcpu_stats(struct module *mod)
             /* read sum_exe_time of each task and add up */
             for (i = 0; i <= n_task; i++) {
                 snprintf(path, 128, "/proc/%d/sched", tasks[i].pid);
-                if ((schedfd = fopen(path,"r")) == NULL) {
+                if ((schedfd = fopen(path, "r")) == NULL) {
                     closedir(dir);
                     return;
                 }

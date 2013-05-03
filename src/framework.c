@@ -146,15 +146,15 @@ reload_check_modules()
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
-        if (!strcmp(mod->name,"mod_apache")
-             || !strcmp(mod->name,"mod_cpu")
-             || !strcmp(mod->name,"mod_mem")
-             || !strcmp(mod->name,"mod_load")
-             || !strcmp(mod->name,"mod_partition")
-             || !strcmp(mod->name,"mod_io")
-             || !strcmp(mod->name,"mod_tcp")
-             || !strcmp(mod->name,"mod_traffic")
-             || !strcmp(mod->name,"mod_nginx"))
+        if (!strcmp(mod->name, "mod_apache")
+             || !strcmp(mod->name, "mod_cpu")
+             || !strcmp(mod->name, "mod_mem")
+             || !strcmp(mod->name, "mod_load")
+             || !strcmp(mod->name, "mod_partition")
+             || !strcmp(mod->name, "mod_io")
+             || !strcmp(mod->name, "mod_tcp")
+             || !strcmp(mod->name, "mod_traffic")
+             || !strcmp(mod->name, "mod_nginx"))
         {
             mod->enable = 1;
 
@@ -272,7 +272,7 @@ set_st_record(struct module *mod)
                             mod->st_flag = 0;
 
                         } else {
-                            mod->st_array[k] = (mod->cur_array[k] -mod->pre_array[k])/conf.print_interval;
+                            mod->st_array[k] = (mod->cur_array[k] -mod->pre_array[k]) / conf.print_interval;
                         }
                         break;
                     default:
@@ -283,7 +283,7 @@ set_st_record(struct module *mod)
 
             if (conf.print_tail) {
                 if (0 == mod->n_record) {
-                    mod->max_array[k] = mod->mean_array[k] = mod->min_array[k] = mod->st_array[k]*1.0;
+                    mod->max_array[k] = mod->mean_array[k] = mod->min_array[k] = mod->st_array[k] * 1.0;
 
                 } else {
                     if (mod->st_array[k] - mod->max_array[k] > 0.1) {
@@ -293,7 +293,7 @@ set_st_record(struct module *mod)
                         mod->min_array[k] = mod->st_array[k];
                     }
                     if (mod->st_array[k] >= 0) {
-                        mod->mean_array[k] = ((mod->n_record-1) *mod->mean_array[k] + mod->st_array[k])/mod->n_record;
+                        mod->mean_array[k] = ((mod->n_record - 1) *mod->mean_array[k] + mod->st_array[k]) / mod->n_record;
                     }
                 }
             }

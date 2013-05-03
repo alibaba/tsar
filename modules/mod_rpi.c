@@ -47,7 +47,7 @@ read_rpi_stats(struct module *mod, char *parameter)
 
     fscanf(fp, "%d", &cpu_temp);
 
-    if (cpu_temp == 85*1000 || cpu_temp < 1) {
+    if (cpu_temp == 85 * 1000 || cpu_temp < 1) {
         return;
     }
 
@@ -70,7 +70,7 @@ static void
 set_rpi_record(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {
-    st_array[0] = cur_array[0]/1000.0;
+    st_array[0] = cur_array[0] / 1000.0;
 }
 
 void
