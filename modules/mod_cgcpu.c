@@ -122,11 +122,12 @@ read_cgcpu_stats(struct module *mod)
                 }
                 scan_fmt = "%s %s %lf";
                 while (fgets(buffer, sizeof(buffer), schedfd)) {
-                    int items;
                     char *title="se.sum_exec_runtime";
                     struct sched_info cur;
 
-                    items = sscanf(buffer, scan_fmt, &cur.name, &cur.none, &cur.time);
+                    if (sscanf(buffer, scan_fmt, &cur.name, &cur.none, &cur.time) < 0){
+                        return;
+                    }
                     if (memcmp(cur.name, title, strlen(title)) == 0) {
                         cgcpu_groups[n_group].sum_exec_runtime += cur.time;
                         break;

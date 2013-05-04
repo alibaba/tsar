@@ -35,13 +35,16 @@ read_stat_load(struct module *mod)
     }
 
     /* Read load averages and queue length */
-    fscanf(fp, "%d.%d %d.%d %d.%d %ld/%d %*d\n",
+    if (fscanf(fp, "%d.%d %d.%d %d.%d %ld/%d %*d\n",
             &load_tmp[0], &st_load.load_avg_1,
             &load_tmp[1], &st_load.load_avg_5,
             &load_tmp[2], &st_load.load_avg_15,
             &st_load.nr_running,
-            &st_load.nr_threads);
-
+            &st_load.nr_threads) != 8)
+    {
+        fclose(fp);
+        return;
+    }
     st_load.load_avg_1  += load_tmp[0] * 100;
     st_load.load_avg_5  += load_tmp[1] * 100;
     st_load.load_avg_15 += load_tmp[2] * 100;

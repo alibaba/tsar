@@ -157,13 +157,21 @@ get_http_status()
     char   *status_code;
     size_t  pagesize = 0;
 
-    asprintf (&buf, "GET %s HTTP/1.0\r\nUser-Agent: check_http\r\n", URL);
-    /* tell HTTP/1.1 servers not to keep the connection alive */
-    asprintf (&buf, "%sConnection: close\r\n", buf);
-    if (server_address) {
-        asprintf (&buf, "%sHost: %s:%d\r\n", buf, server_address, server_port);
+    if (asprintf (&buf, "GET %s HTTP/1.0\r\nUser-Agent: check_http\r\n", URL) < 0) {
+        return -1;
     }
-    asprintf (&buf, "%s%s", buf, CRLF);
+    /* tell HTTP/1.1 servers not to keep the connection alive */
+    if (asprintf (&buf, "%sConnection: close\r\n", buf) < 0) {
+        return -1;
+    }
+    if (server_address) {
+        if (asprintf (&buf, "%sHost: %s:%d\r\n", buf, server_address, server_port) < 0) {
+            return -1;
+        }
+    }
+    if (asprintf (&buf, "%s%s", buf, CRLF) < 0){
+        return -1;
+    }
     if (DEBUG) {
         printf ("send %s\n", buf);
     }
@@ -171,7 +179,9 @@ get_http_status()
     full_page = strdup("");
     while ((i = my_recv (buffer, MAX_INPUT_BUFFER-1)) > 0) {
         buffer[i] = '\0';
-        asprintf (&full_page, "%s%s", full_page, buffer);
+        if (asprintf (&full_page, "%s%s", full_page, buffer) < 0) {
+            return -1;
+        }
         pagesize += i;
         if (document_headers_done (full_page)) {
             i = 0;

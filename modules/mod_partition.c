@@ -39,15 +39,6 @@ int
 store_single_partition(char *buf, char *mntpath, struct stats_partition *sp)
 {
     int                 len = 0;
-    float               util;
-    unsigned long long  nonroot_total = sp->blocks -  sp->bfree + sp->bavail;
-    if (nonroot_total != 0) {
-        util = ((sp->blocks - sp->bfree) * 100) / (float)nonroot_total +
-            ((sp->blocks - sp->bfree) * 100) % nonroot_total != 0;
-
-    } else {
-        util = 0;
-    }
     len += sprintf(buf, "%s=", mntpath);
     len += sprintf(buf + len, "%d,%lld,%lld,%lld",
             sp->bsize,

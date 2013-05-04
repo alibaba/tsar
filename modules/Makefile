@@ -1,4 +1,4 @@
-CFLAGS = -Wall -fPIC --shared -g -O2
+CFLAGS = -Wall -fPIC --shared -g -O2 -Wno-strict-aliasing
 CC = gcc
 INCLUDE_DIR = ../include
 LINK = $(CC) -I$(INCLUDE_DIR) $(CFLAGS)

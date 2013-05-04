@@ -104,9 +104,15 @@ create_script()
 static void
 exec_script()
 {
-    system("/usr/local/pharos/sbin/rndc -c /usr/local/pharos/conf/trndc.conf stats");
-    system("perl /tmp/rndc_tsar.pl > /tmp/rndc_tsar.txt");
-    system("echo -n 'badvs,' >> /tmp/rndc_tsar.txt; MYSQL_BIN=`/bin/rpm -ql mysql|/bin/egrep -e '/bin/mysql$'` && ${MYSQL_BIN} -ss -uroot -Ddns_config -e 'SELECT COUNT(name) FROM vs WHERE in_use=1 AND available=0' >> /tmp/rndc_tsar.txt");
+    if (system("/usr/local/pharos/sbin/rndc -c /usr/local/pharos/conf/trndc.conf stats") < 0) {
+        exit(-1);
+    }
+    if (system("perl /tmp/rndc_tsar.pl > /tmp/rndc_tsar.txt") < 0) {
+        exit(-1);
+    }
+    if (system("echo -n 'badvs,' >> /tmp/rndc_tsar.txt; MYSQL_BIN=`/bin/rpm -ql mysql|/bin/egrep -e '/bin/mysql$'` && ${MYSQL_BIN} -ss -uroot -Ddns_config -e 'SELECT COUNT(name) FROM vs WHERE in_use=1 AND available=0' >> /tmp/rndc_tsar.txt") < 0) {
+        exit(-1);
+    }
 }
 
 static void
@@ -135,7 +141,9 @@ parse_stat_file(char buf[])
         pos += sprintf(buf + pos, "%s,", s);
     }
     fclose(fp);
-    system("rm /tmp/rndc_tsar.txt");
+    if (system("rm /tmp/rndc_tsar.txt") < 0){
+        exit(-1);
+    }
 
     if (pos > 0) {
         buf[pos - 1] = '\0';

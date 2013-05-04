@@ -45,7 +45,10 @@ read_rpi_stats(struct module *mod, char *parameter)
 
     int    cpu_temp;
 
-    fscanf(fp, "%d", &cpu_temp);
+    if (fscanf(fp, "%d", &cpu_temp) != 1) {
+        fclose(fp);
+        return;
+    }
 
     if (cpu_temp == 85 * 1000 || cpu_temp < 1) {
         return;
