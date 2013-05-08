@@ -1,127 +1,128 @@
 Introduction
 ------------
-Tsar(Taobao System Activity Reporter) is an system and application monitor tools, such as system info(cpu, load, io), or apps info(nginx, haproxy). The collect data can be stored at local disk, you can also send the data to nagios.
-It is very convenient to add custom modules for tsar, you just need to write collect function and report function as requested.
+Tsar (Taobao System Activity Reporter) is a monitoring tool, which can be used to gather and summarize system information, e.g. CPU, load, IO, and application information, e.g. nginx, HAProxy, Squid, etc. The results can be stored at local disk or sent to Nagios.
+
+Tsar can be easily extended by writing modules, which makes it a powerful and versatile reporting tool.
 
 Installation
 -------------
-Tsar is now available on github, you can clone it and install as follows:
+Tsar is available on GitHub, you can clone and install it as follows:
 
-    $git clone git://github.com/kongjian/tsar.git
-    $cd tsar
-    $make
-    $make install
-or you can just download zip file and install it an follows:
+    $ git clone git://github.com/kongjian/tsar.git
+    $ cd tsar
+    $ make
+    # make install
 
-    $wget -O tsar.zip https://github.com/alibaba/tsar/archive/master.zip
-    $unzip tsar.zip
-    $cd tsar
-    $make
-    $make install
+Or you can download the zip file and install it:
 
-after install, some major file is:
+    $ wget -O tsar.zip https://github.com/alibaba/tsar/archive/master.zip
+    $ unzip tsar.zip
+    $ cd tsar
+    $ make
+    # make install
 
-* Tsar configure:`/etc/tsar/tsar.conf`, tsar main configure file;
-* cron configure:`/etc/cron.d/tsar`, run tsar collect every minute;
-* logrotate configure:`/etc/logrotate.d/tsar` rotate log file tsar.data every month;
-* modules path:`/usr/local/tsar/modules`contains all modules dynamic library;
+After installation, you may see these files:
 
-Tsar configure
+* `/etc/tsar/tsar.conf`, which is tsar's main configuration file;
+* `/etc/cron.d/tsar`, is used to run tsar to collect information every minute;
+* `/etc/logrotate.d/tsar` will rotate tsar's log files every month;
+* `/usr/local/tsar/modules` is the directory where all module libraries (*.so) are located;
+
+Configuration
 -------------
-after install, it does not have any data,to check tsar, run `tsar -l`, see if real-time collection is normal:
+There is no output displayed after installation by default. Just run `tsar -l` to see if the real-time monitoring works, for instance:
 
-    [kongjian@v132172.sqa.cm4 tsar]$ tsar -l -i 1
+    [kongjian@tsar]$ tsar -l -i 1
     Time              ---cpu-- ---mem-- ---tcp-- -----traffic---- --xvda-- -xvda1-- -xvda2-- -xvda3-- -xvda4-- -xvda5--  ---load-
     Time                util     util   retran    pktin  pktout     util     util     util     util     util     util     load1
     11/04/13-14:09:10   0.20    11.57     0.00     9.00    2.00     0.00     0.00     0.00     0.00     0.00     0.00      0.00
     11/04/13-14:09:11   0.20    11.57     0.00     4.00    2.00     0.00     0.00     0.00     0.00     0.00     0.00      0.00
 
-Tsar main config is `/etc/tsar/tsar.conf`, Often used are;
-* add a module, add `mod_<yourmodname> on` to config
-* enable or disable a module, use `mod_<yourmodname> on/off`
-* parameter for a module, use `mod_<yourmodname> on parameter`
-* `output_stdio_mod` set which modules will be output to stdio when use `tsar`
-* `output_file_path` file to store history data, (you should modify logrotate config `/etc/logrotate.d/tsar` corresponding it)
-* `output_interface` specify tsar data output destination. default is local file, nagios/db is to remote, see advanced usage for nagios/db.
+Usually, we configure Tsar by simply editing `/etc/tsar/tsar.conf`:
 
-Tsar usage
--------------
-* see history :`tsar`
-* -l/--list :list available moudule
-* -l/--live :show real-time info, `tsar -l --cpu`
-* -i/--interval :set interval for report, `tsar -i 1 --cpu`
-* --modname :specify module to show, `tsar --cpu`
-* -s/--spec :specify module detail field, `tsar --cpu -s sys,util`
-* -d/--date :specify data, YYYYMMDD, or n means n days ago
-* -C/--check :show the last collect data
-* -d/--detail :show the module all fields information
-* -h/--help :show help
+* To add a module, add a line like `mod_<yourmodname> on`
+* To enable or disable a module, use `mod_<yourmodname> on/off`
+* To specify parameters for a module, use `mod_<yourmodname> on parameter`
+* `output_stdio_mod` is to set modules output to standard I/O
+* `output_file_path` is to set history data file, (you should modify the logrotate script `/etc/logrotate.d/tsar` too)
+* `output_interface` specifies tsar data output destination, which by default is a local file. See the Advanced section for more information.
 
-Advanced usage
--------------
-* output to nagios
+Usage
+------
+* see history : `tsar`
+* `-l/--list` : list available modules
+* `-l/--live` : show real-time information, e.g. `tsar -l --cpu`
+* `-i/--interval` : set the check interval, e.g. `tsar -i 1 --cpu`
+* `--modname` : specify a module to show its information, e.g. `tsar --cpu`
+* `-s/--spec` : specify a module's field(s), e.g. `tsar --cpu -s sys,util`
+* `-d/--date` : specify the date (YYYYMMDD), or n which means the last n days
+* `-C/--check` : show the latest collected data
+* `-d/--detail` : show all fields of a module
+* `-h/--help` : show help
 
-config：
+Advanced
+--------
+* Output to Nagios
 
-add output type `output_interface file,nagios` at tsar main config
+To turn it on, just set output type `output_interface file,nagios` in the main configuration file.
 
-configure nagios server address, port, and send interval time
+You should also specify Nagios' IP address, port, and sending interval, e.g.:
 
-    ####The IP address or the host running the NSCA daemon
+    ####The IP address or the hostname running the NSCA daemon
     server_addr nagios.server.com
-    ####The port on which the daemon is running - default is 5667
+    ####The port on which the daemon is listening - by default it is 5667
     server_port 8086
-    ####The cycle of send alert to nagios
+    ####The cycle (interval) of sending alerts to Nagios
     cycle_time 300
 
-as tsar use nagios passive mode, it need nsca bin and config location
+As tsar uses Nagios' passive mode, so you should specify the nsca binary and its configuration file, e.g.:
 
     ####nsca client program
     send_nsca_cmd /usr/bin/send_nsca
     send_nsca_conf /home/a/conf/amon/send_nsca.conf
 
-then specify module and field to be checked, there are 4 threshold corresponding to nagios different level
+Then specify the module and fields to be checked. There are 4 threshold levels.
 
     ####tsar mod alert config file
     ####threshold servicename.key;w-min;w-max;c-min;cmax;
     threshold cpu.util;50;60;70;80;
 
-* output to mysql
+* Output to MySQL
 
-config:
+To use this feature, just add output type `output_interface file,db` in tsar's configuration file.
 
-add output type `output_interface file,db` at tsar main config
-
-then specify which module will be output:
+Then specify which module(s) will be enabled:
 
     output_db_mod mod_cpu,mod_mem,mod_traffic,mod_load,mod_tcp,mod_udpmod_io
 
-configure destination address and port
+Note that you should set the IP address (or hostname) and port where tsar2db listens, e.g.:
 
     output_db_addr console2:56677
 
-destination listen at specific port, it recv data and flush to mysql, you can use tsar2db: https://github.com/kongjian/tsar2db
+Tsar2db receives data and flush it to MySQL. You can find more information about tsar2db at https://github.com/alibaba/tsar2db.
 
-module develop
--------------
-add new module for tsar is a good feature, you can collect your interested data and tsar will handler it for you.
 
-First install tsardevel，`make tsardevel` will do it
+Module development
+------------------
+Tsar is easily extended. Whenever you want information that is not collected by tsar yet, you can write a module.
 
-run `tsardevel <yourmodname>`, you will have an yourmodname dir and init files.
+First, install the tsardevel tool (`make tsardevel` will do this for you):
 
-    [kongjian@v132172.sqa.cm4 tsar]$ tsardevel test
+Then run `tsardevel <yourmodname>`, and you will get a directory named yourmodname, e.g.:
+
+    [kongjian@tsar]$ tsardevel test
     build:make
     install:make install
     uninstall:make uninstall
-    [kongjian@v132172.sqa.cm4 tsar]$ ls test
+
+    [kongjian@tsar]$ ls test
     Makefile  mod_test.c  mod_test.conf
 
-modify cread_test_stats set_test_record at test.c
-after modify, use `make;make install` to install your mod, run `tsar --test` to see your data
+You can modify the cread_test_stats() and set_test_record() functions in test.c as you need.
+Then run `make;make install` to install your module and run `tsar --yourmodname` to see the output.
 
 More
--------------
-The homepage of Tsar is at Taocoded: http://code.taobao.org/p/tsar/
+----
+The homepage of Tsar is at http://tsar.taobao.org
 
-Send any question to kongjian@taobao.com
+You can also send your questions to kongjian@taobao.com if you have.
