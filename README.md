@@ -49,16 +49,18 @@ Usually, we configure Tsar by simply editing `/etc/tsar/tsar.conf`:
 
 Usage
 ------
-* see history : `tsar`
-* `-l/--list` : list available modules
-* `-l/--live` : show real-time information, e.g. `tsar -l --cpu`
-* `-i/--interval` : set the check interval, e.g. `tsar -i 1 --cpu`
-* `--modname` : specify a module to show its information, e.g. `tsar --cpu`
-* `-s/--spec` : specify a module's field(s), e.g. `tsar --cpu -s sys,util`
-* `-d/--date` : specify the date (YYYYMMDD), or n which means the last n days
-* `-C/--check` : show the latest collected data
-* `-d/--detail` : show all fields of a module
-* `-h/--help` : show help
+* null          :see default mods history data, `tsar`
+* --modname     :specify module to show, `tsar --cpu`
+* -L/--list     :list available moudule, `tsar -L`
+* -l/--live     :show real-time info, `tsar -l --cpu`
+* -i/--interval :set interval for report, `tsar -i 1 --cpu`
+* -s/--spec     :specify module detail field, `tsar --cpu -s sys,util`
+* -D/--detail   :do not conver data to K/M/G, `tsar --mem -D`
+* -m/--merge    :merge multiply item to one, `tsar --io -m`
+* -I/--item     :show spec item data, `tsar --io -I sda`
+* -d/--date     :specify data, YYYYMMDD, or n means n days ago
+* -C/--check    :show the last collect data
+* -h/--help     :show help, `tsar -h`
 
 Advanced
 --------
@@ -99,7 +101,7 @@ Note that you should set the IP address (or hostname) and port where tsar2db lis
 
     output_db_addr console2:56677
 
-Tsar2db receives data and flush it to MySQL. You can find more information about tsar2db at https://github.com/alibaba/tsar2db.
+Tsar2db receives sql data and flush it to MySQL. You can find more information about tsar2db at https://github.com/alibaba/tsar2db.
 
 
 Module development
