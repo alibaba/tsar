@@ -113,6 +113,7 @@ char *key_float[] = {
     "Request Hit Ratios:",
     "Byte Hit Ratios:",
     "Request Disk Hit Ratios:",
+    "HTTP Requests (All):",
 };
 
 char *
@@ -302,6 +303,9 @@ collect_info(char *l, struct squid_info *si)
     read_a_float_value(l, key_float[6],
             &si->sf.disk_hit,
             RIGHT, 10);
+    read_a_float_value(l, key_float[7],
+            &si->sf.responsetime,
+            RIGHT, 100000);
 
 }
 
@@ -435,7 +439,7 @@ parse_squid_info(char *buf, char *cmd, struct p_squid_info *p_si)
         return -1;
     }
     if (!strcmp(cmd, "info") && p_si->sip->sf.responsetime == 0) {
-        return -1;
+        /* return -1;*/
     }
     return 0;
 }
@@ -549,17 +553,24 @@ store_single_port(char *buf, char *itemname, int i)
 }
 
 void
-read_squid_stat(struct module *mod)
+read_squid_stat(struct module *mod, char *parameter)
 {
     int i, pos = 0;
     char buf[LEN_4096] = {0};
     char itemname[LEN_4096] = {0};
     live_squid_nr = 0;
 
+    count_squid_nr();
     if (squid_nr == 0) {
-        count_squid_nr();
-        if (squid_nr == 0 ) return;
+        if (atoi(parameter) != 0) {
+            port_list[0] = atoi(parameter);  
+            squid_nr = 1;
+        } else {
+            port_list[0] = 3128;
+            squid_nr = 1;
+        }
     }
+
     memset(s_st_squid, 0, STATS_SQUID_SIZE * MAXSQUID);
     /*get the live squid number*/
     for (i = 0; i < squid_nr; i++) {

@@ -2,7 +2,6 @@
 #include "tsar.h"
 
 #define LVS_STATS "/proc/net/ip_vs_stats"
-#define KEEPALIVE "/var/run/keepalived.pid"
 #define LVS_STORE_FMT(d)            \
     "%ld"d"%ld"d"%ld"d"%ld"d"%ld"d"%ld"
 #define MAX_LINE_LEN 1024
@@ -47,18 +46,16 @@ read_lvs(struct module *mod)
     FILE  *fp;
     char   line[MAX_LINE_LEN];
 
-    if (access(KEEPALIVE, 0) == 0) {
-        if ((fp = fopen(LVS_STATS, "r")) != NULL) {
-            while (fgets(line, MAX_LINE_LEN, fp) != NULL) {
-                i++;
-                if (i == 6) {
-                    sscanf(line, "%lx %lx %lx %lx %lx", &st_lvs.conns, &st_lvs.pktin, &st_lvs.pktout, &st_lvs.bytin, &st_lvs.bytout);
-                }
-                st_lvs.stat = 1;
+    if ((fp = fopen(LVS_STATS, "r")) != NULL) {
+        while (fgets(line, MAX_LINE_LEN, fp) != NULL) {
+            i++;
+            if (i == 6) {
+                sscanf(line, "%lx %lx %lx %lx %lx", &st_lvs.conns, &st_lvs.pktin, &st_lvs.pktout, &st_lvs.bytin, &st_lvs.bytout);
             }
-            if (fclose(fp) < 0) {
-                return;
-            }
+            st_lvs.stat = 1;
+        }
+        if (fclose(fp) < 0) {
+            return;
         }
     }
     if (st_lvs.stat == 1) {
