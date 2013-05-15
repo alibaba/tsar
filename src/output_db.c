@@ -104,10 +104,10 @@ send_sql_txt(int fd, int have_collect)
                 strcat(sqls, ");");
             }
         }
-        len = strlen(sqls);
-        if (write(fd, sqls, len) != len) {
-            do_debug(LOG_ERR, "output_db write error:%s", strerror(errno));
-        }
+    }
+    len = strlen(sqls);
+    if (write(fd, sqls, len) != len) {
+        do_debug(LOG_ERR, "output_db write error:%s", strerror(errno));
     }
 }
 
