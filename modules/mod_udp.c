@@ -52,9 +52,9 @@ read_udp_stats(struct module *mod)
 
     int pos = sprintf(buf, "%lld,%lld,%lld,%lld",
             st_udp.InDatagrams,
+            st_udp.OutDatagrams,
             st_udp.NoPorts,
-            st_udp.InErrors,
-            st_udp.OutDatagrams);
+            st_udp.InErrors);
     buf[pos] = '\0';
     set_mod_record(mod, buf);
 }
