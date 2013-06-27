@@ -13,6 +13,7 @@ struct stats_cpu {
     unsigned long long cpu_hardirq;
     unsigned long long cpu_softirq;
     unsigned long long cpu_guest;
+    unsigned long long cpu_number;
 };
 
 #define STATS_CPU_SIZE (sizeof(struct stats_cpu))
@@ -23,7 +24,7 @@ static char *cpu_usage = "    --cpu               CPU share (user, system, inter
 static void
 read_cpu_stats(struct module *mod)
 {
-    FILE   *fp;
+    FILE   *fp, *ncpufp;
     char    line[LEN_4096];
     char    buf[LEN_4096];
     struct  stats_cpu st_cpu;
@@ -53,11 +54,23 @@ read_cpu_stats(struct module *mod)
                     &st_cpu.cpu_guest);
         }
     }
+
+    /* get cpu number */
+    if ((ncpufp = fopen("/proc/cpuinfo", "r")) == NULL) {
+        fclose(fp);
+        return;
+    }
+    while (fgets(line, LEN_4096, ncpufp)) {
+        if (!strncmp(line, "processor\t:", 11))
+            st_cpu.cpu_number++;
+    }
+    fclose(ncpufp);
+
     /* cpu_util =  */
     /*      st_cpu.cpu_user + st_cpu.cpu_sys + */
     /*      st_cpu.cpu_hardirq + st_cpu.cpu_softirq; */
 
-    int pos = sprintf(buf, "%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu",
+    int pos = sprintf(buf, "%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu",
             /* the store order is not same as read procedure */
             st_cpu.cpu_user,
             st_cpu.cpu_sys,
@@ -67,7 +80,8 @@ read_cpu_stats(struct module *mod)
             st_cpu.cpu_idle,
             st_cpu.cpu_nice,
             st_cpu.cpu_steal,
-            st_cpu.cpu_guest);
+            st_cpu.cpu_guest,
+            st_cpu.cpu_number);
 
     buf[pos] = '\0';
     set_mod_record(mod, buf);
@@ -84,7 +98,7 @@ set_cpu_record(struct module *mod, double st_array[],
     U_64   pre_total, cur_total;
     pre_total = cur_total = 0;
 
-    for (i = 0; i < mod->n_col; i++) {
+    for (i = 0; i < mod->n_col - 1; i++) {
         if(cur_array[i] < pre_array[i]){
             for(j = 0; j < 9; j++)
                 st_array[j] = -1;
@@ -104,8 +118,14 @@ set_cpu_record(struct module *mod, double st_array[],
             st_array[i] = (cur_array[i] - pre_array[i]) * 100.0 / (cur_total - pre_total);
     }
 
+    /* util = 100 - idle */
+    if (cur_array[5] >= pre_array[5]) {
+        st_array[5] = 100.0 - (cur_array[5] - pre_array[5]) * 100.0 / (cur_total - pre_total);
+    }
+
+    st_array[9] = cur_array[9];
     /* util = user + sys + hirq + sirq + nice */
-    st_array[5] = st_array[0] + st_array[1] + st_array[3] + st_array[4] + st_array[6];
+    //st_array[5] = st_array[0] + st_array[1] + st_array[3] + st_array[4] + st_array[6];
 }
 
 static struct mod_info cpu_info[] = {
@@ -115,13 +135,14 @@ static struct mod_info cpu_info[] = {
     {"  hirq", DETAIL_BIT,  0,  STATS_NULL},
     {"  sirq", DETAIL_BIT,  0,  STATS_NULL},
     {"  util", SUMMARY_BIT,  0,  STATS_NULL},
-    {"  nice", HIDE_BIT,  0,  STATS_NULL},
-    {" steal", HIDE_BIT,  0,  STATS_NULL},
+    {"  nice", DETAIL_BIT,  0,  STATS_NULL},
+    {" steal", DETAIL_BIT,  0,  STATS_NULL},
     {" guest", HIDE_BIT,  0,  STATS_NULL},
+    {"  ncpu", DETAIL_BIT,  0,  STATS_NULL},
 };
 
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--cpu", cpu_usage, cpu_info, 9, read_cpu_stats, set_cpu_record);
+    register_mod_fileds(mod, "--cpu", cpu_usage, cpu_info, 10, read_cpu_stats, set_cpu_record);
 }

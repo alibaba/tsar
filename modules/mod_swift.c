@@ -175,7 +175,7 @@ parse_swift_info(char *buf)
         if (strstr(line, "Byte Hit Ratios") != NULL) {
             float a, b;
             sscanf(line, "        Byte Hit Ratios:        5min: %f%%, 60min: %f%%", &a, &b);
-            stats.b_hit = a * 1000 + b;
+            stats.b_hit = a * 1000;
         }
         /* UP Time:        247256.904 seconds */
         if (strstr(line, "UP Time") != NULL) {
