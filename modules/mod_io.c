@@ -120,9 +120,12 @@ printable(unsigned int major, unsigned int minor)
     } else if(COMPAQ_MAJOR(major)){
         return (!(minor & 0x0F) && print_device)
             || ((minor & 0x0F) && print_partition);
+    }
+    /*
     } else if(DEVMAP_MAJOR == major){
         return 0;
     }
+    */
     return 1;   /* if uncertain, print it */
 }
 
