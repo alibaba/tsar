@@ -4,7 +4,7 @@
 usage()
 {
   echo "Usage:"
-  echo "tsarmod modname"
+  echo "tsardevel modname"
   exit 0
 }
 install()
