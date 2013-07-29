@@ -135,10 +135,10 @@ static struct mod_info cpu_info[] = {
     {"  hirq", DETAIL_BIT,  0,  STATS_NULL},
     {"  sirq", DETAIL_BIT,  0,  STATS_NULL},
     {"  util", SUMMARY_BIT,  0,  STATS_NULL},
-    {"  nice", DETAIL_BIT,  0,  STATS_NULL},
-    {" steal", DETAIL_BIT,  0,  STATS_NULL},
+    {"  nice", HIDE_BIT,  0,  STATS_NULL},
+    {" steal", HIDE_BIT,  0,  STATS_NULL},
     {" guest", HIDE_BIT,  0,  STATS_NULL},
-    {"  ncpu", DETAIL_BIT,  0,  STATS_NULL},
+    {"  ncpu", HIDE_BIT,  0,  STATS_NULL},
 };
 
 void
