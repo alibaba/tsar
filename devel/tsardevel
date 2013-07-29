@@ -4,7 +4,7 @@
 usage()
 {
   echo "Usage:"
-  echo "tsarmod modname"
+  echo "tsardevel modname"
   exit 0
 }
 install()
@@ -20,12 +20,23 @@ then
 fi
 
 modname=$1
+install_path='/usr/local/tsar/devel'
+
+for file in mod_test.c mod_test.conf Makefile.test
+do
+ if [ ! -e "$install_path/$file" ] ;then
+  echo "$install_path/$file not exist!"
+  echo "make sure you have run 'make tsardevel' when install tsar."
+  exit 1
+ fi
+done
+
 
 # mk new mod_test
-mkdir $modname
-sed -e "s/test/$modname/g" < /usr/local/tsar/devel/mod_test.c > ./$modname/mod_$modname.c
-sed -e "s/test/$modname/g" < /usr/local/tsar/devel/mod_test.conf > ./$modname/mod_$modname.conf
-sed -e "s/test/$modname/g" < /usr/local/tsar/devel/Makefile.test > ./$modname/Makefile
+mkdir -p $modname
+sed -e "s/test/$modname/g" < $install_path/mod_test.c > ./$modname/mod_$modname.c
+sed -e "s/test/$modname/g" < $install_path/mod_test.conf > ./$modname/mod_$modname.conf
+sed -e "s/test/$modname/g" < $install_path/Makefile.test > ./$modname/Makefile
 if [ $? -eq 0 ]
 then
  install
