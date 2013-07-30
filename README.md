@@ -15,7 +15,7 @@ Tsar is available on GitHub, you can clone and install it as follows:
 
 Or you can download the zip file and install it:
 
-    $ wget -O tsar.zip https://github.com/alibaba/tsar/archive/master.zip
+    $ wget -O tsar.zip https://github.com/alibaba/tsar/archive/master.zip --no-check-certificate
     $ unzip tsar.zip
     $ cd tsar
     $ make
