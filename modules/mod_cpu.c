@@ -118,9 +118,9 @@ set_cpu_record(struct module *mod, double st_array[],
             st_array[i] = (cur_array[i] - pre_array[i]) * 100.0 / (cur_total - pre_total);
     }
 
-    /* util = 100 - idle */
+    /* util = 100 - idle - iowait */
     if (cur_array[5] >= pre_array[5]) {
-        st_array[5] = 100.0 - (cur_array[5] - pre_array[5]) * 100.0 / (cur_total - pre_total);
+        st_array[5] = 100.0 - (cur_array[5] - pre_array[5]) * 100.0 / (cur_total - pre_total) - st_array[2];
     }
 
     st_array[9] = cur_array[9];
