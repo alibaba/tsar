@@ -37,6 +37,8 @@ struct status_swift_store {
     unsigned long long mobj;
     unsigned long long dobj;
     unsigned long long size;
+    unsigned long long ram;
+    unsigned long long disk;
     unsigned long long m_hit;
     unsigned long long coss;
     unsigned long long tcoss;
@@ -48,6 +50,8 @@ struct mod_info swift_store_info[] = {
     {"  mobj", DETAIL_BIT,  0,  STATS_NULL},
     {"  dobj", DETAIL_BIT,  0,  STATS_NULL},
     {"  size", DETAIL_BIT,  0,  STATS_NULL},
+    {"   ram", DETAIL_BIT,  0,  STATS_NULL},
+    {"  disk", DETAIL_BIT,  0,  STATS_NULL},
     {" m_hit", DETAIL_BIT,  0,  STATS_NULL},
     {"  coss", DETAIL_BIT,  0,  STATS_NULL},
     {" tcoss", DETAIL_BIT,  0,  STATS_NULL}
@@ -170,9 +174,22 @@ parse_swift_store_info(char *buf)
         if (strstr(line, "Request Filesystem Hit Ratios(5min):") != NULL) {
             float a, b;
             sscanf(line, "        Request Filesystem Hit Ratios(5min):    coss: %f%%, tcoss: %f%%", &a, &b);
-            stats.coss= a * 1000;
+            stats.coss = a * 1000;
             stats.tcoss = b * 1000;
         }
+        /*Storage Swap size:    990388 KB*/
+        if (strstr(line, "Storage Swap size:") != NULL) {
+            float a;
+            sscanf(line, "        Storage Swap size:      %f KB", &a);
+            stats.disk = a * 1000 * 1024;
+        }
+        /*Storage Mem size: 1135290 KB*/
+        if (strstr(line, "Storage Mem size:") != NULL) {
+            float a;
+            sscanf(line, "        Storage Mem size:       %f KB", &a);
+            stats.ram = a * 1000 * 1024;
+        }
+
         line = strtok(NULL, "\n");
     }
     return 0;
@@ -270,11 +287,13 @@ read_swift_store_stats(struct module *mod, char *parameter)
     while (read_swift_store_stat() < 0 && retry < RETRY_NUM) {
         retry++;
     }
-    pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld",
+    pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
             stats.objs,
             stats.mobj,
             stats.dobj,
             stats.size,
+            stats.ram,
+            stats.disk,
             stats.m_hit,
             stats.coss,
             stats.tcoss
@@ -286,5 +305,5 @@ read_swift_store_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift_store", swift_store_usage, swift_store_info, 7, read_swift_store_stats, set_swift_store_record);
+    register_mod_fileds(mod, "--swift_store", swift_store_usage, swift_store_info, 9, read_swift_store_stats, set_swift_store_record);
 }
