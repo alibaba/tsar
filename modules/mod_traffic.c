@@ -67,10 +67,10 @@ read_traffic_stats(struct module *mod)
 }
 
 static struct mod_info traffic_info[] ={
-    {" bytin", DETAIL_BIT,  0,  STATS_SUB_INTER},
-    {"bytout", DETAIL_BIT,  0,  STATS_SUB_INTER},
-    {" pktin", SUMMARY_BIT,  0,  STATS_SUB_INTER},
-    {"pktout", SUMMARY_BIT,  0,  STATS_SUB_INTER}
+    {" bytin", SUMMARY_BIT,  0,  STATS_SUB_INTER},
+    {"bytout", SUMMARY_BIT,  0,  STATS_SUB_INTER},
+    {" pktin", DETAIL_BIT,  0,  STATS_SUB_INTER},
+    {"pktout", DETAIL_BIT,  0,  STATS_SUB_INTER}
 };
 
 void
