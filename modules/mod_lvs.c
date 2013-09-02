@@ -85,7 +85,6 @@ read_lvs(struct module *mod)
         return;
     }
     buf[pos] = '\0';
-    printf("%s\n", buf);
     set_mod_record(mod, buf);
     return;
 }
