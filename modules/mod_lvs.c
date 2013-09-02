@@ -85,12 +85,27 @@ read_lvs(struct module *mod)
         return;
     }
     buf[pos] = '\0';
+    printf("%s\n", buf);
     set_mod_record(mod, buf);
     return;
 }
 
 void
+set_lvs_record(struct module *mod, double st_array[],
+    U_64 pre_array[], U_64 cur_array[], int inter)
+{
+    st_array[0] = cur_array[0];
+    int i = 1;
+    for(i = 1;i<=5;i++){
+        if(cur_array[i] < pre_array[i]){
+            continue;
+        }
+        st_array[i] = (cur_array[i] -  pre_array[i]) / inter;
+    }
+}
+
+void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--lvs", lvs_usage, info, sizeof(info)/sizeof(struct mod_info), read_lvs, NULL);
+    register_mod_fileds(mod, "--lvs", lvs_usage, info, sizeof(info)/sizeof(struct mod_info), read_lvs, set_lvs_record);
 }
