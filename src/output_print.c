@@ -801,6 +801,8 @@ running_check(int check_type)
     char       check[LEN_10240] = {0};
     char       host_name[LEN_64] = {0};
     struct     module *mod = NULL;
+    struct     stat statbuf; 
+    time_t     nowtime;
     double    *st_array;
 
     /* get hostname */
@@ -820,6 +822,12 @@ running_check(int check_type)
     fp = fopen(filename, "r");
     if (!fp) {
         do_debug(LOG_FATAL, "unable to open the log file %s.\n", filename);
+    }
+    /* check file update time */
+    stat(filename, &statbuf);
+    time(&nowtime);
+    if (nowtime - statbuf.st_ctime > 300) {
+        do_debug(LOG_FATAL, "/var/log/tsar.data is far away from now, last time is %s", ctime(&statbuf.st_ctime));
     }
     /* get file len */
     memset(&line[0], 0, LEN_10240);
