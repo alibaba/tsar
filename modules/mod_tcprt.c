@@ -58,7 +58,6 @@ static void
 read_tcprt_stats(struct module *mod)
 {
     char    buf[LEN_4096];
-    char    item_value[LEN_256];
     struct  stats_tcprt st_tcprt;
 
     memset(buf, 0, LEN_4096);
