@@ -23,7 +23,7 @@ struct hostinfo {
     char *uri;
 };
 
-static char *nginx_usage = "    --nginx            nginx statistics";
+static char *nginx_usage = "    --nginx             nginx statistics";
 
 static struct mod_info nginx_info[] = {
     {"accept", DETAIL_BIT,  0,  STATS_SUB},
