@@ -33,6 +33,9 @@ static struct mod_info nginx_info[] = {
     {"   cps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
     {"   qps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
     {"   2XX", SUMMARY_BIT, 0,  STATS_SUB_INTER},
+    {"   3XX", SUMMARY_BIT, 0,  STATS_SUB_INTER},
+    {"   4XX", SUMMARY_BIT, 0,  STATS_SUB_INTER},
+    {"   5XX", SUMMARY_BIT, 0,  STATS_SUB_INTER},
     {"    rt", SUMMARY_BIT, 0,  STATS_NULL},
 };
 
@@ -43,13 +46,13 @@ set_nginx_record(struct module *mod, double st_array[],
 {
     int i;
 
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 6; i++) {
         st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
     }
 
     /* avg_rt = (cur_rt - pre_rt) / (cur_nreq - pre_nreq) */
-    if (cur_array[3] >= pre_array[3] && cur_array[1] > pre_array[1]) {
-        st_array[3] = (cur_array[3] - pre_array[3]) * 1.0 / (cur_array[1] - pre_array[1]);
+    if (cur_array[6] >= pre_array[6] && cur_array[1] > pre_array[1]) {
+        st_array[6] = (cur_array[6] - pre_array[6]) * 1.0 / (cur_array[1] - pre_array[1]);
     }
 }
 
@@ -150,8 +153,8 @@ read_nginx_domain_stats(struct module *mod, char *parameter)
         }
         stat.domain = line;
 
-        pos += sprintf(buf + pos, "%s=%lld,%lld,%lld,%lld" ITEM_SPLIT,
-                stat.domain, stat.nconn, stat.nreq, stat.n2XX, stat.rt);
+        pos += sprintf(buf + pos, "%s=%lld,%lld,%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT,
+                stat.domain, stat.nconn, stat.nreq, stat.n2XX, stat.n3XX, stat.n4XX, stat.n5XX, stat.rt);
     }
     buf[pos] = '\0';
     set_mod_record(mod, buf);
@@ -163,5 +166,5 @@ read_nginx_domain_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--nginx_domain", nginx_usage, nginx_info, 4, read_nginx_domain_stats, set_nginx_record);
+    register_mod_fileds(mod, "--nginx_domain", nginx_usage, nginx_info, 7, read_nginx_domain_stats, set_nginx_record);
 }
