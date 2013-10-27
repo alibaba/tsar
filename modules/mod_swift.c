@@ -23,6 +23,8 @@ int mgrport=81;
  * CPU Time:       23487.042 seconds
  * StoreEntries           : 20776287
  * client_http.requests = 150291472
+ * client_http.hits = 0
+ * client_http.total_svc_time = 1998366283
  * client_http.bytes_in = 6380253436
  * client_http.bytes_out = 5730106537327
  */
@@ -30,14 +32,16 @@ const static char *SWIFT_STORE[] = {
     "client_http.requests",
     "client_http.bytes_in",
     "client_http.bytes_out",
+    "client_http.total_svc_time",
+    "client_http.hits",
     "StoreEntries"
 };
 
 /* struct for swift counters */
 struct status_swift {
     unsigned long long requests;
-    unsigned long long rt;
-    unsigned long long r_hit;
+    unsigned long long hits;
+    unsigned long long total_svc_time;
     unsigned long long b_hit;
     unsigned long long objs;
     unsigned long long bytes_in;
@@ -158,24 +162,17 @@ parse_swift_info(char *buf)
         read_swift_value(line, SWIFT_STORE[0], &stats.requests);
         read_swift_value(line, SWIFT_STORE[1], &stats.bytes_in);
         read_swift_value(line, SWIFT_STORE[2], &stats.bytes_out);
-        read_swift_value(line, SWIFT_STORE[3], &stats.objs);
-        /*Average HTTP respone time:      5min: 11.70 ms, 60min: 10.06 ms*/
-        if (strstr(line, "Average HTTP respone time") != NULL) {
-            float a, b;
-            sscanf(line, "        Average HTTP respone time:      5min: %f ms, 60min: %f ms", &a, &b);
-            stats.rt = a * 1000;
-        }
-        /* Request Hit Ratios:     5min: 95.8%, 60min: 95.7% */
-        if (strstr(line, "Request Hit Ratios") != NULL) {
-            float a, b;
-            sscanf(line, "        Request Hit Ratios:     5min: %f%%, 60min: %f%%", &a, &b);
-            stats.r_hit = a * 1000;
-        }
+        read_swift_value(line, SWIFT_STORE[3], &stats.total_svc_time);
+        read_swift_value(line, SWIFT_STORE[4], &stats.hits);
+        read_swift_value(line, SWIFT_STORE[5], &stats.objs);
         /* Byte Hit Ratios:        5min: 96.6%, 60min: 96.6% */
         if (strstr(line, "Byte Hit Ratios") != NULL) {
             float a, b;
             sscanf(line, "        Byte Hit Ratios:        5min: %f%%, 60min: %f%%", &a, &b);
-            stats.b_hit = a * 1000;
+            if (a > 0)
+                stats.b_hit = a * 1000;
+            else
+                stats.b_hit = 0;
         }
         /* UP Time:        247256.904 seconds */
         if (strstr(line, "UP Time") != NULL) {
@@ -202,34 +199,48 @@ set_swift_record(struct module *mod, double st_array[],
         st_array[0] = (cur_array[0] -  pre_array[0]) / inter;
 
     } else {
-        st_array[0] = -1;
+        st_array[0] = 0;
     }
     /* rt */
-    st_array[1] = cur_array[1] * 1.0 / 1000;
-    /* r_hit b_hit */
-    st_array[2] = cur_array[2] * 1.0 / 1000;
-    st_array[3] = cur_array[3] * 1.0 / 1000;
+    if (cur_array[0] > pre_array[0] && cur_array[1] > pre_array[1])
+        st_array[1] = (cur_array[1] - pre_array[1]) / (cur_array[0] - pre_array[0]);
+    else
+        st_array[1] = 0;
+    /* r_hit */
+    if (cur_array[0] > pre_array[0] && cur_array[2] > pre_array[2])
+        st_array[2] = 100 * (cur_array[2] - pre_array[2]) / (cur_array[0] - pre_array[0]);
+    else
+        st_array[2] = 0;
+    /* b_hit */
+    if (cur_array[3] > 0)
+        st_array[3] = cur_array[3] * 1.0 / 1000;
+    else
+        st_array[3] = 0;
+
     /* objs */
-    st_array[4] = cur_array[4];
+    if (cur_array[4] > 0)
+        st_array[4] = cur_array[4];
+    else
+        st_array[4] = 0;
     /* in_bw out_bw */
     if (cur_array[5] >= pre_array[5]) {
         st_array[5] = (cur_array[5] -  pre_array[5]) / inter;
 
     } else {
-        st_array[5] = -1;
+        st_array[5] = 0;
     }
     if (cur_array[6] >= pre_array[6]) {
         st_array[6] = (cur_array[6] -  pre_array[6]) / inter;
 
     } else {
-        st_array[6] = -1;
+        st_array[6] = 0;
     }
     /* cpu */
     if(cur_array[7] > pre_array[7] && cur_array[8] >= pre_array[8]) {
         st_array[7] = (cur_array[8] - pre_array[8]) * 100.0 / (cur_array[7] - pre_array[7]);
 
     } else {
-        st_array[7] = -1;
+        st_array[7] = 0;
     }
 }
 
@@ -320,8 +331,8 @@ read_swift_stats(struct module *mod, char *parameter)
     }
     pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
             stats.requests,
-            stats.rt,
-            stats.r_hit,
+            stats.total_svc_time,
+            stats.hits,
             stats.b_hit,
             stats.objs,
             stats.bytes_in,
@@ -330,6 +341,7 @@ read_swift_stats(struct module *mod, char *parameter)
             stats.s_cpu
              );
     buf[pos] = '\0';
+    // fprintf(stderr, "buf: %s\n", buf);
     set_mod_record(mod, buf);
 }
 

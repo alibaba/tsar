@@ -1151,6 +1151,10 @@ running_check(int check_type)
                 char   *token = strtok(n_record, ITEM_SPLIT);
                 char   *s_token;
                 for (j = 0; j < mod->n_item; j++) {
+                    /* set max check partition for -check */
+                    if (j > 5) {
+                        break;
+                    }
                     s_token = strstr(token, ITEM_SPSTART);
                     if (s_token) {
                         memset(opt, 0, sizeof(opt));

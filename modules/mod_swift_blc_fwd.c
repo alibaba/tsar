@@ -2,7 +2,6 @@
 #include <fcntl.h>
 #include "tsar.h"
 
-
 #define RETRY_NUM 3
 /* swift default port should not changed */
 #define HOSTNAME "localhost"
@@ -10,26 +9,26 @@
 #define EQUAL "="
 #define DEBUG 0
 
-char  *swift_fwd_usage = "    --swift_fwd         Swift source infomation";
-int    mgrport = 81;
+char  *swift_blc_fwd_usage = "    --swift_blc_fwd     Swift forward to Balancer infomation";
+int    mgrport = 82;
 
 /* swiftclient -p 81 mgr:counters */
 /*
-   server_http.requests = 13342113
-   server_http.errors = 220
-   server_http.bytes_in = 210982517709
-   server_http.bytes_out = 0
-   server_http.svc_time = 1526450363
+   blc_fwd_http.requests = 13342113
+   blc_fwd_http.errors = 220
+   blc_fwd_http.bytes_in = 210982517709
+   blc_fwd_http.bytes_out = 0
+   blc_fwd_http.svc_time = 1526450363
  */
-const static char *SWIFT_FWD[] = {
-    "server_http.requests",
-    "server_http.errors",
-    "server_http.bytes_in",
-    "server_http.svc_time"
+const static char *SWIFT_BLC_FWD[] = {
+    "blc_fwd_http.requests",
+    "blc_fwd_http.errors",
+    "blc_fwd_http.bytes_in",
+    "blc_fwd_http.svc_time"
 };
 
 /* struct for httpfwd counters */
-struct status_swift_fwd {
+struct status_swift_blc_fwd {
     unsigned long long requests;
     unsigned long long errors;
     unsigned long long bytes_in;
@@ -37,7 +36,7 @@ struct status_swift_fwd {
 } stats;
 
 /* swift register info for tsar */
-struct mod_info swift_fwd_info[] = {
+struct mod_info swift_blc_fwd_info[] = {
     {"   qps", DETAIL_BIT,  0,  STATS_NULL},
     {" traff", DETAIL_BIT,  0,  STATS_NULL},
     {" error", DETAIL_BIT,  0,  STATS_NULL},
@@ -45,7 +44,7 @@ struct mod_info swift_fwd_info[] = {
 };
 /* opens a tcp or udp connection to a remote host or local socket */
 int
-my_swift_fwd_net_connect(const char *host_name, int port, int *sd, char* proto)
+my_swift_blc_fwd_net_connect(const char *host_name, int port, int *sd, char *proto)
 {
     int    result;
     struct sockaddr_in servaddr;
@@ -78,25 +77,25 @@ my_swift_fwd_net_connect(const char *host_name, int port, int *sd, char* proto)
     if (result < 0) {
         close(*sd);
         switch (errno) {
-            case ECONNREFUSED:
-                if (DEBUG) {
-                    printf("Connection refused by host\n");
-                }
-                break;
-            case ETIMEDOUT:
-                if (DEBUG) {
-                    printf("Timeout while attempting connection\n");
-                }
-                break;
-            case ENETUNREACH:
-                if (DEBUG) {
-                    printf("Network is unreachable\n");
-                }
-                break;
-            default:
-                if (DEBUG) {
-                    printf("Connection refused or timed out\n");
-                }
+        case ECONNREFUSED:
+            if (DEBUG) {
+                printf("Connection refused by host\n");
+            }
+            break;
+        case ETIMEDOUT:
+            if (DEBUG) {
+                printf("Timeout while attempting connection\n");
+            }
+            break;
+        case ENETUNREACH:
+            if (DEBUG) {
+                printf("Network is unreachable\n");
+            }
+            break;
+        default:
+            if (DEBUG) {
+                printf("Connection refused or timed out\n");
+            }
         }
 
         return 2;
@@ -104,22 +103,22 @@ my_swift_fwd_net_connect(const char *host_name, int port, int *sd, char* proto)
     return 0;
 }
 ssize_t
-mywrite_swift_fwd(int fd, void *buf, size_t len)
+mywrite_swift_blc_fwd(int fd, void *buf, size_t len)
 {
     return send(fd, buf, len, 0);
 }
 
 ssize_t
-myread_swift_fwd(int fd, void *buf, size_t len)
+myread_swift_blc_fwd(int fd, void *buf, size_t len)
 {
     return recv(fd, buf, len, 0);
 }
 
 /* get value from counter */
 int
-read_swift_fwd_value(char *buf,
-    const char *key,
-    unsigned long long *ret)
+read_swift_blc_fwd_value(char *buf,
+                         const char *key,
+                         unsigned long long *ret)
 {
     int    k=0;
     char  *tmp;
@@ -136,23 +135,23 @@ read_swift_fwd_value(char *buf,
 }
 
 int
-parse_swift_fwd_info(char *buf)
+parse_swift_blc_fwd_info(char *buf)
 {
     char   *line;
     line = strtok(buf, "\n");
-    while(line != NULL){
-        read_swift_fwd_value(line, SWIFT_FWD[0], &stats.requests);
-        read_swift_fwd_value(line, SWIFT_FWD[1], &stats.errors);
-        read_swift_fwd_value(line, SWIFT_FWD[2], &stats.bytes_in);
-        read_swift_fwd_value(line, SWIFT_FWD[3], &stats.svc_time);
+    while(line != NULL) {
+        read_swift_blc_fwd_value(line, SWIFT_BLC_FWD[0], &stats.requests);
+        read_swift_blc_fwd_value(line, SWIFT_BLC_FWD[1], &stats.errors);
+        read_swift_blc_fwd_value(line, SWIFT_BLC_FWD[2], &stats.bytes_in);
+        read_swift_blc_fwd_value(line, SWIFT_BLC_FWD[3], &stats.svc_time);
         line = strtok(NULL, "\n");
     }
     return 0;
 }
 
 void
-set_swift_fwd_record(struct module *mod, double st_array[],
-    U_64 pre_array[], U_64 cur_array[], int inter)
+set_swift_blc_fwd_record(struct module *mod, double st_array[],
+                         U_64 pre_array[], U_64 cur_array[], int inter)
 {
     int i;
     for (i = 0; i < mod->n_col - 1; i++) {
@@ -163,7 +162,7 @@ set_swift_fwd_record(struct module *mod, double st_array[],
             st_array[i] = -1;
         }
     }
-    if(cur_array[i] >= pre_array[i] && st_array[0] > 0){
+    if(cur_array[i] >= pre_array[i] && st_array[0] > 0) {
         st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / st_array[0] / inter;
 
     } else {
@@ -172,7 +171,7 @@ set_swift_fwd_record(struct module *mod, double st_array[],
 }
 
 int
-read_swift_fwd_stat()
+read_swift_blc_fwd_stat()
 {
     int    len, conn, bytesWritten, fsize = 0;
     char   msg[LEN_512];
@@ -184,7 +183,7 @@ read_swift_fwd_stat()
             "Accept:*/*\r\n"
             "Connection: close\r\n\r\n");
 
-    if (my_swift_fwd_net_connect(HOSTNAME, mgrport, &conn, "tcp") != 0) {
+    if (my_swift_blc_fwd_net_connect(HOSTNAME, mgrport, &conn, "tcp") != 0) {
         close(conn);
         return -1;
     }
@@ -207,7 +206,7 @@ read_swift_fwd_stat()
     setsockopt(conn, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(struct timeval));
     setsockopt(conn, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval));
 
-    bytesWritten = mywrite_swift_fwd(conn, msg, strlen(msg));
+    bytesWritten = mywrite_swift_blc_fwd(conn, msg, strlen(msg));
     if (bytesWritten < 0) {
         close(conn);
         return -2;
@@ -217,7 +216,7 @@ read_swift_fwd_stat()
         return -3;
     }
 
-    while ((len = myread_swift_fwd(conn, buf, sizeof(buf))) > 0) {
+    while ((len = myread_swift_blc_fwd(conn, buf, sizeof(buf))) > 0) {
         fsize += len;
     }
 
@@ -227,7 +226,7 @@ read_swift_fwd_stat()
         return -1;
     }
 
-    if (parse_swift_fwd_info(buf) < 0) {
+    if (parse_swift_blc_fwd_info(buf) < 0) {
         close(conn);
         return -1;
     }
@@ -237,24 +236,24 @@ read_swift_fwd_stat()
 }
 
 void
-read_swift_fwd_stats(struct module *mod, char *parameter)
+read_swift_blc_fwd_stats(struct module *mod, char *parameter)
 {
     int    retry = 0, pos = 0;
     char   buf[LEN_1024];
     memset(&stats, 0, sizeof(stats));
     mgrport = atoi(parameter);
     if (!mgrport) {
-        mgrport = 81;
+        mgrport = 82;
     }
-    while (read_swift_fwd_stat() < 0 && retry < RETRY_NUM) {
+    while (read_swift_blc_fwd_stat() < 0 && retry < RETRY_NUM) {
         retry++;
     }
     pos = sprintf(buf, "%lld,%lld,%lld,%lld",
-            stats.requests,
-            stats.bytes_in,
-            stats.errors,
-            stats.svc_time
-             );
+                  stats.requests,
+                  stats.bytes_in,
+                  stats.errors,
+                  stats.svc_time
+                 );
     buf[pos] = '\0';
     set_mod_record(mod, buf);
 }
@@ -262,5 +261,5 @@ read_swift_fwd_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift_fwd", swift_fwd_usage, swift_fwd_info, 4, read_swift_fwd_stats, set_swift_fwd_record);
+    register_mod_fileds(mod, "--swift_blc_fwd", swift_blc_fwd_usage, swift_blc_fwd_info, 4, read_swift_blc_fwd_stats, set_swift_blc_fwd_record);
 }

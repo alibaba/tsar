@@ -8,7 +8,7 @@
 char *partition_usage = "    --partition         Disk and partition usage";
 
 
-#define MAXPART 20
+#define MAXPART 10
 
 struct stats_partition {
     int bsize;                           /* block size*/

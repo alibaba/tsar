@@ -11,7 +11,7 @@
 #define EQUAL ":"
 #define DEBUG 1
 
-char *swift_store_usage = "    --swift_store             Swift object storage infomation";
+char *swift_store_usage = "    --swift_store       Swift object storage infomation";
 int mgrport = 81;
 
 /* httpstore string at swiftclient -p 81 mgr:info */
@@ -27,21 +27,21 @@ int mgrport = 81;
  */
 const static char *SWIFT_STORE[] = {
     "StoreEntries",
-    "on-memory objects",
+    "MemObjects",
     "on-disk objects",
 };
 
 /* struct for httpstore counters */
 struct status_swift_store {
-    unsigned long long objs;
-    unsigned long long mobj;
-    unsigned long long dobj;
-    unsigned long long size;
-    unsigned long long ram;
-    unsigned long long disk;
-    unsigned long long m_hit;
-    unsigned long long coss;
-    unsigned long long tcoss;
+    long long objs;
+    long long mobj;
+    long long dobj;
+    long long size;
+    long long ram;
+    long long disk;
+    long long m_hit;
+    long long coss;
+    long long tcoss;
 } stats;
 
 /* swift register info for tsar */
@@ -133,7 +133,7 @@ myread_swift_store(int fd, void *buf, size_t len)
 int
 read_swift_store_value(char *buf,
         const char *key,
-        unsigned long long *ret)
+        long long *ret)
 {
     int    k=0;
     char  *tmp;
@@ -142,6 +142,9 @@ read_swift_store_value(char *buf,
         /* compute the offset */
         k = strcspn(tmp, EQUAL);
         sscanf(tmp + k + 1, "%lld", ret);
+        if (*ret < 0) {
+            *ret = 0;
+        }
         return 1;
 
     } else {

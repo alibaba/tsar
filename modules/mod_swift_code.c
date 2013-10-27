@@ -10,7 +10,7 @@
 #define EQUAL "="
 #define DEBUG 0
 
-char *swift_code_usage = "    --swift_code             Swift httpcode";
+char *swift_code_usage = "    --swift_code        Swift httpcode";
 int mgrport = 81;
 
 /* httpcode string at swiftclient -p 81 mgr:counters */

@@ -17,7 +17,7 @@
 #define NUM_DOMAIN_MAX 4096
 #define DOMAIN_LIST_DELIM ", \t"
 
-char *swift_domain_usage = "    --swift_domain      Swift domain info";
+char *swift_esi_usage = "    --swift_esi         Swift ESI info";
 int mgrport = 81;
 
 /* httpcode string at swiftclient -p 81 mgr:domain_list */
@@ -47,18 +47,20 @@ typedef struct domain_id_pair {
 
 int num_domain = 0;
 static int stats_count = sizeof(SWIFT_DOMAIN)/sizeof(char *);
-static char **swift_domain = SWIFT_DOMAIN;
-static char *swift_domain_array[NUM_DOMAIN_MAX];
+static char **swift_esi = SWIFT_DOMAIN;
+static char *swift_esi_array[NUM_DOMAIN_MAX];
 static domain_id_pair domain_to_id[NUM_DOMAIN_MAX];
 
 /* struct for http domain */
-long long swift_domain_stats[1024][3];
+long long swift_esi_stats[1024][5];
 
 /* swift register info for tsar */
-struct mod_info swift_domain_info[] = {
-    {"   qps", DETAIL_BIT,  0,  STATS_NULL},
-    {"   hit", DETAIL_BIT,  0,  STATS_NULL},
-    {"    rt", DETAIL_BIT,  0,  STATS_NULL}
+struct mod_info swift_esi_info[] = {
+    {"  eqps", DETAIL_BIT,  0,  STATS_NULL},
+    {" emiss", DETAIL_BIT,  0,  STATS_NULL},
+    {"  ehit", DETAIL_BIT,  0,  STATS_NULL},
+    {" ecomb", DETAIL_BIT,  0,  STATS_NULL},
+    {" pload", DETAIL_BIT,  0,  STATS_NULL}
 };
 
 static int cmp(const void *a, const void *b)
@@ -70,7 +72,7 @@ static int cmp(const void *a, const void *b)
 }
 
 /* opens a tcp or udp connection to a remote host or local socket */
-static int my_swift_domain_net_connect(const char *host_name, int port, int *sd, char* proto)
+static int my_swift_esi_net_connect(const char *host_name, int port, int *sd, char* proto)
 {
     int                 result;
     struct sockaddr_in  servaddr;
@@ -139,26 +141,39 @@ static ssize_t myread_swift_code(int fd, void *buf, size_t len)
     return recv(fd, buf, len, 0);
 }
 
-static void read_swift_domain_value(char *buf,
-        long long *r1, long long *r2, long long *r3)
+static void read_swift_esi_value(char *buf,
+        long long *r1, long long *r2, long long *r3, long long *r4, long long *r5)
 {
     int       ret;
-    char      token[1024], hit_dumb[32];
-    long long req, miss, rt;
+    char      token[1024][6];
+    long long ereq, emiss, ehit, ecomb, preload;
 
-    ret = sscanf(buf, "%s%s%lld%lld%lld", token, hit_dumb, &req, &miss, &rt);
-    assert(ret == 5);
+    ret = sscanf(buf, "%s%s%s%s%s%s%lld%lld%lld%lld%lld", token[0], token[1], token[2],
+                 token[3], token[4], token[5], &ereq, &emiss, &ehit, &ecomb, &preload);
+    assert(ret == 11);
 
-    if (rt < 0)
-        rt = 0;
+    if (ereq < 0)
+        ereq = 0;
+    if (emiss < 0)
+        emiss = 0;
+    if (ehit < 0)
+        ehit = 0;
+    if (ecomb < 0)
+        ecomb = 0;
+    if (preload < 0)
+        preload = 0;
 
-    *r1 += req;
-    *r2 += miss;
-    *r3 += rt;
+    *r1 += ereq;
+    *r2 += emiss;
+    *r3 += ehit;
+    *r4 += ecomb;
+    *r5 += preload;
 
     *r1 = *r1 < 0LL ? 0LL : *r1;
     *r2 = *r2 < 0LL ? 0LL : *r2;
     *r3 = *r3 < 0LL ? 0LL : *r3;
+    *r4 = *r4 < 0LL ? 0LL : *r4;
+    *r5 = *r5 < 0LL ? 0LL : *r5;
 }
 
 /**
@@ -196,9 +211,11 @@ static int parse_swift_code_info(char *buf, size_t buflen)
 
         id = pair->id;
 
-        read_swift_domain_value(line, &swift_domain_stats[id][0],
-                                      &swift_domain_stats[id][1],
-                                      &swift_domain_stats[id][2]);
+        read_swift_esi_value(line, &swift_esi_stats[id][0],
+                                   &swift_esi_stats[id][1],
+                                   &swift_esi_stats[id][2],
+                                   &swift_esi_stats[id][3],
+                                   &swift_esi_stats[id][4]);
 
         free(line);
     }
@@ -207,11 +224,12 @@ static int parse_swift_code_info(char *buf, size_t buflen)
 }
 
 /**
- * xxx_array[0]: req
- * xxx_array[1]: miss
- * xxx_array[2]: rt (actually serving time)
+ * xxx_array[0]: esi_request
+ * xxx_array[1]: esi_miss
+ * xxx_array[2]: esi_hit
+ * xxx_array[3]: esi_combine
  */
-static void set_swift_domain_record(struct module *mod, double st_array[],
+static void set_swift_esi_record(struct module *mod, double st_array[],
      U_64 pre_array[], U_64 cur_array[], int inter)
 {
     /* qps */
@@ -221,19 +239,42 @@ static void set_swift_domain_record(struct module *mod, double st_array[],
         st_array[0] = 0.0;
     }
 
-    /* hit ratio */
+    if (cur_array[2] - pre_array[2] <= cur_array[4] - pre_array[4]) {
+        st_array[1] = 0.0;
+        st_array[2] = 0.0;
+        st_array[3] = 0.0;
+        st_array[4] = 0.0;
+        return ;
+    }
+
+    /* miss ratio */
     if (cur_array[1] >= pre_array[1] && cur_array[0] > pre_array[0]) {
-        st_array[1] = (cur_array[1] - pre_array[1]) * 1.0 / (cur_array[0] - pre_array[0]);
-        st_array[1] = (1.0 - st_array[1]) * 100.0;
+        st_array[1] = (cur_array[1] - pre_array[1] + (cur_array[4] - pre_array[4])) * 1.0 / (cur_array[0] - pre_array[0]);
+        st_array[1] = st_array[1] * 100.0;
     } else {
         st_array[1] = 0.0;
     }
 
-    /* rt */
+    /* hit */
     if (cur_array[0] > pre_array[0] && cur_array[2] >= pre_array[2]) {
-        st_array[2] = (cur_array[2] - pre_array[2]) * 1.0 / (cur_array[0] - pre_array[0]);
+        st_array[2] = (cur_array[2] - pre_array[2] - (cur_array[4] - pre_array[4])) * 1.0 / (cur_array[0] - pre_array[0]);
+        st_array[2] = st_array[2] * 100.0;
     } else {
         st_array[2] = 0.0;
+    }
+    /* comb */
+    if (cur_array[0] > pre_array[0] && cur_array[3] >= pre_array[3]) {
+        st_array[3] = (cur_array[3] - pre_array[3]) * 1.0 / (cur_array[0] - pre_array[0]);
+        st_array[3] = st_array[3] * 100.0;
+    } else {
+        st_array[3] = 0.0;
+    }
+    /* comb */
+    if (cur_array[0] > pre_array[0] && cur_array[4] >= pre_array[4]) {
+        st_array[4] = (cur_array[4] - pre_array[4]) * 1.0 / (cur_array[0] - pre_array[0]);
+        st_array[4] = st_array[4] * 100.0;
+    } else {
+        st_array[4] = 0.0;
     }
 }
 
@@ -250,7 +291,7 @@ static int read_swift_code_stat()
             "Accept:*/*\r\n"
             "Connection: close\r\n\r\n");
 
-    if (my_swift_domain_net_connect(HOSTNAME, mgrport, &conn, "tcp") != 0) {
+    if (my_swift_esi_net_connect(HOSTNAME, mgrport, &conn, "tcp") != 0) {
         close(conn);
         return -1;
     }
@@ -292,7 +333,7 @@ static int read_swift_code_stat()
     return 0;
 }
 
-static void swift_domain_init(char *parameter)
+static void swift_esi_init(char *parameter)
 {
     FILE    *fp;
     char    *line = NULL, *domain, *token, *s;
@@ -327,7 +368,7 @@ static void swift_domain_init(char *parameter)
                 s = strdup(token);
 
                 if (first) {
-                    swift_domain_array[domain_id] = s;
+                    swift_esi_array[domain_id] = s;
                     first = 0;
                 }
 
@@ -342,7 +383,7 @@ static void swift_domain_init(char *parameter)
         }
     }
 
-    swift_domain = swift_domain_array;
+    swift_esi = swift_esi_array;
     stats_count = domain_id;
 
     qsort(domain_to_id, num_domain, sizeof(domain_to_id[0]), cmp);
@@ -357,34 +398,38 @@ static void swift_domian_free()
     int i;
 
     for (i = 0; i < NUM_DOMAIN_MAX; i ++) {
-        if (swift_domain_array[i])
-            free(swift_domain_array[i]);
+        if (swift_esi_array[i])
+            free(swift_esi_array[i]);
     }
 }
 
-static void read_swift_domain_stats(struct module *mod, char *parameter)
+static void read_swift_esi_stats(struct module *mod, char *parameter)
 {
     int  i, retry = 0, pos = 0;
     char buf[LEN_1024];
 
-    memset(&swift_domain_stats, 0, sizeof(swift_domain_stats));
+    memset(&swift_esi_stats, 0, sizeof(swift_esi_stats));
 
-    swift_domain_init(parameter);
+    swift_esi_init(parameter);
 
     while (read_swift_code_stat() < 0 && retry < RETRY_NUM) {
         retry++;
     }
 
     for (i = 0; i < stats_count; i++) {
-        assert(swift_domain_stats[i][0] >= 0
-                && swift_domain_stats[i][1] >= 0
-                && swift_domain_stats[i][2] >= 0);
+        assert(swift_esi_stats[i][0] >= 0
+                && swift_esi_stats[i][1] >= 0
+                && swift_esi_stats[i][2] >= 0
+                && swift_esi_stats[i][3] >= 0
+                && swift_esi_stats[i][4] >= 0);
 
-        pos += sprintf(buf + pos, "%s=%lld,%lld,%lld",
-                                  swift_domain_array[i],
-                                  swift_domain_stats[i][0],
-                                  swift_domain_stats[i][1],
-                                  swift_domain_stats[i][2]);
+        pos += sprintf(buf + pos, "%s=%lld,%lld,%lld,%lld,%lld",
+                                  swift_esi_array[i],
+                                  swift_esi_stats[i][0],
+                                  swift_esi_stats[i][1],
+                                  swift_esi_stats[i][2],
+                                  swift_esi_stats[i][3],
+                                  swift_esi_stats[i][4]);
 
         pos += sprintf(buf + pos, ITEM_SPLIT);
     }
@@ -397,7 +442,7 @@ static void read_swift_domain_stats(struct module *mod, char *parameter)
 
 void mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift_domain", swift_domain_usage,
-                        swift_domain_info, 3, read_swift_domain_stats,
-                        set_swift_domain_record);
+    register_mod_fileds(mod, "--swift_esi", swift_esi_usage,
+                        swift_esi_info, 5, read_swift_esi_stats,
+                        set_swift_esi_record);
 }

@@ -10,7 +10,7 @@
 #define EQUAL "="
 #define DEBUG 0
 
-char *swift_tcmalloc_usage = "    --swift_tcmalloc             Swift tcmalloc";
+char *swift_tcmalloc_usage = "    --swift_tcmalloc    Swift tcmalloc";
 int mgrport = 81;
 
 /* httpcode string at swiftclient -p 81 mgr:mem_stats */
