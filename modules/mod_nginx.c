@@ -46,6 +46,8 @@ set_nginx_record(struct module *mod, double st_array[],
     for (i = 0; i < 3; i++) {
         if (cur_array[i] >= pre_array[i]) {
             st_array[i] = cur_array[i] - pre_array[i];
+        } else {
+            st_array[i] = 0;
         }
     }
 
@@ -55,11 +57,15 @@ set_nginx_record(struct module *mod, double st_array[],
 
     if (cur_array[2] >= pre_array[2]) {
         st_array[7] = (cur_array[2] - pre_array[2]) * 1.0 / inter;
+    } else {
+        st_array[7] = 0;
     }
 
     if (cur_array[8] >= pre_array[8]) {
         if (cur_array[2] > pre_array[2]) {
             st_array[8] = (cur_array[8] - pre_array[8]) * 1.0 / (cur_array[2] - pre_array[2]);
+        } else {
+            st_array[8] = 0;
         }
     }
 }
