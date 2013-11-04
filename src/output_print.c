@@ -351,6 +351,10 @@ find_offset_from_start(FILE *fp, int number)
         stm.tm_year = conf.print_day / 10000 - 1900;
         stm.tm_mon = conf.print_day % 10000 / 100 - 1;
         stm.tm_mday = conf.print_day % 100;
+        stm.tm_hour = 0;
+        stm.tm_min = 0;
+        stm.tm_sec = 0;
+        stm.tm_isdst = -1;
         t_token = mktime(&stm);
         conf.print_day = (now - t_token) / (24 * 60 * 60);
     }
