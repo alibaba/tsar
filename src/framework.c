@@ -93,7 +93,6 @@ reload_modules(const char *s_mod)
 {
     int    i;
     int    reload = 0;
-    struct module *mod;
     char   buf[LEN_512], name[LEN_64], *token, *param;
 
     if (!s_mod || !strlen(s_mod)) {
@@ -117,15 +116,13 @@ reload_modules(const char *s_mod)
         }
 
         for (i = 0; i < statis.total_mod_num; i++) {
-            mod = &mods[i];
-
-            if (strcmp(name, mod->name) == 0
-                    || strcmp(name, mod->opt_line) == 0) {
+            if (strcmp(name, mods[i].name) == 0
+                    || strcmp(name, mods[i].opt_line) == 0) {
                 reload = 1;
-                mod->enable = 1;
+                mods[i].enable = 1;
 
                 if (param != NULL) {
-                    strncpy(mod->parameter, param, strlen(param) + 1);
+                    strncpy(mods[i].parameter, param, strlen(param) + 1);
                 }
 
                 break;
