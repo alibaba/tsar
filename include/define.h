@@ -45,6 +45,7 @@
 #define ITEM_SPLIT  ";"
 #define ITEM_SPSTART    "="
 #define DATA_SPLIT  ","
+#define PARAM_SPLIT ':'
 #define HDR_SPLIT   "#"
 #define PRINT_DATA_SPLIT "  "
 #define PRINT_SEC_SPLIT " "

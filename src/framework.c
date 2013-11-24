@@ -84,28 +84,6 @@ load_modules()
 
 
 /*
- * module name must be composed by alpha/number/_
- * match return 1
- */
-int
-is_include_string(const char *mods, const char *mod)
-{
-    char   *token, n_str[LEN_512] = {0};
-
-    memcpy(n_str, mods, strlen(mods));
-
-    token = strtok(n_str, DATA_SPLIT);
-    while (token) {
-        if (!strcmp(token, mod)) {
-            return 1;
-        }
-        token = strtok(NULL, DATA_SPLIT);
-    }
-    return 0;
-}
-
-
-/*
  * reload modules by mods, if not find in mods, then set module disable
  * return 1 if mod load ok
  * return 0 else
@@ -116,21 +94,47 @@ reload_modules(const char *s_mod)
     int    i;
     int    reload = 0;
     struct module *mod;
+    char   buf[LEN_512], name[LEN_64], *token, *param;
 
     if (!s_mod || !strlen(s_mod)) {
         return reload;
     }
 
-    for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
-        if (is_include_string(s_mod, mod->name) || is_include_string(s_mod, mod->opt_line)) {
-            mod->enable = 1;
-            reload = 1;
+    strncpy(buf, s_mod, strlen(s_mod) + 1);
 
-        } else {
-            mod->enable = 0;
+    for (i = 0; i < statis.total_mod_num; i++)
+        mods[i].enable = 0;
+
+    token = strtok(buf, DATA_SPLIT);
+    while (token != NULL) {
+        strncpy(name, token, strlen(token) + 1);
+
+        /* extract the parameter specified in the command line */
+        param = strchr(name, PARAM_SPLIT);
+        if (param != NULL) {
+            *param = '\0';
+            ++param;
         }
+
+        for (i = 0; i < statis.total_mod_num; i++) {
+            mod = &mods[i];
+
+            if (strcmp(name, mod->name) == 0
+                    || strcmp(name, mod->opt_line) == 0) {
+                reload = 1;
+                mod->enable = 1;
+
+                if (param != NULL) {
+                    strncpy(mod->parameter, param, strlen(param) + 1);
+                }
+
+                break;
+            }
+        }
+
+        token = strtok(NULL, DATA_SPLIT);
     }
+
     return reload;
 }
 
