@@ -168,7 +168,7 @@ parse_swift_store_info(char *buf)
             stats.size = a * 1000;
         }
         /*Request Memory Hit Ratios:      5min: 71.3%, 60min: 71.8% */
-        if (strstr(line, "Request Memory Hit Ratios:") != NULL) {
+        if ((strstr(line, "Request Memory Hit Ratios:") != NULL) && (strstr(line, "Balancer") == NULL)) {
             float a, b;
             sscanf(line, "        Request Memory Hit Ratios:      5min: %f%%, 60min: %f%%", &a, &b);
             stats.m_hit = a * 1000;
