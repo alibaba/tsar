@@ -14,7 +14,7 @@
 
 char *io_usage = "    --io                Linux I/O performance";
 
-#define MAX_PARTITIONS 16
+#define MAX_PARTITIONS 64
 #define IO_FILE "/proc/diskstats"
 
 struct part_info {
@@ -42,7 +42,8 @@ FILE *iofp;                     /* /proc/diskstats*/
 int print_partition = 0;
 int print_device = 1;
 
-unsigned int n_partitions;  /* Number of partitions */
+unsigned int n_partitions = 0;  /* Number of partitions */
+unsigned int max_partitions = MAX_PARTITIONS;  /* Max of partitions */
 
 static struct mod_info io_info[] = {
     {" rrqms", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
@@ -144,6 +145,9 @@ initialize()
         if (sscanf(buffer, scan_fmt, &curr.major, &curr.minor,
                     curr.name, &reads) == 4) {
             unsigned int p;
+            if (n_partitions >= max_partitions) {
+                break;
+            }
 
             for (p = 0; p < n_partitions
                     && (partition[p].major != curr.major
@@ -269,8 +273,11 @@ print_partition_stats(struct module *mod)
 }
 
 void
-read_io_stat(struct module *mod)
+read_io_stat(struct module *mod, char *parameter)
 {
+    if (atoi(parameter) != 0) {
+        max_partitions = atoi(parameter);
+    }
     setlinebuf(stdout);
     /*open current io statistics file*/
     iofp = fopen(IO_FILE, "r");
