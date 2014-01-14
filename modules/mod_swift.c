@@ -248,7 +248,7 @@ int
 read_swift_stat(char *cmd)
 {
     char msg[LEN_512];
-    char buf[LEN_4096];
+    char buf[1024*1024];
     sprintf(msg,
             "GET cache_object://localhost/%s "
             "HTTP/1.1\r\n"
@@ -292,7 +292,7 @@ read_swift_stat(char *cmd)
         return -3;
     }
 
-    while ((len = myread_swift(conn, buf, sizeof(buf))) > 0) {
+    while ((len = myread_swift(conn, buf + fsize, sizeof(buf))) > 0) {
         fsize += len;
     }
 

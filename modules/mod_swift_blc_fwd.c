@@ -175,7 +175,7 @@ read_swift_blc_fwd_stat()
 {
     int    len, conn, bytesWritten, fsize = 0;
     char   msg[LEN_512];
-    char   buf[LEN_4096];
+    char   buf[1024*1024];
     sprintf(msg,
             "GET cache_object://localhost/counters "
             "HTTP/1.1\r\n"
@@ -216,7 +216,7 @@ read_swift_blc_fwd_stat()
         return -3;
     }
 
-    while ((len = myread_swift_blc_fwd(conn, buf, sizeof(buf))) > 0) {
+    while ((len = myread_swift_blc_fwd(conn, buf + fsize, sizeof(buf))) > 0) {
         fsize += len;
     }
 

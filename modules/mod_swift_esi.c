@@ -318,7 +318,7 @@ static int read_swift_code_stat()
         return -3;
     }
 
-    while ((len = myread_swift_code(conn, buf, sizeof(buf))) > 0) {
+    while ((len = myread_swift_code(conn, buf + fsize, sizeof(buf))) > 0) {
         fsize += len;
     }
 
