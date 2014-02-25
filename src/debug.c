@@ -21,14 +21,22 @@
 
 
 void
-do_debug(log_level_t level, const char *fmt, ...)
+_do_debug(log_level_t level, const char *file, int line, const char *fmt, ...)
 {
     /* FIXME */
     if (level >= conf.debug_level) {
         time_t    timep;
         va_list   argp;
+        char      *timestr;
+        struct tm *local;
 
         time(&timep);
+        local = localtime(&timep);
+        timestr = asctime(local);
+
+        fprintf(stderr, "[%.*s] %s:%d ", 
+                strlen(timestr) - 1, timestr, file, line);
+
         va_start(argp, fmt);
         vfprintf(stderr, fmt, argp);
         fflush(stderr);
@@ -36,6 +44,7 @@ do_debug(log_level_t level, const char *fmt, ...)
     }
 
     if (level == LOG_FATAL) {
+        printf("\n");
         exit(1);
     }
 }
