@@ -39,12 +39,18 @@ int
 store_single_partition(char *buf, char *mntpath, struct stats_partition *sp)
 {
     int                 len = 0;
+    int                 k = 1;
+    if (sp->bsize % 1024 != 0) {
+	    return len;
+    } else {
+	    k = sp->bsize / 1024;
+    }
     len += sprintf(buf, "%s=", mntpath);
     len += sprintf(buf + len, "%d,%lld,%lld,%lld",
-            sp->bsize,
-            sp->bfree,
-            sp->blocks,
-            sp->bavail);
+            sp->bsize / k,
+            sp->bfree * k,
+            sp->blocks * k,
+            sp->bavail * k);
     return len;
 }
 
@@ -106,10 +112,10 @@ set_part_record(struct module *mod, double st_array[], U_64 pre_array[], U_64 cu
 }
 
 static struct mod_info part_info[] = {
-    {" bfree", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
+    {" bfree", DETAIL_BIT,  MERGE_AVG,  STATS_NULL},
     {" bused", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
     {" btotl", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
-    {"  util", DETAIL_BIT, MERGE_AVG,  STATS_NULL},
+    {"  util", DETAIL_BIT, MERGE_SUM,  STATS_NULL},
 };
 
 void
