@@ -38,6 +38,8 @@ const static char *SWIFT_CODE[] = {
     "http status code 400",
     "http status code 403",
     "http status code 404",
+    "http status code 408",
+    "http status code 416",
     "http status code 500",
     "http status code 502",
     "http status code 503",
@@ -55,6 +57,8 @@ struct status_swift_code {
     unsigned long long code400;
     unsigned long long code403;
     unsigned long long code404;
+    unsigned long long code408;
+    unsigned long long code416;
     unsigned long long code500;
     unsigned long long code502;
     unsigned long long code503;
@@ -72,6 +76,8 @@ struct mod_info swift_code_info[] = {
     {"   400", DETAIL_BIT,  0,  STATS_NULL},
     {"   403", DETAIL_BIT,  0,  STATS_NULL},
     {"   404", DETAIL_BIT,  0,  STATS_NULL},
+    {"   408", DETAIL_BIT,  0,  STATS_NULL},
+    {"   416", DETAIL_BIT,  0,  STATS_NULL},
     {"   500", DETAIL_BIT,  0,  STATS_NULL},
     {"   502", DETAIL_BIT,  0,  STATS_NULL},
     {"   503", DETAIL_BIT,  0,  STATS_NULL},
@@ -183,11 +189,13 @@ parse_swift_code_info(char *buf)
         read_swift_code_value(line, SWIFT_CODE[5], &stats.code400);
         read_swift_code_value(line, SWIFT_CODE[6], &stats.code403);
         read_swift_code_value(line, SWIFT_CODE[7], &stats.code404);
-        read_swift_code_value(line, SWIFT_CODE[8], &stats.code500);
-        read_swift_code_value(line, SWIFT_CODE[9], &stats.code502);
-        read_swift_code_value(line, SWIFT_CODE[10], &stats.code503);
-        read_swift_code_value(line, SWIFT_CODE[11], &stats.code504);
-        read_swift_code_value(line, SWIFT_CODE[12], &stats.codeother);
+        read_swift_code_value(line, SWIFT_CODE[8], &stats.code408);
+        read_swift_code_value(line, SWIFT_CODE[9], &stats.code416);
+        read_swift_code_value(line, SWIFT_CODE[10], &stats.code500);
+        read_swift_code_value(line, SWIFT_CODE[11], &stats.code502);
+        read_swift_code_value(line, SWIFT_CODE[12], &stats.code503);
+        read_swift_code_value(line, SWIFT_CODE[13], &stats.code504);
+        read_swift_code_value(line, SWIFT_CODE[14], &stats.codeother);
         line = strtok(NULL, "\n");
     }
     return 0;
@@ -284,7 +292,7 @@ read_swift_code_stats(struct module *mod, char *parameter)
     while (read_swift_code_stat() < 0 && retry < RETRY_NUM) {
         retry++;
     }
-    pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
+    pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
             stats.code200,
             stats.code206,
             stats.code301,
@@ -293,6 +301,8 @@ read_swift_code_stats(struct module *mod, char *parameter)
             stats.code400,
             stats.code403,
             stats.code404,
+            stats.code408,
+            stats.code416,
             stats.code500,
             stats.code502,
             stats.code503,
@@ -306,5 +316,5 @@ read_swift_code_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift_code", swift_code_usage, swift_code_info, 13, read_swift_code_stats, set_swift_code_record);
+    register_mod_fileds(mod, "--swift_code", swift_code_usage, swift_code_info, 15, read_swift_code_stats, set_swift_code_record);
 }

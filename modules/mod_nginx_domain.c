@@ -18,6 +18,9 @@ struct stats_nginx {
     unsigned long long n5XX;        /* 5XX status code */
     unsigned long long nother;      /* other status code & http version 0.9 responses */
     unsigned long long rt;          /* response time sum of total requests */
+    unsigned long long uprt;        /* response time sum of total upstream requests */
+    unsigned long long upreq;       /* total upstream request */
+    unsigned long long upactreq;    /* actual upstream requests */
 };
 
 struct hostinfo {
@@ -30,13 +33,16 @@ struct hostinfo {
 static char *nginx_usage = "    --nginx_domain      nginx domain statistics";
 
 static struct mod_info nginx_info[] = {
-    {"   cps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
-    {"   qps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
-    {"   2XX", SUMMARY_BIT, 0,  STATS_SUB_INTER},
-    {"   3XX", SUMMARY_BIT, 0,  STATS_SUB_INTER},
-    {"   4XX", SUMMARY_BIT, 0,  STATS_SUB_INTER},
-    {"   5XX", SUMMARY_BIT, 0,  STATS_SUB_INTER},
-    {"    rt", SUMMARY_BIT, 0,  STATS_NULL},
+    {"   cps", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
+    {"   qps", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
+    {"   2XX", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
+    {"   3XX", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
+    {"   4XX", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
+    {"   5XX", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
+    {"    rt", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
+    {"  uprt", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
+    {" upret", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
+    {" upqps", HIDE_BIT, MERGE_SUM,  STATS_NULL}
 };
 
 
@@ -53,6 +59,16 @@ set_nginx_record(struct module *mod, double st_array[],
     /* avg_rt = (cur_rt - pre_rt) / (cur_nreq - pre_nreq) */
     if (cur_array[6] >= pre_array[6] && cur_array[1] > pre_array[1]) {
         st_array[6] = (cur_array[6] - pre_array[6]) * 1.0 / (cur_array[1] - pre_array[1]);
+    }
+
+    /* upstream request rt */
+    if (cur_array[7] >= pre_array[7] && cur_array[9] > pre_array[9]) {
+        st_array[7] = (cur_array[7] - pre_array[7]) * 1.0 / (cur_array[9] - pre_array[9]);
+    }
+
+    /* upstream retry percent = (actual upstream request - total upstream request)/total upstream request */
+    if (cur_array[8] >= pre_array[8] && cur_array[9] > pre_array[9] && (cur_array[9] - pre_array[9]) >= (cur_array[8] - pre_array[8])) {
+        st_array[8] = ((cur_array[9] - pre_array[9]) - (cur_array[8] - pre_array[8])) * 1.0 / (cur_array[9] - pre_array[9]);
     }
 }
 
@@ -146,15 +162,15 @@ read_nginx_domain_stats(struct module *mod, char *parameter)
         }
         *p++ = '\0';    /* stat.domain terminating null */
 
-        if (sscanf(p, "%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu",
+        if (sscanf(p, "%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu",
                    &stat.nbytesin, &stat.nbytesout, &stat.nconn, &stat.nreq,
-                   &stat.n2XX, &stat.n3XX, &stat.n4XX, &stat.n5XX, &stat.nother, &stat.rt) != 10) {
+                   &stat.n2XX, &stat.n3XX, &stat.n4XX, &stat.n5XX, &stat.nother, &stat.rt, &stat.upreq, &stat.uprt, &stat.upactreq) != 13) {
             continue;
         }
         stat.domain = line;
 
-        pos += sprintf(buf + pos, "%s=%lld,%lld,%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT,
-                stat.domain, stat.nconn, stat.nreq, stat.n2XX, stat.n3XX, stat.n4XX, stat.n5XX, stat.rt);
+        pos += sprintf(buf + pos, "%s=%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT,
+                stat.domain, stat.nconn, stat.nreq, stat.n2XX, stat.n3XX, stat.n4XX, stat.n5XX, stat.rt, stat.uprt, stat.upreq, stat.upactreq);
     }
     buf[pos] = '\0';
     set_mod_record(mod, buf);
@@ -166,5 +182,5 @@ read_nginx_domain_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--nginx_domain", nginx_usage, nginx_info, 7, read_nginx_domain_stats, set_nginx_record);
+    register_mod_fileds(mod, "--nginx_domain", nginx_usage, nginx_info, 10, read_nginx_domain_stats, set_nginx_record);
 }

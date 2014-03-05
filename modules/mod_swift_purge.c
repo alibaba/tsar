@@ -14,7 +14,7 @@
 #define EQUAL "="
 #define DEBUG 1
 
-static char *swift_usage = "    --swift_purge     Swift purge info";
+static char *swift_usage = "    --swift_purge       Swift purge info";
 static int mgrport=82;
 
 

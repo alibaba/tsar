@@ -59,7 +59,8 @@ convert_record_to_array(U_64 *array, int l_array, const char *record)
         token = strtok(NULL, DATA_SPLIT);
         i++;
     }
-    if (i != l_array) {
+    /* support add col*/
+    if (i > l_array) {
         return 0;
     }
     return i;
