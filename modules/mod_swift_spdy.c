@@ -27,7 +27,7 @@ int mgrport=81;
  * client_http.bytes_out = 5730106537327
  */
 const static char *SWIFT_STORE[] = {
-    "spdy.requests",
+    "spdy_client.requests",
     "spdy_client.read",
     "spdy_client.write",
     "spdy_client.process",

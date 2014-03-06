@@ -23,6 +23,9 @@
 int
 is_digit(const char *str)
 {
+    if (*str == '-') {
+        str++;
+    }
     /*dont handle minus value in tsar.data */
     while (*str) {
         if (!isdigit(*str++)) {
