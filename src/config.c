@@ -33,6 +33,10 @@ parse_mod(const char *mod_name)
             return;
         }
     }
+    if (statis.total_mod_num >= MAX_MOD_NUM) {
+	do_debug(LOG_ERR, "Max mod number is %d ignore mod %s\n", MAX_MOD_NUM, mod_name);
+        return;
+    }
     struct module *mod = &mods[statis.total_mod_num++];
     char    *token = strtok(NULL, W_SPACE);
     if (token && (!strcasecmp(token, "on") || !strcasecmp(token, "enable"))) {
