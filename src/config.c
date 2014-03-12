@@ -227,8 +227,8 @@ process_input_line(char *config_input_line, int len, const char *file_name)
     }
     /* FIXME can't support wrap line */
     if (!parse_line(config_input_line)) {
-	    do_debug(LOG_INFO, "parse_config_file: unknown keyword in '%s' at file %s\n", 
-    			config_input_line, file_name);
+        do_debug(LOG_INFO, "parse_config_file: unknown keyword in '%s' at file %s\n", 
+                 config_input_line, file_name);
     }
     
 final:
@@ -253,7 +253,7 @@ parse_config_file(const char *file_name)
     conf.debug_level = LOG_ERR;
     conf.print_detail = FALSE;
     while (fgets(config_input_line, LEN_1024, fp)) {
-		process_input_line(config_input_line, LEN_1024, file_name);
+        process_input_line(config_input_line, LEN_1024, file_name);
     }
     if (fclose(fp) < 0) {
         do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
@@ -299,7 +299,7 @@ get_include_conf()
             }
             memset(config_input_line, '\0', LEN_1024);
             while (fgets(config_input_line, LEN_1024, fp)) {
-				process_input_line(config_input_line, LEN_1024, buf);
+                process_input_line(config_input_line, LEN_1024, buf);
             }
             if (fclose(fp) < 0) {
                 do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
