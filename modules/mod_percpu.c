@@ -116,15 +116,15 @@ set_percpu_record(struct module *mod, double st_array[],
 }
 
 static struct mod_info percpu_info[] = {
-    {"  user", DETAIL_BIT,  0,  STATS_NULL},
-    {"   sys", DETAIL_BIT,  0,  STATS_NULL},
-    {"  wait", DETAIL_BIT,  0,  STATS_NULL},
-    {"  hirq", DETAIL_BIT,  0,  STATS_NULL},
-    {"  sirq", DETAIL_BIT,  0,  STATS_NULL},
-    {"  util", SUMMARY_BIT,  0,  STATS_NULL},
-    {"  nice", HIDE_BIT,  0,  STATS_NULL},
-    {" steal", HIDE_BIT,  0,  STATS_NULL},
-    {" guest", HIDE_BIT,  0,  STATS_NULL},
+    {"  user", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
+    {"   sys", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
+    {"  wait", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
+    {"  hirq", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
+    {"  sirq", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
+    {"  util", SUMMARY_BIT,  MERGE_SUM,  STATS_NULL},
+    {"  nice", HIDE_BIT,  MERGE_SUM,  STATS_NULL},
+    {" steal", HIDE_BIT,  MERGE_SUM,  STATS_NULL},
+    {" guest", HIDE_BIT,  MERGE_SUM,  STATS_NULL},
 };
 
 void
