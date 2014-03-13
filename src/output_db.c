@@ -205,11 +205,7 @@ select:
     timeout.tv_usec = 0;
 
     res = select(fd + 1, &fdr, &fdw, NULL, &timeout);
-    if (res < 0) {
-        close(fd);
-        return;
-    }
-    if (res == 0) {
+    if (res <= 0) {
         close(fd);
         return;
     }
