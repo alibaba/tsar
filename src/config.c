@@ -41,7 +41,6 @@ parse_mod(const char *mod_name)
         if (token) {
             strncpy(mod->parameter, token, strlen(token));
         }
-        return;
 
     } else {
         memset(mod, 0, sizeof(struct module));
@@ -210,11 +209,36 @@ parse_line(char *buff)
     return 1;
 }
 
+static void
+process_input_line(char *config_input_line, int len, const char *file_name)
+{
+    char *token;
+    
+    if ((token = strchr(config_input_line, '\n'))) {
+    	*token = '\0';
+    }
+    if ((token = strchr(config_input_line, '\r'))) {
+    	*token = '\0';
+    }
+    if (config_input_line[0] == '#') {
+    	goto final;
+    } else if (config_input_line[0] == '\0') {
+    	goto final;
+    }
+    /* FIXME can't support wrap line */
+    if (!parse_line(config_input_line)) {
+        do_debug(LOG_INFO, "parse_config_file: unknown keyword in '%s' at file %s\n", 
+                 config_input_line, file_name);
+    }
+    
+final:
+    memset(config_input_line, '\0', LEN_1024);
+}
+
 void
 parse_config_file(const char *file_name)
 {
     FILE   *fp;
-    char   *token;
     char    config_input_line[LEN_1024] = {0};
 
     if (!(fp = fopen(file_name, "r"))) {
@@ -229,24 +253,7 @@ parse_config_file(const char *file_name)
     conf.debug_level = LOG_ERR;
     conf.print_detail = FALSE;
     while (fgets(config_input_line, LEN_1024, fp)) {
-        if ((token = strchr(config_input_line, '\n'))) {
-            *token = '\0';
-        }
-        if ((token = strchr(config_input_line, '\r'))) {
-            *token = '\0';
-        }
-        if (config_input_line[0] == '#') {
-            memset(config_input_line, '\0', LEN_1024);
-            continue;
-        }
-        if (config_input_line[0] == '\0') {
-            continue;
-        }
-        /* FIXME can't supprot wrap line */
-        if (!parse_line(config_input_line)) {
-            do_debug(LOG_INFO, "parse_config_file: unknown keyword in '%s' \n", config_input_line);
-        }
-        memset(config_input_line, '\0', LEN_1024);
+        process_input_line(config_input_line, LEN_1024, file_name);
     }
     if (fclose(fp) < 0) {
         do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
@@ -258,7 +265,7 @@ void
 get_include_conf()
 {
     char   *token = strtok(NULL, W_SPACE);
-    char   *tmp, *p;
+    char   *p;
     FILE   *stream, *fp;
     char    cmd[LEN_1024] = {0};
     char    buf[LEN_1024] = {0};
@@ -292,24 +299,7 @@ get_include_conf()
             }
             memset(config_input_line, '\0', LEN_1024);
             while (fgets(config_input_line, LEN_1024, fp)) {
-                if ((tmp = strchr(config_input_line, '\n'))) {
-                    *tmp= '\0';
-                }
-                if ((tmp = strchr(config_input_line, '\r'))) {
-                    *tmp = '\0';
-                }
-                if (config_input_line[0] == '#') {
-                    memset(config_input_line, '\0', LEN_1024);
-                    continue;
-                }
-                if (config_input_line[0] == '\0') {
-                    continue;
-                }
-                /* FIXME can't supprot wrap line */
-                if (!parse_line(config_input_line)) {
-                    do_debug(LOG_INFO, "parse_config_file: unknown keyword in '%s' at file %s\n", config_input_line, buf);
-                }
-                memset(config_input_line, '\0', LEN_1024);
+                process_input_line(config_input_line, LEN_1024, buf);
             }
             if (fclose(fp) < 0) {
                 do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
