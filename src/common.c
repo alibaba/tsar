@@ -23,6 +23,9 @@
 int
 is_digit(const char *str)
 {
+    if (*str == '-') {
+        str++;
+    }
     /*dont handle minus value in tsar.data */
     while (*str) {
         if (!isdigit(*str++)) {
@@ -59,7 +62,8 @@ convert_record_to_array(U_64 *array, int l_array, const char *record)
         token = strtok(NULL, DATA_SPLIT);
         i++;
     }
-    if (i != l_array) {
+    /* support add col*/
+    if (i > l_array) {
         return 0;
     }
     return i;
