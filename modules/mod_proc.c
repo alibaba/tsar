@@ -58,26 +58,27 @@ read_proc_stats(struct module *mod, char *parameter)
         if (nb >= 16) {
             return;
         }
-        p=strtok(NULL, " ");
+        p = strtok(NULL, " ");
     }
     /* get all pid's info */
-    while (--nb >=0) {
+    while (--nb >= 0) {
         unsigned long long data;
         /* read values from /proc/pid/stat */
         sprintf(filename, PID_STAT, pid[nb]);
         if ((fp = fopen(filename, "r")) == NULL) {
             return;
-	}
+        }
         unsigned long long cpudata[4];
         if (fgets(line, 256, fp) == NULL) {
             return;
         }
+
         p = strstr(line, ")");
-	if (sscanf(p, "%*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %llu %llu %llu %llu",
+        if (sscanf(p, "%*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %llu %llu %llu %llu",
                     &cpudata[0], &cpudata[1], &cpudata[2], &cpudata[3]) == EOF) {
             fclose(fp);
             return;
-	}
+        }
         st_proc.user_cpu += cpudata[0];
         st_proc.user_cpu += cpudata[2];
         st_proc.sys_cpu += cpudata[1];

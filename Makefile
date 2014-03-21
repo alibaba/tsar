@@ -43,3 +43,7 @@ uninstall:
 	rm -f /usr/bin/tsardevel
 	#backup configure file
 	mv /etc/tsar/tsar.conf /etc/tsar/tsar.conf.rpmsave
+
+tags:
+	ctags -R
+	cscope -Rbq
