@@ -787,6 +787,7 @@ trim(char* src, int max_len)
 {
     int    cur_len = 0;
     char  *index=src;
+
     while (*index == ' ' && cur_len<max_len) {
         index++;
         cur_len++;

@@ -455,12 +455,12 @@ read_line_to_module_record(char *line)
     int    i;
     struct module *mod;
     char  *s_token, *e_token;
+    char   mod_opt[LEN_64];
 
     line[strlen(line) - 1] = '\0';
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
         if (mod->enable) {
-            char mod_opt[LEN_64];
             sprintf(mod_opt, "%s%s%s", SECTION_SPLIT, mod->opt_line, STRING_SPLIT);
             memset(mod->record, 0, sizeof(mod->record));
 
@@ -491,6 +491,8 @@ disable_col_zero()
 {
     int    i, j;
     struct module *mod = NULL;
+    int    p_col;
+    struct mod_info *info;
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
@@ -502,8 +504,8 @@ disable_col_zero()
             mod->enable = 0;
 
         } else {
-            int    p_col = 0;
-            struct mod_info *info = mod->info;
+            p_col = 0;
+            info = mod->info;
 
             for (j = 0; j < mod->n_col; j++) {
                 if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[j].summary_bit))
