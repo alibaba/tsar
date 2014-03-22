@@ -173,9 +173,8 @@ main_init(int argc, char **argv)
 
     if (RUN_NULL == conf.running_mode) {
         conf.running_mode = RUN_PRINT;
-    }
 
-    if (conf.running_mode == RUN_CHECK_NEW) {
+    } else if (conf.running_mode == RUN_CHECK_NEW) {
         conf.print_interval = 60;
         conf.print_tail = 0;
         conf.print_nline_interval = conf.print_interval;

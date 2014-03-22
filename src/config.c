@@ -159,6 +159,10 @@ parse_line(char *buff)
         /* ignore empty lines */
         (void) 0;
 
+    } else if (token[0] == '#') {
+        /* ignore comment lines */
+        (void) 0;
+
     } else if (strstr(token, "mod_")) {
         parse_mod(token);
 
