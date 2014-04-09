@@ -16,11 +16,6 @@ struct stats_ts_err {
     unsigned long long other;
     unsigned long long hangup;
 };
-/* return value type */
-const static short int TS_REC_INT = 0;
-const static short int TS_REC_COUNTER = 0;
-const static short int TS_REC_FLOAT = 2;
-const static short int TS_REC_STRING = 3;
 /* command type */
 const static short int TS_RECORD_GET = 3;
 /* records */

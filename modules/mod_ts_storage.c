@@ -11,10 +11,6 @@ struct stats_ts_storage {
     unsigned long long dirs_used;
     unsigned long long avg_obj_size;
 };
-const static short int TS_REC_INT = 0;
-const static short int TS_REC_COUNTER = 0;
-const static short int TS_REC_FLOAT = 2;
-const static short int TS_REC_STRING = 3;
 const static short int TS_RECORD_GET = 3;
 const static int LINE_1024 = 1024;
 const static int LINE_4096 = 4096;
