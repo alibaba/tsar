@@ -23,12 +23,13 @@
 void
 _do_debug(log_level_t level, const char *file, int line, const char *fmt, ...)
 {
+    char      *timestr;
+    time_t     timep;
+    va_list    argp;
+    struct tm *local;
+
     /* FIXME */
     if (level >= conf.debug_level) {
-        time_t    timep;
-        va_list   argp;
-        char      *timestr;
-        struct tm *local;
 
         time(&timep);
         local = localtime(&timep);

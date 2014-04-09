@@ -24,21 +24,25 @@
 void
 parse_mod(const char *mod_name)
 {
+    int     i = 0;
+    struct  module *mod;
+    char   *token;
+
     /* check if the mod load already */
-    int   i = 0;
     for ( i = 0; i < statis.total_mod_num; i++ )
     {
-        struct module *mod = &mods[i];
+        mod = &mods[i];
         if (!strcmp(mod->name, mod_name)) {
             return;
         }
     }
     if (statis.total_mod_num >= MAX_MOD_NUM) {
-	do_debug(LOG_ERR, "Max mod number is %d ignore mod %s\n", MAX_MOD_NUM, mod_name);
+        do_debug(LOG_ERR, "Max mod number is %d ignore mod %s\n", MAX_MOD_NUM, mod_name);
         return;
     }
-    struct module *mod = &mods[statis.total_mod_num++];
-    char    *token = strtok(NULL, W_SPACE);
+
+    mod = &mods[statis.total_mod_num++];
+    token = strtok(NULL, W_SPACE);
     if (token && (!strcasecmp(token, "on") || !strcasecmp(token, "enable"))) {
         strncpy(mod->name, mod_name, strlen(mod_name));
         token = strtok(NULL, W_SPACE);
@@ -56,7 +60,7 @@ void
 special_mod(const char *spec_mod)
 {
     int       i = 0, j = 0;
-    char      mod_name[32];
+    char      mod_name[LEN_32];
     struct    module *mod = NULL;
 
     memset(mod_name, 0, LEN_32);
@@ -87,6 +91,7 @@ void
 parse_int(int *var)
 {
     char   *token = strtok(NULL, W_SPACE);
+
     if (token == NULL) {
         do_debug(LOG_FATAL, "Bungled line");
     }
@@ -107,6 +112,7 @@ void
 parse_add_string(char *var)
 {
     char   *token = strtok(NULL, W_SPACE);
+
     if (var == NULL) {
         if (token) {
             strncpy(var, token, strlen(token));
@@ -127,6 +133,7 @@ void
 set_debug_level()
 {
     char   *token = strtok(NULL, W_SPACE);
+
     if (token) {
         if (!strcmp(token, "INFO")) {
             conf.debug_level = LOG_INFO;
@@ -329,7 +336,9 @@ get_threshold()
     if (conf.mod_num >= MAX_MOD_NUM) {
         do_debug(LOG_FATAL, "Too many mod threshold\n");
     }
-    sscanf(token, "%[^;];%[.N0-9];%[.N0-9];%[.N0-9];%[.N0-9];", conf.check_name[conf.mod_num], tmp[0], tmp[1], tmp[2], tmp[3]);
+    sscanf(token, "%[^;];%[.N0-9];%[.N0-9];%[.N0-9];%[.N0-9];", 
+           conf.check_name[conf.mod_num], tmp[0], tmp[1], tmp[2], tmp[3]);
+
     if (!strcmp(tmp[0], "N")) {
         conf.wmin[conf.mod_num] = 0;
 
@@ -360,8 +369,9 @@ get_threshold()
 void
 set_special_field(const char *s)
 {
-    int i = 0, j = 0;
+    int    i = 0, j = 0;
     struct module *mod = NULL;
+
     for (i = 0; i < statis.total_mod_num; i++)
     {
         mod = &mods[i];
@@ -382,8 +392,9 @@ set_special_field(const char *s)
 void
 set_special_item(const char *s)
 {
-    int i = 0;
+    int    i = 0;
     struct module *mod = NULL;
+
     for (i = 0; i < statis.total_mod_num; i++)
     {
         mod = &mods[i];

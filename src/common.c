@@ -171,6 +171,7 @@ get_mod_hdr(char hdr[], const struct module *mod)
 {
     int    i, pos = 0;
     struct mod_info *info = mod->info;
+
     for (i = 0; i < mod->n_col; i++) {
         if (mod->spec) {
             if (SPEC_BIT == info[i].summary_bit) {
