@@ -1145,7 +1145,7 @@ running_check(int check_type)
                         sprintf(tmp[6], " TCPretr=-");
 
                     } else {
-                        sprintf(tmp[6], " TCPretr=%0.2f", st_array[4]);
+                        sprintf(tmp[6], " TCPretr=%0.2f", st_array[7]);
                     }
                 }
             }
