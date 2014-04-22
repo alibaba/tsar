@@ -16,7 +16,7 @@ ifeq ($(UNAME_S),Darwin)
             mod_swift.so mod_swift_code.so mod_swift_store.so mod_swift_spdy.so\
             mod_swift_fwd.so mod_swift_domain.so mod_swift_swapdir.so \
             mod_swift_purge.so mod_swift_tcmalloc.so mod_swift_sys.so \
-            mod_swift_esi.so mod_swift_balancer.so mod_swift_blc_fwd.so\
+            mod_swift_esi.so mod_swift_balancer.so mod_swift_blc_fwd.so mod_swift_conn.so\
             mod_tmd.so mod_percpu.so mod_rpi.so mod_tcprt.so mod_shell.so mod_nginx_domain.so
 else
     OBJS =  mod_swap.so mod_partition.so mod_cpu.so mod_mem.so mod_lvs.so mod_haproxy.so \
@@ -28,7 +28,7 @@ else
             mod_swift.so mod_swift_code.so mod_swift_store.so mod_swift_spdy.so\
             mod_swift_fwd.so mod_swift_domain.so mod_swift_swapdir.so \
             mod_swift_purge.so mod_swift_tcmalloc.so mod_swift_sys.so \
-            mod_swift_esi.so mod_swift_balancer.so mod_swift_blc_fwd.so\
+            mod_swift_esi.so mod_swift_balancer.so mod_swift_blc_fwd.so mod_swift_conn.so\
             mod_tmd.so mod_percpu.so mod_rpi.so mod_tcprt.so mod_shell.so mod_nginx_domain.so
 endif
 
