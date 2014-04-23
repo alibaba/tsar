@@ -23,7 +23,7 @@
 void
 output_file()
 {
-    int    i, ret = 0;
+    int    i, ret, n = 0;
     FILE  *fp = NULL;
     char   line[LEN_10240] = {0};
     char   detail[LEN_4096] = {0};
@@ -43,7 +43,14 @@ output_file()
         mod = &mods[i];
         if (mod->enable && strlen(mod->record)) {
             /* save collect data to output_file */
-            sprintf(detail, "%s%s%s%s", SECTION_SPLIT, mod->opt_line, STRING_SPLIT, mod->record);
+            n = snprintf(detail, LEN_4096, "%s%s%s%s", SECTION_SPLIT, mod->opt_line, STRING_SPLIT, mod->record);
+            if (n >= LEN_4096 - 1) {
+                do_debug(LOG_FATAL, "mod %s lenth is overflow %d\n", mod->name, n);
+            }
+	    /* one for \n one for \0 */
+            if (strlen(line) + strlen(detail) >= LEN_10240 - 2) {
+                do_debug(LOG_FATAL, "tsar.data line lenth is overflow line %d detail %d\n", strlen(line), strlen(detail));
+            }
             strcat(line, detail);
             ret = 1;
         }

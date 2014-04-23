@@ -55,7 +55,7 @@ read_percpu_stats(struct module *mod)
             if (st_percpu.cpu_name[3] == '\0') //ignore cpu summary stat
                 continue;
 
-            pos += sprintf(buf + pos, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu",
+            pos += snprintf(buf + pos, LEN_4096 - pos, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu" ITEM_SPLIT,
                     /* the store order is not same as read procedure */
                     st_percpu.cpu_name,
                     st_percpu.cpu_user,
@@ -66,19 +66,18 @@ read_percpu_stats(struct module *mod)
                     st_percpu.cpu_idle,
                     st_percpu.cpu_nice,
                     st_percpu.cpu_steal,
-                    st_percpu.cpu_guest);
-
-            pos += sprintf(buf + pos, ITEM_SPLIT);
-
-            cpus ++;
-            if (cpus > MAX_CPUS)
+		    st_percpu.cpu_guest);
+	    if (strlen(buf) == LEN_4096 - 1) {
+		    fclose(fp);
+		    return;
+	    }
+            cpus++;
+            if (cpus > MAX_CPUS) {
                 break;
+            }
         }
     }
-    if (pos) {
-        buf[pos] = '\0';
-        set_mod_record(mod, buf);
-    }
+    set_mod_record(mod, buf);
     fclose(fp);
     return;
 }

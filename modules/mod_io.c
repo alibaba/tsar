@@ -14,7 +14,7 @@
 
 char *io_usage = "    --io                Linux I/O performance";
 
-#define MAX_PARTITIONS 64
+#define MAX_PARTITIONS 32
 #define IO_FILE "/proc/diskstats"
 
 struct part_info {
@@ -243,7 +243,7 @@ print_partition_stats(struct module *mod)
     unsigned int p;
 
     for (p = 0; p < n_partitions; p++) {
-        pos += sprintf(buf + pos, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%d",
+        pos += snprintf(buf + pos, LEN_4096 - pos, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%d" ITEM_SPLIT,
                 partition[p].name,
                 new_blkio[p].rd_ios,
                 new_blkio[p].rd_merges,
@@ -256,12 +256,12 @@ print_partition_stats(struct module *mod)
                 new_blkio[p].ticks,
                 new_blkio[p].aveq,
                 pos);
-        pos += sprintf(buf + pos, ITEM_SPLIT);
+        if (strlen(buf) == LEN_4096 - 1) {
+            fclose(iofp);
+            return;
+        }
     }
-    if (pos) {
-        buf[pos] = '\0';
-        set_mod_record(mod, buf);
-    }
+    set_mod_record(mod, buf);
     rewind(iofp);
     if (NULL != iofp) {
         if (fclose(iofp) < 0) {

@@ -36,7 +36,7 @@ __read_partition_stat(char *fsname, struct stats_partition *sp)
 }
 
 int
-store_single_partition(char *buf, char *mntpath, struct stats_partition *sp)
+store_single_partition(char *buf, char *mntpath, struct stats_partition *sp, int size)
 {
     int                 len = 0;
     int                 k = 1;
@@ -45,8 +45,8 @@ store_single_partition(char *buf, char *mntpath, struct stats_partition *sp)
     } else {
 	    k = sp->bsize / 1024;
     }
-    len += sprintf(buf, "%s=", mntpath);
-    len += sprintf(buf + len, "%d,%lld,%lld,%lld",
+    len += snprintf(buf + len, size, "%s=%d,%lld,%lld,%lld" ITEM_SPLIT,
+            mntpath,
             sp->bsize / k,
             sp->bfree * k,
             sp->blocks * k,
@@ -83,15 +83,16 @@ read_partition_stat(struct module *mod)
             __read_partition_stat(mnt->mnt_dir, &temp);
 
             /* print log to the buffer */
-            pos += store_single_partition(buf + pos, mnt->mnt_dir, &temp);
-            pos += sprintf(buf + pos, ITEM_SPLIT);
+	    pos += store_single_partition(buf + pos, mnt->mnt_dir, &temp, LEN_4096 - pos);
+            if (strlen(buf) == LEN_4096 - 1) {
+                return;
+            }
             /* successful read */
             part_nr++;
             /* move the pointer to the next structure */
         }
     }
     endmntent(mntfile);
-    buf[pos] = '\0';
     set_mod_record(mod, buf);
     return;
 }

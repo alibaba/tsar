@@ -56,7 +56,7 @@ read_cpu_stats(struct module *mod)
                     &st_cpu.cpu_steal,
                     &st_cpu.cpu_guest);
 
-            pos += sprintf(buf + pos, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu",
+            pos += snprintf(buf + pos, LEN_4096 - pos, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu" ITEM_SPLIT,
                     /* the store order is not same as read procedure */
                     cpuname,
                     st_cpu.cpu_user,
@@ -67,14 +67,14 @@ read_cpu_stats(struct module *mod)
                     st_cpu.cpu_idle,
                     st_cpu.cpu_nice,
                     st_cpu.cpu_steal,
-                    st_cpu.cpu_guest);
-            pos += sprintf(buf + pos, ITEM_SPLIT);
+		    st_cpu.cpu_guest);
+	    if (strlen(buf) == LEN_4096 - 1) {
+                fclose(fp);
+                return;
+	    }
         }
     }
-    if (pos) {
-        buf[pos] = '\0';
-        set_mod_record(mod, buf);
-    }
+    set_mod_record(mod, buf);
     fclose(fp);
     return;
 }
