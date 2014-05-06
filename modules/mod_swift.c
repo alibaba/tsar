@@ -7,14 +7,14 @@
 #define RETRY_NUM 3
 /* swift default port should not changed */
 #define HOSTNAME "localhost"
-#define PORT 81
+#define PORT 82
 #define EQUAL ":="
 #define DEBUG 1
 
 char *swift_usage = "    --swift             Swift object storage infomation";
-int mgrport=81;
+int mgrport = 82;
 
-/* string at swiftclient -p 81 mgr:info */
+/* string at swiftclient -p 82 mgr:info */
 /*
  * Average HTTP respone time:      5min: 11.70 ms, 60min: 10.06 ms
  * Request Hit Ratios:     5min: 95.8%, 60min: 95.7%
@@ -315,12 +315,12 @@ void
 read_swift_stats(struct module *mod, char *parameter)
 {
     int    retry = 0, pos = 0;
-    char   buf[LEN_1024];
+    char   buf[LEN_10240];
 
     memset(&stats, 0, sizeof(stats));
     mgrport = atoi(parameter);
     if (!mgrport) {
-        mgrport = 81;
+        mgrport = 82;
     }
     while (read_swift_stat("info") < 0 && retry < RETRY_NUM) {
         retry++;

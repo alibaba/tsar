@@ -6,14 +6,14 @@
 #define RETRY_NUM 3
 /* swift default port should not changed */
 #define HOSTNAME "localhost"
-#define PORT 81
+#define PORT 82
 #define EQUAL "="
 #define DEBUG 0
 
 char *swift_code_usage = "    --swift_code        Swift httpcode";
-int mgrport = 81;
+int mgrport = 82;
 
-/* httpcode string at swiftclient -p 81 mgr:counters */
+/* httpcode string at swiftclient -p 82 mgr:counters */
 /*
    http status code 200 = 223291656
    http status code 204 = 54
@@ -27,7 +27,7 @@ int mgrport = 81;
    http status code 502 = 5
    http status code 503 = 229
    http status code 504 = 213
-   http status code other = 8981
+   http status code other = 8982
  */
 const static char *SWIFT_CODE[] = {
     "http status code 200",
@@ -283,11 +283,11 @@ void
 read_swift_code_stats(struct module *mod, char *parameter)
 {
     int    retry = 0, pos = 0;
-    char   buf[LEN_1024];
+    char   buf[LEN_10240];
     memset(&stats, 0, sizeof(stats));
     mgrport = atoi(parameter);
     if(!mgrport){
-        mgrport = 81;
+        mgrport = 82;
     }
     while (read_swift_code_stat() < 0 && retry < RETRY_NUM) {
         retry++;

@@ -6,14 +6,14 @@
 #define RETRY_NUM 3
 /* swift default port should not changed */
 #define HOSTNAME "localhost"
-#define PORT 81
+#define PORT 82
 #define EQUAL "="
 #define DEBUG 1
 
 char *swift_balancer_usage = "    --swift_balancer    Swift L7 balancer infomation";
-int mgrport=82;
+int mgrport = 82;
 
-/* string at swiftclient -p 81 mgr:info */
+/* string at swiftclient -p 82 mgr:info */
 /*
  * balancer_http.requests = 67541388
  * balancer_http.total_svc_time = 320478065
@@ -260,7 +260,7 @@ void
 read_swift_balancer_stats(struct module *mod, char *parameter)
 {
     int    retry = 0, pos = 0;
-    char   buf[LEN_1024];
+    char   buf[LEN_10240];
 
     memset(&stats, 0, sizeof(stats));
     mgrport = atoi(parameter);

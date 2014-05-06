@@ -5,14 +5,14 @@
 #define RETRY_NUM 3
 /* swift default port should not changed */
 #define HOSTNAME "localhost"
-#define PORT 81
+#define PORT 82
 #define EQUAL "="
 #define DEBUG 0
 
 char  *swift_blc_fwd_usage = "    --swift_blc_fwd     Swift forward to Balancer infomation";
 int    mgrport = 82;
 
-/* swiftclient -p 81 mgr:counters */
+/* swiftclient -p 82 mgr:counters */
 /*
    blc_fwd_http.requests = 13342113
    blc_fwd_http.errors = 220
@@ -239,7 +239,7 @@ void
 read_swift_blc_fwd_stats(struct module *mod, char *parameter)
 {
     int    retry = 0, pos = 0;
-    char   buf[LEN_1024];
+    char   buf[LEN_10240];
     memset(&stats, 0, sizeof(stats));
     mgrport = atoi(parameter);
     if (!mgrport) {

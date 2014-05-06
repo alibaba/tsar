@@ -15,7 +15,7 @@
 #define DEBUG 1
 
 static char *swift_usage = "    --swift_purge       Swift purge info";
-static int mgrport=82;
+static int mgrport = 82;
 
 
 /* string at swiftclient -p 82 mgr:counters */

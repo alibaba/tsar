@@ -11,16 +11,16 @@
 #define RETRY_NUM 3
 /* swift default port should not changed */
 #define HOSTNAME "localhost"
-#define PORT 81
+#define PORT 82
 #define EQUAL "="
 #define DEBUG 0
 #define NUM_DOMAIN_MAX 4096
 #define DOMAIN_LIST_DELIM ", \t"
 
 char *swift_domain_usage = "    --swift_domain      Swift domain info";
-int mgrport = 81;
+int mgrport = 82;
 
-/* httpcode string at swiftclient -p 81 mgr:domain_list */
+/* httpcode string at swiftclient -p 82 mgr:domain_list */
 /*
  * DOMAIN                        HIT(%)         REQ        MISS       rt         fwd
  * cdn.hc.org                     0.11%     3331664     3327927     0.01     3327927
@@ -29,7 +29,7 @@ int mgrport = 81;
  * item.tmall.com                32.94%          85          57    19.31          57
  * d.life.taobao.com              0.00%           3           3    53.67           6
  * d.tongcheng.taobao.com         0.00%           0           0     0.00           0
- * item.taobao.com               28.56%      327813      234176    17.25      525541
+ * item.taobao.com               28.56%      327823      234176    17.25      525541
  * edyna.item.taobao.com          0.00%           0           0     0.00           0
  * default.swift                  0.00%           0           0     0.00           0
  */
@@ -313,7 +313,7 @@ static void swift_domain_init(char *parameter)
         if (ret > 5 && strncasecmp("port=", line, 5) == 0) {
             mgrport = atoi(line + 5);
             if (!mgrport) {
-                mgrport = 81;
+                mgrport = 82;
             }
         } else if (ret > 7 && strncasecmp("domain=", line, 7) == 0) {
             line[ret - 1] = '\0';
@@ -365,7 +365,7 @@ static void swift_domian_free()
 static void read_swift_domain_stats(struct module *mod, char *parameter)
 {
     int  i, retry = 0, pos = 0;
-    char buf[LEN_1024];
+    char buf[LEN_10240];
 
     memset(&swift_domain_stats, 0, sizeof(swift_domain_stats));
 

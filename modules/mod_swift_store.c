@@ -7,14 +7,14 @@
 #define RETRY_NUM 3
 /* swift default port should not changed */
 #define HOSTNAME "localhost"
-#define PORT 81
+#define PORT 82
 #define EQUAL ":"
 #define DEBUG 1
 
 char *swift_store_usage = "    --swift_store       Swift object storage infomation";
-int mgrport = 81;
+int mgrport = 82;
 
-/* httpstore string at swiftclient -p 81 mgr:info */
+/* httpstore string at swiftclient -p 82 mgr:info */
 /*
  * Mean Object Size:       40.35 KB
  * StoreEntries           : 20676021
@@ -281,11 +281,11 @@ void
 read_swift_store_stats(struct module *mod, char *parameter)
 {
     int    retry = 0, pos = 0;
-    char   buf[LEN_1024];
+    char   buf[LEN_10240];
     memset(&stats, 0, sizeof(stats));
     mgrport = atoi(parameter);
     if (!mgrport) {
-        mgrport = 81;
+        mgrport = 82;
     }
     while (read_swift_store_stat() < 0 && retry < RETRY_NUM) {
         retry++;

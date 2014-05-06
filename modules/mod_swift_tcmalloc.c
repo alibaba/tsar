@@ -6,14 +6,14 @@
 #define RETRY_NUM 3
 /* swift default port should not changed */
 #define HOSTNAME "localhost"
-#define PORT 81
+#define PORT 82
 #define EQUAL "="
 #define DEBUG 0
 
 char *swift_tcmalloc_usage = "    --swift_tcmalloc    Swift tcmalloc";
-int mgrport = 81;
+int mgrport = 82;
 
-/* httpcode string at swiftclient -p 81 mgr:mem_stats */
+/* httpcode string at swiftclient -p 82 mgr:mem_stats */
 /*
    ------------------------------------------------
 MALLOC:        4916632 (    4.7 MB) Bytes in use by application
@@ -302,11 +302,11 @@ void
 read_swift_tcmalloc_stats(struct module *mod, char *parameter)
 {
     int    retry = 0 , pos = 0;
-    char   buf[LEN_1024];
+    char   buf[LEN_10240];
     memset(&stats, 0, sizeof(stats));
     mgrport = atoi(parameter);
     if (!mgrport) {
-        mgrport = 81;
+        mgrport = 82;
     }
     while (read_swift_tcmalloc_stat() < 0 && retry < RETRY_NUM) {
         retry++;

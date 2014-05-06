@@ -6,12 +6,12 @@
 #define RETRY_NUM 4
 /* swift default port should not changed */
 #define HOSTNAME "localhost"
-#define PORT 81
+#define PORT 82
 #define EQUAL ":="
 #define DEBUG 1
 
 char *swift_conn_usage = "    --swift_conn         Swift connection infomation";
-int mgrport=81;
+int mgrport = 82;
 
 const static char *SWIFT_STORE[] = {
     "client_http.accepts",
@@ -186,7 +186,7 @@ static int
 read_swift_stat(char *cmd)
 {
     char msg[LEN_512];
-    char buf[LEN_4096];
+    char buf[LEN_10240];
     sprintf(msg,
             "GET cache_object://localhost/%s "
             "HTTP/1.1\r\n"
@@ -253,12 +253,12 @@ static void
 read_swift_stats(struct module *mod, char *parameter)
 {
     int    retry = 0, pos = 0;
-    char   buf[LEN_1024];
+    char   buf[LEN_10240];
 
     memset(&stats, 0, sizeof(stats));
     mgrport = atoi(parameter);
     if (!mgrport) {
-        mgrport = 81;
+        mgrport = 82;
     }
     retry = 0;
     while (read_swift_stat("counters") < 0 && retry < RETRY_NUM) {

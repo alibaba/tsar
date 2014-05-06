@@ -15,7 +15,7 @@
 #define DEBUG 1
 
 static char *swift_usage = "    --swift_swapdir     Swift disk info";
-static int mgrport=82;
+static int mgrport = 82;
 
 #define MAX_PARTITIONS 128
 

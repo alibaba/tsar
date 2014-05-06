@@ -6,14 +6,14 @@
 #define RETRY_NUM 3
 /* swift default port should not changed */
 #define HOSTNAME "localhost"
-#define PORT 81
+#define PORT 82
 #define EQUAL "="
 #define DEBUG 0
 
 char  *swift_fwd_usage = "    --swift_fwd         Swift source infomation";
-int    mgrport = 81;
+int    mgrport = 82;
 
-/* swiftclient -p 81 mgr:counters */
+/* swiftclient -p 82 mgr:counters */
 /*
    server_http.requests = 13342113
    server_http.errors = 220
@@ -240,11 +240,11 @@ void
 read_swift_fwd_stats(struct module *mod, char *parameter)
 {
     int    retry = 0, pos = 0;
-    char   buf[LEN_1024];
+    char   buf[LEN_10240];
     memset(&stats, 0, sizeof(stats));
     mgrport = atoi(parameter);
     if (!mgrport) {
-        mgrport = 81;
+        mgrport = 82;
     }
     while (read_swift_fwd_stat() < 0 && retry < RETRY_NUM) {
         retry++;
