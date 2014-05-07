@@ -346,7 +346,7 @@ find_offset_from_start(FILE *fp, int number)
 
     /* get time token */
     time(&now);
-    if (conf.print_day > 180) {
+    if (conf.print_day > conf.print_max_day) {
         /*get specify date by --date/-d*/
         stm.tm_year = conf.print_day / 10000 - 1900;
         stm.tm_mon = conf.print_day % 10000 / 100 - 1;
@@ -359,8 +359,8 @@ find_offset_from_start(FILE *fp, int number)
         conf.print_day = (now - t_token) / (24 * 60 * 60);
     }
     if (conf.print_day >= 0) {
-        if (conf.print_day > 180) {
-            conf.print_day = 180;
+        if (conf.print_day > conf.print_max_day) {
+            conf.print_day = conf.print_max_day;
         }
         /* get day's beginning plus 8 hours.Set start and end time for print*/
         now = now - now % (24 * 60 * 60) - (8 * 60 * 60);
@@ -370,8 +370,8 @@ find_offset_from_start(FILE *fp, int number)
 
     } else {
         /* set max days for print 6 months*/
-        if (conf.print_ndays > 180) {
-            conf.print_ndays = 180;
+        if (conf.print_ndays > conf.print_max_day) {
+            conf.print_ndays = conf.print_max_day;
         }
         now = now - now % (60 * conf.print_nline_interval);
         t_token = now - conf.print_ndays * (24 * 60 * 60) - (60 * conf.print_nline_interval);

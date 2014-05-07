@@ -120,11 +120,11 @@ Then run `tsardevel <yourmodname>`, and you will get a directory named yourmodna
     [kongjian@tsar]$ ls test
     Makefile  mod_test.c  mod_test.conf
 
-You can modify the cread_test_stats() and set_test_record() functions in test.c as you need.
+You can modify the read_test_stats() and set_test_record() functions in test.c as you need.
 Then run `make;make install` to install your module and run `tsar --yourmodname` to see the output.
 
 More
 ----
-The homepage of Tsar is at http://tsar.taobao.org
+Homepage http://tsar.taobao.org
 
-You can also send your questions to kongjian@taobao.com if you have.
+Any question, please feel free to contact me by kongjian@taobao.com

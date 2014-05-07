@@ -209,6 +209,9 @@ parse_line(char *buff)
     } else if (!strcmp(token, "cycle_time")) {
         parse_int(conf.cycle_time);
 
+    } else if (!strcmp(token, "max_day")) {
+        parse_int(&conf.print_max_day);
+
     } else if (!strcmp(token, "send_nsca_cmd")) {
         parse_string(conf.send_nsca_cmd);
 
@@ -267,6 +270,7 @@ parse_config_file(const char *file_name)
     conf.cycle_time = (int *)malloc(sizeof(int));
     conf.debug_level = LOG_ERR;
     conf.print_detail = FALSE;
+    conf.print_max_day = 365;
     while (fgets(config_input_line, LEN_1024, fp)) {
         process_input_line(config_input_line, LEN_1024, file_name);
     }

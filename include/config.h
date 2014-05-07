@@ -43,11 +43,12 @@ struct configure {
     int     print_merge;                /* mult items is merge */
     int     print_detail;               /* conver data to K/M/G */
     int     print_ndays;                /* these days will print.default:1 */
-    int     print_day;                  /* which day will print*/
-    int     print_start_time;           /* the start of the print time*/
-    int     print_end_time;             /* the end of the print time*/
+    int     print_day;                  /* which day will print */
+    int     print_start_time;           /* the start of the print time */
+    int     print_end_time;             /* the end of the print time */
     int     print_tail;
-    int     print_file_number;          /* which tsar.data file used*/
+    int     print_file_number;          /* which tsar.data file used */
+    int     print_max_day;              /* max day for history print */
 
     /* output db */
     char    output_db_mod[LEN_512];     /* which mod will output */
