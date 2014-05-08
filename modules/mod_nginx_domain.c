@@ -6,7 +6,7 @@
 #include "tsar.h"
 
 
-struct stats_nginx {
+struct stats_nginx_domain {
     char *domain;                   /* domain name */
     unsigned long long nbytesin;    /* total bytes in */
     unsigned long long nbytesout;   /* total bytes out */
@@ -30,7 +30,7 @@ struct hostinfo {
     char *uri;
 };
 
-static char *nginx_usage = "    --nginx_domain      nginx domain statistics";
+static char *nginx_domain_usage = "    --nginx_domain      nginx domain statistics";
 
 static struct mod_info nginx_info[] = {
     {"   cps", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
@@ -47,7 +47,7 @@ static struct mod_info nginx_info[] = {
 
 
 static void
-set_nginx_record(struct module *mod, double st_array[],
+set_nginx_domain_record(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {
     int i;
@@ -85,7 +85,7 @@ init_nginx_host_info(struct hostinfo *p)
     p->port = port ? atoi(port) : 80;
 
     p->uri = getenv("NGX_TSAR_DOMAIN_URI");
-    p->uri = p->uri ? p->uri : "/nginx_domain_status";
+    p->uri = p->uri ? p->uri : "/traffic_status";
 
     p->server_name = getenv("NGX_TSAR_SERVER_NAME");
     p->server_name = p->server_name ? p->server_name : "status.taobao.com";
@@ -103,7 +103,7 @@ read_nginx_domain_stats(struct module *mod, char *parameter)
     struct sockaddr_in  servaddr;
     struct sockaddr_un  servaddr_un;
     struct hostinfo     hinfo;
-    struct stats_nginx  stat;
+    struct stats_nginx_domain  stat;
 
     /* get peer info */
     init_nginx_host_info(&hinfo);
@@ -169,12 +169,16 @@ read_nginx_domain_stats(struct module *mod, char *parameter)
         }
         stat.domain = line;
 
-        pos += sprintf(buf + pos, "%s=%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT,
+        pos += snprintf(buf + pos, LEN_4096 - pos, "%s=%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT,
                 stat.domain, stat.nconn, stat.nreq, stat.n2XX, stat.n3XX, stat.n4XX, stat.n5XX, stat.rt, stat.uprt, stat.upreq, stat.upactreq);
+        if (strlen(buf) == LEN_4096 - 1) {
+            fclose(stream);
+            close(sockfd);
+            return;
+        }
     }
-    buf[pos] = '\0';
-    set_mod_record(mod, buf);
 
+    set_mod_record(mod, buf);
     fclose(stream);
     close(sockfd);
 }
@@ -182,5 +186,5 @@ read_nginx_domain_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--nginx_domain", nginx_usage, nginx_info, 10, read_nginx_domain_stats, set_nginx_record);
+    register_mod_fileds(mod, "--nginx_domain", nginx_domain_usage, nginx_info, 10, read_nginx_domain_stats, set_nginx_domain_record);
 }
