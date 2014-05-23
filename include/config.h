@@ -56,8 +56,8 @@ struct configure {
 
     /* output nagios */
     char    server_addr[LEN_512];
-    int     *server_port;
-    int     *cycle_time;
+    int     server_port;
+    int     cycle_time;
     char    send_nsca_cmd[LEN_512];
     char    send_nsca_conf[LEN_512];
 

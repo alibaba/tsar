@@ -36,7 +36,7 @@ output_nagios()
 
     /* if cycle time ok*/
     now_time = statis.cur_time - statis.cur_time%60;
-    if ((*conf.cycle_time) == 0 || now_time%*(conf.cycle_time) != 0) {
+    if (conf.cycle_time == 0 || now_time%conf.cycle_time != 0) {
         return;
     }
 
@@ -156,7 +156,7 @@ output_nagios()
     }
     /* send to nagios server*/
     char    nagios_cmd[LEN_1024];
-    sprintf(nagios_cmd, "echo \"%s;tsar;%d;%s|%s\"|%s -H %s -p %d -to 10 -d \";\" -c %s", host_name, result, output_err, output, conf.send_nsca_cmd, conf.server_addr, *(conf.server_port), conf.send_nsca_conf);
+    sprintf(nagios_cmd, "echo \"%s;tsar;%d;%s|%s\"|%s -H %s -p %d -to 10 -d \";\" -c %s", host_name, result, output_err, output, conf.send_nsca_cmd, conf.server_addr, conf.server_port, conf.send_nsca_conf);
     do_debug(LOG_DEBUG, "send to naigos:%s\n", nagios_cmd);
     if (system(nagios_cmd) != 0) {
         do_debug(LOG_WARN, "nsca run error:%s\n", nagios_cmd);

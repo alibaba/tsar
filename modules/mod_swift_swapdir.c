@@ -251,7 +251,7 @@ read_swift_swapdir_stat(char *cmd)
         return -3;
     }
 
-    while ((len = myread_swift(conn, buf + fsize, sizeof(buf))) > 0) {
+    while ((len = myread_swift(conn, buf + fsize, sizeof(buf) - fsize)) > 0) {
         fsize += len;
     }
 
@@ -275,7 +275,7 @@ void
 read_swift_swapdir_stats(struct module *mod, char *parameter)
 {
     int    retry = 0, pos = 0, p = 0, n_swapdir;
-    char   buf[2048];
+    char   buf[LEN_4096];
 
     for (p = 0; p < MAX_PARTITIONS; p++) {
         memset(&swapdir_stats[p], 0, sizeof(swapdir_stats[p]));

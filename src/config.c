@@ -204,10 +204,10 @@ parse_line(char *buff)
         parse_string(conf.server_addr);
 
     } else if (!strcmp(token, "server_port")) {
-        parse_int(conf.server_port);
+        parse_int(&conf.server_port);
 
     } else if (!strcmp(token, "cycle_time")) {
-        parse_int(conf.cycle_time);
+        parse_int(&conf.cycle_time);
 
     } else if (!strcmp(token, "max_day")) {
         parse_int(&conf.print_max_day);
@@ -266,11 +266,10 @@ parse_config_file(const char *file_name)
     memset(&mods, '\0', sizeof(mods));
     memset(&conf, '\0', sizeof(conf));
     memset(&statis, '\0', sizeof(statis));
-    conf.server_port = (int *)malloc(sizeof(int));
-    conf.cycle_time = (int *)malloc(sizeof(int));
     conf.debug_level = LOG_ERR;
     conf.print_detail = FALSE;
     conf.print_max_day = 365;
+    sprintf(conf.output_interface, "file");
     while (fgets(config_input_line, LEN_1024, fp)) {
         process_input_line(config_input_line, LEN_1024, file_name);
     }

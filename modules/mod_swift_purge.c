@@ -244,7 +244,7 @@ read_swift_purge_stat(char *cmd)
         return -3;
     }
 
-    while ((len = myread_swift(conn, buf + fsize, sizeof(buf))) > 0) {
+    while ((len = myread_swift(conn, buf + fsize, sizeof(buf) - fsize)) > 0) {
         fsize += len;
     }
 
@@ -268,7 +268,7 @@ void
 read_swift_purge_stats(struct module *mod, char *parameter)
 {
     int    retry = 0, pos = 0;
-    char   buf[2048] = {0};
+    char   buf[LEN_4096] = {0};
 
     memset(&purge_stats, 0, sizeof(purge_stats));
 

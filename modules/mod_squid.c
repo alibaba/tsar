@@ -483,7 +483,7 @@ __get_squid_info(char *squidoption, char *squidcmd, int port, int index)
         close(conn);
         return -3;
     }
-    while ((len = myread(conn, buf, sizeof(buf))) > 0) {
+    while ((len = myread(conn, buf, sizeof(buf) - fsize)) > 0) {
         fsize += len;
     }
     /* read error */

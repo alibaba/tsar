@@ -65,7 +65,4 @@ output_file()
     if (fclose(fp) < 0) {
         do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
     }
-    if (chmod(conf.output_file_path, 0666) < 0 ) {
-        do_debug(LOG_WARN, "chmod file %s error\n", conf.output_file_path);
-    }
 }

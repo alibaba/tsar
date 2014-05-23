@@ -320,7 +320,7 @@ static int read_swift_code_stat()
         return -3;
     }
 
-    while ((len = myread_swift_code(conn, buf + fsize, sizeof(buf))) > 0) {
+    while ((len = myread_swift_code(conn, buf + fsize, sizeof(buf) - fsize)) > 0) {
         fsize += len;
     }
 
@@ -408,7 +408,7 @@ static void swift_domian_free()
 static void read_swift_esi_stats(struct module *mod, char *parameter)
 {
     int  i, retry = 0, pos = 0;
-    char buf[LEN_10240];
+    char buf[LEN_4096];
 
     memset(&swift_esi_stats, 0, sizeof(swift_esi_stats));
 

@@ -279,7 +279,7 @@ read_swift_tcmalloc_stat()
         return -3;
     }
 
-    while ((len = myread_swift_tcmalloc(conn, buf + fsize, sizeof(buf))) > 0) {
+    while ((len = myread_swift_tcmalloc(conn, buf + fsize, sizeof(buf) - fsize)) > 0) {
         fsize += len;
     }
 
@@ -302,7 +302,7 @@ void
 read_swift_tcmalloc_stats(struct module *mod, char *parameter)
 {
     int    retry = 0 , pos = 0;
-    char   buf[LEN_10240];
+    char   buf[LEN_4096];
     memset(&stats, 0, sizeof(stats));
     mgrport = atoi(parameter);
     if (!mgrport) {

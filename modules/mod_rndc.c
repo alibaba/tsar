@@ -10,7 +10,7 @@
 
 
 static char *rndc_usage = "    --rndc               information for rndc stats";
-static char g_buf[10240];
+static char g_buf[LEN_4096];
 
 static void
 create_script()
