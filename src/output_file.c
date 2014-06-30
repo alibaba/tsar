@@ -25,8 +25,8 @@ output_file()
 {
     int    i, ret, n = 0;
     FILE  *fp = NULL;
-    char   line[LEN_10240] = {0};
-    char   detail[LEN_4096] = {0};
+    char   line[LEN_40960] = {0};
+    char   detail[LEN_10240] = {0};
     char   s_time[LEN_256] = {0};
     struct module *mod;
 
@@ -43,12 +43,12 @@ output_file()
         mod = &mods[i];
         if (mod->enable && strlen(mod->record)) {
             /* save collect data to output_file */
-            n = snprintf(detail, LEN_4096, "%s%s%s%s", SECTION_SPLIT, mod->opt_line, STRING_SPLIT, mod->record);
-            if (n >= LEN_4096 - 1) {
+            n = snprintf(detail, LEN_10240, "%s%s%s%s", SECTION_SPLIT, mod->opt_line, STRING_SPLIT, mod->record);
+            if (n >= LEN_10240 - 1) {
                 do_debug(LOG_FATAL, "mod %s lenth is overflow %d\n", mod->name, n);
             }
 	    /* one for \n one for \0 */
-            if (strlen(line) + strlen(detail) >= LEN_10240 - 2) {
+            if (strlen(line) + strlen(detail) >= LEN_40960 - 2) {
                 do_debug(LOG_FATAL, "tsar.data line lenth is overflow line %d detail %d\n", strlen(line), strlen(detail));
             }
             strcat(line, detail);

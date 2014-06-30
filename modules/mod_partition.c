@@ -8,7 +8,7 @@
 char *partition_usage = "    --partition         Disk and partition usage";
 
 
-#define MAXPART 10
+#define MAXPART 32
 
 struct stats_partition {
     int bsize;                           /* block size*/
@@ -59,12 +59,12 @@ void
 read_partition_stat(struct module *mod)
 {
     int                     part_nr, pos = 0;
-    char                    buf[LEN_4096];
+    char                    buf[LEN_10240];
     FILE                   *mntfile;
     struct mntent          *mnt = NULL;
     struct stats_partition  temp;
 
-    memset(buf, 0, LEN_4096);
+    memset(buf, 0, LEN_10240);
     memset(&temp, 0, sizeof(temp));
 
     /* part_nr = count_partition_nr(NULL); */
@@ -83,8 +83,8 @@ read_partition_stat(struct module *mod)
             __read_partition_stat(mnt->mnt_dir, &temp);
 
             /* print log to the buffer */
-	    pos += store_single_partition(buf + pos, mnt->mnt_dir, &temp, LEN_4096 - pos);
-            if (strlen(buf) == LEN_4096 - 1) {
+	    pos += store_single_partition(buf + pos, mnt->mnt_dir, &temp, LEN_10240 - pos);
+            if (strlen(buf) == LEN_10240 - 1) {
                 return;
             }
             /* successful read */

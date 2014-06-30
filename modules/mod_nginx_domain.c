@@ -1,13 +1,23 @@
+#define _GNU_SOURCE
+
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include "tsar.h"
+#include <stdio.h>
 
+#define NUM_DOMAIN_MAX 4096
+#define DOMAIN_LIST_DELIM ", \t"
+
+int nginx_port = 80;
+int domain_num = 0;
+int top_domain = 0;
+int all_domain = 0;
 
 struct stats_nginx_domain {
-    char *domain;                   /* domain name */
+    char domain[256];               /* domain name */
     unsigned long long nbytesin;    /* total bytes in */
     unsigned long long nbytesout;   /* total bytes out */
     unsigned long long nconn;       /* total connections */
@@ -23,6 +33,18 @@ struct stats_nginx_domain {
     unsigned long long upactreq;    /* actual upstream requests */
 };
 
+/* struct for http domain */
+static struct stats_nginx_domain nginx_domain_stats[NUM_DOMAIN_MAX];
+static int nginxcmp(const void *a, const void *b)
+{
+    struct stats_nginx_domain *pa = (struct stats_nginx_domain *)a, *pb = (struct stats_nginx_domain *)b;
+    return strcmp(pa->domain, pb->domain);
+}
+static int nginxcmp2(const void *a, const void *b)
+{
+    struct stats_nginx_domain *pa = (struct stats_nginx_domain *)a, *pb = (struct stats_nginx_domain *)b;
+    return (pa->nreq < pb->nreq);
+}
 struct hostinfo {
     char *host;
     int   port;
@@ -45,6 +67,60 @@ static struct mod_info nginx_info[] = {
     {" upqps", HIDE_BIT, MERGE_SUM,  STATS_NULL}
 };
 
+static void nginx_domain_init(char *parameter)
+{
+    FILE    *fp;
+    char    *line = NULL, *domain, *token;
+    size_t   size = LEN_1024;
+    ssize_t  ret = 0;
+
+    domain_num = 0;
+    memset(nginx_domain_stats, 0, NUM_DOMAIN_MAX * sizeof(struct stats_nginx_domain));
+
+    fp = fopen(parameter, "r");
+    if (fp == NULL) {
+        nginx_port = 80;
+        all_domain = 1;
+        return;
+    }
+
+    while ((ret = getline(&line, &size, fp)) > 0) {
+        if (ret > 5 && strncasecmp("port=", line, 5) == 0) {
+            nginx_port = atoi(line + 5);
+            if (!nginx_port) {
+                nginx_port = 80;
+            }
+        } else if (ret > 4 && strncasecmp("top=", line, 4) == 0) {
+            top_domain = atoi(line + 4);
+            if (!top_domain) {
+                top_domain = NUM_DOMAIN_MAX;
+            }
+        } else if (ret > 7 && strncasecmp("domain=", line, 7) == 0) {
+            line[ret - 1] = '\0';
+            domain = line + 7;
+            token = strtok(domain, DOMAIN_LIST_DELIM);
+            while (token != NULL) {
+                if (domain_num >= NUM_DOMAIN_MAX) {
+                    continue;
+                }
+                strcpy(nginx_domain_stats[domain_num].domain, token);
+                domain_num++;
+                token = strtok(NULL, DOMAIN_LIST_DELIM);
+            }
+        }
+    }
+    if (top_domain > domain_num && domain_num > 0) {
+        top_domain = domain_num;
+    }
+    if (domain_num == 0) {
+        all_domain = 1;
+    }
+
+    qsort(nginx_domain_stats, domain_num, sizeof(nginx_domain_stats[0]), nginxcmp);
+    if (line != NULL) {
+        free(line);
+    }
+}
 
 static void
 set_nginx_domain_record(struct module *mod, double st_array[],
@@ -95,8 +171,8 @@ init_nginx_host_info(struct hostinfo *p)
 void
 read_nginx_domain_stats(struct module *mod, char *parameter)
 {
-    int                 addr_len, domain, m, sockfd, send, pos = 0;
-    char                buf[LEN_4096], request[LEN_4096], line[LEN_4096];
+    int                 i, addr_len, domain, m, sockfd, send, pos = 0;
+    char                buf[LEN_10240], request[LEN_4096], line[LEN_4096];
     char               *p;
     void               *addr;
     FILE               *stream = NULL;
@@ -104,12 +180,14 @@ read_nginx_domain_stats(struct module *mod, char *parameter)
     struct sockaddr_un  servaddr_un;
     struct hostinfo     hinfo;
     struct stats_nginx_domain  stat;
+    struct stats_nginx_domain *pair;
 
     /* get peer info */
     init_nginx_host_info(&hinfo);
-    if (parameter && atoi(parameter) != 0) {
-       hinfo.port = atoi(parameter);
-    }
+
+    nginx_domain_init(parameter);
+
+    hinfo.port = nginx_port;
 
     if (*hinfo.host == '/') {
         addr = &servaddr_un;
@@ -162,16 +240,36 @@ read_nginx_domain_stats(struct module *mod, char *parameter)
         }
         *p++ = '\0';    /* stat.domain terminating null */
 
-        if (sscanf(p, "%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu",
-                   &stat.nbytesin, &stat.nbytesout, &stat.nconn, &stat.nreq,
-                   &stat.n2XX, &stat.n3XX, &stat.n4XX, &stat.n5XX, &stat.nother, &stat.rt, &stat.upreq, &stat.uprt, &stat.upactreq) != 13) {
+        memset(&stat, 0, sizeof(struct stats_nginx_domain));
+        if (sscanf(p, "%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,"
+                   "%*u,%*u,%*u,%*u,%*u,%*u,%*u,%*u,%*u,%*u,%*u,%*u,%*u,%*u",
+                   &stat.nbytesin, &stat.nbytesout, &stat.nconn, &stat.nreq, &stat.n2XX, &stat.n3XX, &stat.n4XX, &stat.n5XX, &stat.nother, &stat.rt, &stat.upreq, &stat.uprt, &stat.upactreq) != 13) {
             continue;
         }
-        stat.domain = line;
+        strcpy(stat.domain, line);
 
-        pos += snprintf(buf + pos, LEN_4096 - pos, "%s=%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT,
-                stat.domain, stat.nconn, stat.nreq, stat.n2XX, stat.n3XX, stat.n4XX, stat.n5XX, stat.rt, stat.uprt, stat.upreq, stat.upactreq);
-        if (strlen(buf) == LEN_4096 - 1) {
+        if (all_domain == 0) {
+            pair = bsearch(&stat, nginx_domain_stats, domain_num, sizeof(nginx_domain_stats[0]), nginxcmp);
+            if (pair == NULL) {
+                continue;
+	    } else {
+	        memcpy(pair, &stat, sizeof(struct stats_nginx_domain));
+	    }
+	} else {
+	    memcpy(&nginx_domain_stats[domain_num], &stat, sizeof(struct stats_nginx_domain));
+            domain_num++;
+        }
+    }
+    if (top_domain == 0 || top_domain > domain_num) {
+        top_domain = domain_num;
+    }
+
+    qsort(nginx_domain_stats, domain_num, sizeof(nginx_domain_stats[0]), nginxcmp2);
+
+    for (i=0; i< top_domain; i++) {
+        pos += snprintf(buf + pos, LEN_10240 - pos, "%s=%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT,
+                       nginx_domain_stats[i].domain, nginx_domain_stats[i].nconn, nginx_domain_stats[i].nreq, nginx_domain_stats[i].n2XX, nginx_domain_stats[i].n3XX, nginx_domain_stats[i].n4XX, nginx_domain_stats[i].n5XX, nginx_domain_stats[i].rt, nginx_domain_stats[i].uprt, nginx_domain_stats[i].upreq, nginx_domain_stats[i].upactreq);
+        if (strlen(buf) == LEN_10240 - 1) {
             fclose(stream);
             close(sockfd);
             return;
