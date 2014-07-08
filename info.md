@@ -286,9 +286,9 @@ tcprecvq tcpsendq tcpest tcptimewait tcpfinwait1 tcpfinwait2 tcplistenq tcpliste
         24 24 7 0
         Reading: 0 Writing: 1 Waiting: 0
 
-类似的有nginx_code, nginx_domain模块,响应的配置是:
+类似的有nginx_code, nginx_domain模块,相应的配置是:
 
-        location /us {
+        location /traffic_status {
                 req_status_show;
         }  
         
