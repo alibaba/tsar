@@ -365,7 +365,7 @@ haproxy经过了patch,能够在多进程模式下进行统计信息的汇总,然
 访问lvs的统计文件:/proc/net/ip_vs_stats
 
 ###apache
-私有方式,略
+参见:https://github.com/kongjian/tsar-apache
 ###tcprt
 私有应用,略
 ###swift
