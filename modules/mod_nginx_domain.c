@@ -8,7 +8,8 @@
 #include "tsar.h"
 #include <stdio.h>
 
-#define NUM_DOMAIN_MAX 4096
+#define NUM_DOMAIN_MAX 64
+#define MAX 40960
 #define DOMAIN_LIST_DELIM ", \t"
 
 int nginx_port = 80;
@@ -34,7 +35,7 @@ struct stats_nginx_domain {
 };
 
 /* struct for http domain */
-static struct stats_nginx_domain nginx_domain_stats[NUM_DOMAIN_MAX];
+static struct stats_nginx_domain nginx_domain_stats[MAX];
 static int nginxcmp(const void *a, const void *b)
 {
     struct stats_nginx_domain *pa = (struct stats_nginx_domain *)a, *pb = (struct stats_nginx_domain *)b;
@@ -75,7 +76,7 @@ static void nginx_domain_init(char *parameter)
     ssize_t  ret = 0;
 
     domain_num = 0;
-    memset(nginx_domain_stats, 0, NUM_DOMAIN_MAX * sizeof(struct stats_nginx_domain));
+    memset(nginx_domain_stats, 0, MAX * sizeof(struct stats_nginx_domain));
 
     fp = fopen(parameter, "r");
     if (fp == NULL) {
@@ -256,12 +257,18 @@ read_nginx_domain_stats(struct module *mod, char *parameter)
 	        memcpy(pair, &stat, sizeof(struct stats_nginx_domain));
 	    }
 	} else {
-	    memcpy(&nginx_domain_stats[domain_num], &stat, sizeof(struct stats_nginx_domain));
+            if(domain_num >= MAX) {
+                continue;
+            }
+            memcpy(&nginx_domain_stats[domain_num], &stat, sizeof(struct stats_nginx_domain));
             domain_num++;
         }
     }
     if (top_domain == 0 || top_domain > domain_num) {
         top_domain = domain_num;
+    }
+    if (top_domain > NUM_DOMAIN_MAX) {
+        top_domain = NUM_DOMAIN_MAX;
     }
 
     qsort(nginx_domain_stats, domain_num, sizeof(nginx_domain_stats[0]), nginxcmp2);
