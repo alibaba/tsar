@@ -285,15 +285,22 @@ tcprecvq tcpsendq tcpest tcptimewait tcpfinwait1 tcpfinwait2 tcplistenq tcpliste
         server accepts handled requests request_time
         24 24 7 0
         Reading: 0 Writing: 1 Waiting: 0
+需要确保nginx配置该location,并且能够访问`curl http://localhost/nginx_status`得到上面的数据  
+如果nginx的端口不是80,则需要在配置文件中指定端口,配置文件是/etc/tsar/tsar.conf,修改mod_nginx on为mod_nginx on 8080  
 
 类似的有nginx_code, nginx_domain模块,相应的配置是:
 
+        req_status_zone server "$host" 20M;
+        req_status server;
         location /traffic_status {
                 req_status_show;
-        }  
-        
+        } 
+
+通过访问`curl http://localhost/traffic_status`能够得到如下字段的数据  
+`localhost,0,0,2,2,2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0`  
+
 请求到的数据每个字段的含义是:
-* kv 计算得到的req_status_zone指令定义变量的值
+* kv 计算得到的req_status_zone指令定义变量的值,此时为domain字段
 * bytes_in_total 从客户端接收流量总和
 * bytes_out_total 发送到客户端流量总和
 * conn_total 处理过的连接总数
@@ -321,6 +328,12 @@ tcprecvq tcpsendq tcpest tcptimewait tcpfinwait1 tcpfinwait2 tcplistenq tcpliste
 * 504 504请求的总数
 * 508 508请求的总数
 * detail_other 非以上13种status code的请求总数
+
+如果domain数量太多,或者端口不是80,需要进行专门的配置,配置文件内容如下:  
+port=8080 #指定nginx的端口  
+top=10 #指定最多采集的域名个数，按照请求总个数排列  
+domain=a.com b.com #指定特定需要采集的域名列表,分隔符为空格,逗号,或者制表符  
+在/etc/tsar/tsar.conf中指定配置文件的路径:mod_nginx_domain on /tmp/my.conf  
 
 ###squid
 ####字段含义
