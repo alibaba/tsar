@@ -13,6 +13,22 @@ struct stats_pharos {
     unsigned long long tcp_reqs;
     unsigned long long udp_reqs;
     unsigned long long tcp_accepts;
+    unsigned long long rt;
+    unsigned long long total_reloads;
+    unsigned long long success_reloads;
+    unsigned long long sn;
+    unsigned long long rip;
+    unsigned long long wrp;
+    unsigned long long wideip_pool;
+    unsigned long long fpool;
+    unsigned long long introduce_domain;
+    unsigned long long soa;
+    unsigned long long ns;
+    unsigned long long wideip;
+    unsigned long long region;
+    unsigned long long pool;
+    char               ignore1[64];
+    char               ignore2[64];
 };
 
 struct hostinfo {
@@ -25,11 +41,23 @@ struct hostinfo {
 static char *pharos_usage = "    --pharos             pharos statistics";
 
 static struct mod_info pharos_info[] = {
-    {"accept", DETAIL_BIT,  0,  STATS_NULL},
-    {"  reqs", DETAIL_BIT,  0,  STATS_NULL},
-    {"   tcp", DETAIL_BIT,  0,  STATS_NULL},
-    {"   udp", DETAIL_BIT,  0,  STATS_NULL},
-    {"   qps", SUMMARY_BIT, 0,  STATS_NULL}
+    {"reqs",   DETAIL_BIT,  0,  STATS_NULL},
+    {"tcp",    DETAIL_BIT,  0,  STATS_NULL},
+    {"udp",    DETAIL_BIT,  0,  STATS_NULL},
+    {"qps",    SUMMARY_BIT, 0,  STATS_NULL},
+    {"rld",    DETAIL_BIT,  0,  STATS_NULL},
+    {"srld",   DETAIL_BIT,  0,  STATS_NULL},
+    {"sn",     DETAIL_BIT,  0,  STATS_NULL},
+    {"rip",    DETAIL_BIT,  0,  STATS_NULL},
+    {"wrp",    DETAIL_BIT,  0,  STATS_NULL},
+    {"wipol",  DETAIL_BIT,  0,  STATS_NULL},
+    {"fpol",   DETAIL_BIT,  0,  STATS_NULL},
+    {"idm",    DETAIL_BIT,  0,  STATS_NULL},
+    {"soa",    DETAIL_BIT,  0,  STATS_NULL},
+    {"ns",     DETAIL_BIT,  0,  STATS_NULL},
+    {"wip",    DETAIL_BIT,  0,  STATS_NULL},
+    {"reg",    DETAIL_BIT,  0,  STATS_NULL},
+    {"pool",   DETAIL_BIT,  0,  STATS_NULL}
 };
 
 
@@ -40,8 +68,20 @@ set_pharos_record(struct module *mod, double st_array[],
     st_array[0] = sub(cur_array[0], pre_array[0]);
     st_array[1] = sub(cur_array[1], pre_array[1]);
     st_array[2] = sub(cur_array[2], pre_array[2]);
-    st_array[3] = sub(cur_array[3], pre_array[3]);
-    st_array[4] = st_array[0] * 1.0 / inter;
+    st_array[3] = st_array[0] * 1.0 / inter;
+    st_array[4] = cur_array[3];
+    st_array[5] = cur_array[4];
+    st_array[6] = cur_array[5];
+    st_array[7] = cur_array[6];
+    st_array[8] = cur_array[7];
+    st_array[9] = cur_array[8];
+    st_array[10] = cur_array[9];
+    st_array[11] = cur_array[10];
+    st_array[12] = cur_array[11];
+    st_array[13] = cur_array[12];
+    st_array[14] = cur_array[13];
+    st_array[15] = cur_array[14];
+    st_array[16] = cur_array[15];
 }
 
 
@@ -128,10 +168,34 @@ read_pharos_stats(struct module *mod, char *parameter)
     }
 
     while (fgets(line, LEN_4096, stream) != NULL) {
-        if (!strncmp(line, "requests=", sizeof("requests=") - 1)) {
-            sscanf(line, "requests=%llu,tcp_reqs=%llu,udp_reqs=%llu,tcp_accepts=%llu",
+        if (!strncmp(line, "request_status:", sizeof("request_status:") - 1)) {
+            sscanf(line, "request_status:requests=%llu,tcp_reqs=%llu,udp_reqs=%llu,tcp_accepts=%llu,rt=%llu",
                     &st_pharos.requests, &st_pharos.tcp_reqs, &st_pharos.udp_reqs,
-                    &st_pharos.tcp_accepts);
+                    &st_pharos.tcp_accepts, &st_pharos.rt);
+            write_flag = 1;
+        }
+
+        if (!strncmp(line, "reload_status:", sizeof("reload_status:") - 1)) {
+            sscanf(line, "reload_status:total_reload_num=%llu,success_reload_num=%llu",
+                    &st_pharos.total_reloads, &st_pharos.success_reloads);
+            write_flag = 1;
+        }
+
+        if (!strncmp(line, "mysql_module_status:", sizeof("mysql_module_status:") - 1)) {
+            sscanf(line, "mysql_module_status:sn=%llu,latest_reload_time=%s %8s,frs_region_ip=%llu,frs_wrp=%llu,frs_wideip_pool=%llu,frs_pool=%llu,introduce_domain=%llu,soa=%llu,sn=%llu,wideip=%llu,region=%llu,pool=%llu",
+                    &st_pharos.sn,
+                    st_pharos.ignore1,
+                    st_pharos.ignore2,
+                    &st_pharos.rip,
+                    &st_pharos.wrp,
+                    &st_pharos.wideip_pool,
+                    &st_pharos.fpool,
+                    &st_pharos.introduce_domain,
+                    &st_pharos.soa,
+                    &st_pharos.ns,
+                    &st_pharos.wideip,
+                    &st_pharos.region,
+                    &st_pharos.pool);
             write_flag = 1;
         }
     }
@@ -146,11 +210,23 @@ writebuf:
     }
 
     if (write_flag) {
-        pos = sprintf(buf, "%lld,%lld,%lld,%lld",
+        pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
                 st_pharos.requests,
                 st_pharos.tcp_reqs,
                 st_pharos.udp_reqs,
-                st_pharos.tcp_accepts);
+                st_pharos.total_reloads,
+                st_pharos.success_reloads,
+                st_pharos.sn,
+                st_pharos.rip,
+                st_pharos.wrp,
+                st_pharos.wideip_pool,
+                st_pharos.fpool,
+                st_pharos.introduce_domain,
+                st_pharos.soa,
+                st_pharos.ns,
+                st_pharos.wideip,
+                st_pharos.region,
+                st_pharos.pool);
 
         buf[pos] = '\0';
         set_mod_record(mod, buf);
@@ -160,5 +236,5 @@ writebuf:
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--pharos", pharos_usage, pharos_info, 5, read_pharos_stats, set_pharos_record);
+    register_mod_fileds(mod, "--pharos", pharos_usage, pharos_info, 17, read_pharos_stats, set_pharos_record);
 }
