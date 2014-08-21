@@ -248,7 +248,7 @@ read_nginx_domain_stats(struct module *mod, char *parameter)
             continue;
         }
         strcpy(stat.domain, line);
-        if(stat.domain == 0) {
+        if(strlen(stat.domain) == 0) {
             strcpy(stat.domain, "null");
         }
 
