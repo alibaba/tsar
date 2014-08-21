@@ -115,6 +115,9 @@ strtok_next_item(char item[], char *record, int *start)
     if (!s_token) {
         return 0;
     }
+    if (e_token < s_token) {
+        return 0;
+    }
 
     memcpy(item, s_token + sizeof(ITEM_SPSTART) - 1, e_token - s_token - 1);
     *start = e_token - record + sizeof(ITEM_SPLIT);

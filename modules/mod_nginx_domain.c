@@ -248,6 +248,9 @@ read_nginx_domain_stats(struct module *mod, char *parameter)
             continue;
         }
         strcpy(stat.domain, line);
+        if(stat.domain == 0) {
+            strcpy(stat.domain, "null");
+        }
 
         if (all_domain == 0) {
             pair = bsearch(&stat, nginx_domain_stats, domain_num, sizeof(nginx_domain_stats[0]), nginxcmp);
