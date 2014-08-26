@@ -130,7 +130,11 @@ set_nginx_domain_record(struct module *mod, double st_array[],
     int i;
 
     for (i = 0; i < 6; i++) {
-        st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
+        if (cur_array[i] >= pre_array[i]) {
+            st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
+        } else {
+            st_array[i] = 0;
+        }
     }
 
     /* avg_rt = (cur_rt - pre_rt) / (cur_nreq - pre_nreq) */
