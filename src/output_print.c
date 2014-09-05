@@ -84,6 +84,7 @@ print_header()
             /* set print opt line */
             token = strtok(n_record, ITEM_SPLIT);
             int count = 0;
+            mod->p_item = -1;
             while (token) {
                 s_token = strstr(token, ITEM_SPSTART);
                 if (s_token) {
@@ -95,7 +96,7 @@ print_header()
                         count++;
                         continue;
                     }
-                    mod->p_item |= (1<<count);
+                    mod->p_item = count++;
                     adjust_print_opt_line(n_opt, opt, strlen(mod_hdr));
                     strcat(opt_line, n_opt);
                     strcat(opt_line, PRINT_SEC_SPLIT);
@@ -103,7 +104,6 @@ print_header()
                     strcat(hdr_line, PRINT_SEC_SPLIT);
                 }
                 token = strtok(NULL, ITEM_SPLIT);
-                count++;
             }
             free(n_record);
             n_record = NULL;
@@ -240,7 +240,7 @@ print_record()
 
         } else {
             for (j = 0; j < mod->n_item; j++) {
-                if (*mod->print_item != 0 && (mod->p_item & (1<<j)) == 0) {
+                if (*mod->print_item != 0 && (mod->p_item != j)) {
                     continue;
                 }
                 st_array = &mod->st_array[j * mod->n_col];
@@ -490,7 +490,9 @@ check_time(const char *line)
 
     /* get record time */
     token = strstr(line, SECTION_SPLIT);
-    memcpy(s_time, line, token - line);
+    if ((token - line) < 32) {
+	    memcpy(s_time, line, token - line);
+    }
     now_time = atol(s_time);
 
     /* check if time is over print_end_time */
@@ -568,7 +570,7 @@ print_tail(int tail_type)
 
         k = 0;
         for (j = 0; j < mod->n_item; j++) {
-            if (*mod->print_item != 0 && (mod->p_item & (1<<j)) == 0) {
+            if (*mod->print_item != 0 && (mod->p_item != j)) {
                 k += mod->n_col;
                 continue;
             }

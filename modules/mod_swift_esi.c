@@ -152,7 +152,9 @@ static void read_swift_esi_value(char *buf,
     ret = sscanf(buf, "%s%s%s%s%s%s%s%s%s%lld%lld%lld%lld%lld", token[0], token[1], token[2],
                  token[3], token[4], token[5], token[6], token[7], token[8], &ereq, &emiss,
                  &ehit, &ecomb, &preload);
-    assert(ret == 14);
+    if (ret != 14) {
+        return;
+    }
 
     if (ereq < 0)
         ereq = 0;

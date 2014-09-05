@@ -147,7 +147,9 @@ static void read_swift_domain_value(char *buf,
     long long req, miss, rt;
 
     ret = sscanf(buf, "%s%s%lld%lld%lld", token, hit_dumb, &req, &miss, &rt);
-    assert(ret == 5);
+    if (ret != 5) {
+        return;
+    }
 
     if (rt < 0)
         rt = 0;

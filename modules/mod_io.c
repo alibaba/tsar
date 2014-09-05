@@ -14,7 +14,7 @@
 
 char *io_usage = "    --io                Linux I/O performance";
 
-#define MAX_PARTITIONS 32
+#define MAX_PARTITIONS 64
 #define IO_FILE "/proc/diskstats"
 
 struct part_info {
