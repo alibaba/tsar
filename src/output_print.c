@@ -804,7 +804,7 @@ running_check(int check_type)
     FILE      *fp;
     char       line[2][LEN_40960];
     char       filename[LEN_128] = {0};
-    char       tmp[9][LEN_4096];
+    char       tmp[10][LEN_4096];
     char       check[LEN_40960] = {0};
     char       host_name[LEN_64] = {0};
     struct     module *mod = NULL;
@@ -823,7 +823,7 @@ running_check(int check_type)
             break;
         }
     }
-    memset(tmp, 0, 9 * LEN_4096);
+    memset(tmp, 0, 10 * LEN_4096);
     sprintf(check, "%s\ttsar\t", host_name);
     sprintf(filename, "%s", conf.output_file_path);
     fp = fopen(filename, "r");
@@ -1189,8 +1189,19 @@ running_check(int check_type)
                     }
                 }
             }
+	    if (!strcmp(mod->name, "mod_swap")) {
+	        for (j = 0; j < mod->n_item; j++) {
+                    st_array = &mod->st_array[j * mod->n_col];
+                    if (!st_array || !mod->st_flag) {
+                        sprintf(tmp[9], " swap/total=- swap/util=-");
+
+                    } else {
+                        sprintf(tmp[9], " swap/total=%0.2f swap/util=%0.2f%%", st_array[2] / 1024 / 1024, st_array[3]);
+                    }
+                }
+	    }
         }
-        for (j = 0; j < 9; j++) {
+        for (j = 0; j < 10; j++) {
             strcat(check, tmp[j]);
         }
         printf("%s\n", check);

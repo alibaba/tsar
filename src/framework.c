@@ -155,7 +155,8 @@ reload_check_modules()
              || !strcmp(mod->name, "mod_io")
              || !strcmp(mod->name, "mod_tcp")
              || !strcmp(mod->name, "mod_traffic")
-             || !strcmp(mod->name, "mod_nginx"))
+             || !strcmp(mod->name, "mod_nginx")
+             || !strcmp(mod->name, "mod_swap"))
         {
             mod->enable = 1;
 
