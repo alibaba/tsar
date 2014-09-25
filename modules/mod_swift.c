@@ -34,7 +34,10 @@ const static char *SWIFT_STORE[] = {
     "client_http.bytes_out",
     "client_http.total_svc_time",
     "client_http.hits",
-    "StoreEntries"
+    "StoreEntries",
+    "Number of clients accessing cache",
+    "client_http.accepts",
+    "client_http.conns",
 };
 
 /* struct for swift counters */
@@ -48,6 +51,9 @@ struct status_swift {
     unsigned long long bytes_out;
     unsigned long long t_cpu;
     unsigned long long s_cpu;
+    unsigned long long clients;
+    unsigned long long accepts;
+    unsigned long long conns;
 } stats;
 
 /* swift register info for tsar */
@@ -60,6 +66,10 @@ struct mod_info swift_info[] = {
     {" in_bw", DETAIL_BIT,  0,  STATS_NULL},
     {"out_bw", DETAIL_BIT,  0,  STATS_NULL},
     {"   cpu", DETAIL_BIT,  0,  STATS_NULL},
+    {"client", DETAIL_BIT,  0,  STATS_NULL},
+    {"accept", DETAIL_BIT,  0,  STATS_NULL},
+    {" conns", DETAIL_BIT,  0,  STATS_NULL},
+    {"  live", DETAIL_BIT,  0,  STATS_NULL},
     {"  null", HIDE_BIT,  0,  STATS_NULL}
 };
 /* opens a tcp or udp connection to a remote host or local socket */
@@ -165,6 +175,9 @@ parse_swift_info(char *buf)
         read_swift_value(line, SWIFT_STORE[3], &stats.total_svc_time);
         read_swift_value(line, SWIFT_STORE[4], &stats.hits);
         read_swift_value(line, SWIFT_STORE[5], &stats.objs);
+        read_swift_value(line, SWIFT_STORE[6], &stats.clients);
+        read_swift_value(line, SWIFT_STORE[7], &stats.accepts);
+        read_swift_value(line, SWIFT_STORE[8], &stats.conns);
         /* Byte Hit Ratios:        5min: 96.6%, 60min: 96.6% */
         if (strstr(line, "Byte Hit Ratios") != NULL) {
             float a, b;
@@ -242,12 +255,27 @@ set_swift_record(struct module *mod, double st_array[],
     } else {
         st_array[7] = 0;
     }
+    /* clients */
+    st_array[8] = cur_array[9];
+
+    /* accepts */
+    if (cur_array[10] >= pre_array[10]) {
+        st_array[9] = (cur_array[10] -  pre_array[10]) / inter;
+    } else {
+        st_array[9] = 0;
+    }
+
+    /* conns */
+    st_array[10] = cur_array[11];
+
+    /* live */
+    st_array[11] = cur_array[12];
 }
 
 int
 read_swift_stat(char *cmd)
 {
-    char msg[LEN_512];
+    char msg[LEN_1024];
     char buf[1024*1024];
     sprintf(msg,
             "GET cache_object://localhost/%s "
@@ -311,6 +339,65 @@ read_swift_stat(char *cmd)
     return 0;
 }
 
+int
+read_swift_health()
+{
+    char msg[LEN_512];
+    char buf[1024*1024];
+    sprintf(msg,
+            "GET /status?SERVICE=swift HTTP/1.1\r\nConnection: close\r\n"
+            "Host: cdn.hc.org\r\n\r\n");
+
+    int len, conn, bytesWritten, fsize = 0;
+    int port = mgrport - 1;
+
+    if (my_swift_net_connect(HOSTNAME, port, &conn, "tcp") != 0) {
+        close(conn);
+        return 0;
+    }
+
+    int flags;
+
+    /* set socket fd noblock */
+    if ((flags = fcntl(conn, F_GETFL, 0)) < 0) {
+        close(conn);
+        return 0;
+    }
+
+    if (fcntl(conn, F_SETFL, flags & ~O_NONBLOCK) < 0) {
+        close(conn);
+        return 0;
+    }
+
+    struct timeval timeout = {10, 0};
+
+    setsockopt(conn, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(struct timeval));
+    setsockopt(conn, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval));
+
+    bytesWritten = mywrite_swift(conn, msg, strlen(msg));
+    if (bytesWritten < 0) {
+        close(conn);
+        return 0;
+
+    } else if (bytesWritten != strlen(msg)) {
+        close(conn);
+        return 0;
+    }
+
+    while ((len = myread_swift(conn, buf + fsize, sizeof(buf) - fsize) - 1) > 0) {
+        fsize += len;
+    }
+
+    buf[fsize] = '\0';
+
+    char *p = strstr(buf, "\r\n");
+    if (p && memcmp(buf, "HTTP/1.1 200 OK", 15) == 0) {
+        return 1;
+    }
+
+    return 0;
+}
+
 void
 read_swift_stats(struct module *mod, char *parameter)
 {
@@ -329,7 +416,10 @@ read_swift_stats(struct module *mod, char *parameter)
     while (read_swift_stat("counters") < 0 && retry < RETRY_NUM) {
         retry++;
     }
-    pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
+
+    unsigned long long live = read_swift_health();
+
+    pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
             stats.requests,
             stats.total_svc_time,
             stats.hits,
@@ -338,7 +428,11 @@ read_swift_stats(struct module *mod, char *parameter)
             stats.bytes_in,
             stats.bytes_out,
             stats.t_cpu,
-            stats.s_cpu
+            stats.s_cpu,
+            stats.clients,
+            stats.accepts,
+            stats.conns,
+            live
              );
     buf[pos] = '\0';
     // fprintf(stderr, "buf: %s\n", buf);
@@ -348,5 +442,5 @@ read_swift_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift", swift_usage, swift_info, 9, read_swift_stats, set_swift_record);
+    register_mod_fileds(mod, "--swift", swift_usage, swift_info, 13, read_swift_stats, set_swift_record);
 }

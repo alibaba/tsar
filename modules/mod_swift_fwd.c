@@ -7,7 +7,7 @@
 /* swift default port should not changed */
 #define HOSTNAME "localhost"
 #define PORT 82
-#define EQUAL "="
+#define EQUAL ":="
 #define DEBUG 0
 
 char  *swift_fwd_usage = "    --swift_fwd         Swift source infomation";
@@ -25,7 +25,11 @@ const static char *SWIFT_FWD[] = {
     "server_http.requests",
     "server_http.errors",
     "server_http.bytes_in",
-    "server_http.svc_time"
+    "server_http.svc_time",
+    "server_http.on_connects",
+    "server_http.conns",
+    "server_http.wait_conns",
+    "Number of clients forwarding"
 };
 
 /* struct for httpfwd counters */
@@ -34,6 +38,10 @@ struct status_swift_fwd {
     unsigned long long errors;
     unsigned long long bytes_in;
     unsigned long long svc_time;
+    unsigned long long accepts;
+    unsigned long long conns;
+    unsigned long long waits;
+    unsigned long long clients;
 } stats;
 
 /* swift register info for tsar */
@@ -41,7 +49,11 @@ struct mod_info swift_fwd_info[] = {
     {"   qps", DETAIL_BIT,  0,  STATS_NULL},
     {" traff", DETAIL_BIT,  0,  STATS_NULL},
     {" error", DETAIL_BIT,  0,  STATS_NULL},
-    {"    rt", DETAIL_BIT,  0,  STATS_NULL}
+    {"    rt", DETAIL_BIT,  0,  STATS_NULL},
+    {"accept", DETAIL_BIT,  0,  STATS_NULL},
+    {" conns", DETAIL_BIT,  0,  STATS_NULL},
+    {"  wait", DETAIL_BIT,  0,  STATS_NULL},
+    {"client", DETAIL_BIT,  0,  STATS_NULL},
 };
 /* opens a tcp or udp connection to a remote host or local socket */
 int
@@ -128,6 +140,7 @@ read_swift_fwd_value(char *buf,
         /* compute the offset */
         k = strcspn(tmp, EQUAL);
         sscanf(tmp + k + 1, "%lld", ret);
+// printf("key: %s, value: %lld, k: %d, tmp: %s\n", key, *ret, k, tmp + k + 1);
         return 1;
 
     } else {
@@ -145,44 +158,55 @@ parse_swift_fwd_info(char *buf)
         read_swift_fwd_value(line, SWIFT_FWD[1], &stats.errors);
         read_swift_fwd_value(line, SWIFT_FWD[2], &stats.bytes_in);
         read_swift_fwd_value(line, SWIFT_FWD[3], &stats.svc_time);
+        read_swift_fwd_value(line, SWIFT_FWD[4], &stats.accepts);
+        read_swift_fwd_value(line, SWIFT_FWD[5], &stats.conns);
+        read_swift_fwd_value(line, SWIFT_FWD[6], &stats.waits);
+        read_swift_fwd_value(line, SWIFT_FWD[7], &stats.clients);
         line = strtok(NULL, "\n");
     }
     return 0;
 }
 
+#define COUNT_PER_SECOND(cur, pre, inter) ((cur) >= (pre)) ? ((cur) - (pre)) * 1.0 / (inter) : 0
+#define COUNT(cur) ((cur) >= 0) ? (cur) : 0
 void
 set_swift_fwd_record(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {
     int i;
     for (i = 0; i < mod->n_col - 1; i++) {
-        if (cur_array[i] >= pre_array[i]) {
-            st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
-
-        } else {
-            st_array[i] = -1;
-        }
+        st_array[i] = COUNT_PER_SECOND(cur_array[i], pre_array[i], inter);
     }
-    if(cur_array[i] >= pre_array[i] && st_array[0] > 0){
-        st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / st_array[0] / inter;
 
+    // rt
+    if(cur_array[3] >= pre_array[3] && st_array[0] > 0){
+        st_array[3] = (cur_array[3] - pre_array[3]) * 1.0 / st_array[0] / inter;
     } else {
-        st_array[i] = -1;
+        st_array[3] = -1;
     }
+
+    // conns
+    st_array[5] = COUNT(cur_array[5]);
+
+    // waits
+    st_array[6] = COUNT(cur_array[6]);
+
+    // waits
+    st_array[7] = COUNT(cur_array[7]);
 }
 
 int
-read_swift_fwd_stat()
+read_swift_fwd_stat(char *cmd)
 {
     int    len, conn, bytesWritten, fsize = 0;
     char   msg[LEN_512];
     char   buf[1024*1024];
     sprintf(msg,
-            "GET cache_object://localhost/counters "
+            "GET cache_object://localhost/%s "
             "HTTP/1.1\r\n"
             "Host: localhost\r\n"
             "Accept:*/*\r\n"
-            "Connection: close\r\n\r\n");
+            "Connection: close\r\n\r\n", cmd);
 
     if (my_swift_fwd_net_connect(HOSTNAME, mgrport, &conn, "tcp") != 0) {
         close(conn);
@@ -246,14 +270,22 @@ read_swift_fwd_stats(struct module *mod, char *parameter)
     if (!mgrport) {
         mgrport = 82;
     }
-    while (read_swift_fwd_stat() < 0 && retry < RETRY_NUM) {
+    while (read_swift_fwd_stat("info") < 0 && retry < RETRY_NUM) {
         retry++;
     }
-    pos = sprintf(buf, "%lld,%lld,%lld,%lld",
+    retry = 0;
+    while (read_swift_fwd_stat("counters") < 0 && retry < RETRY_NUM) {
+        retry++;
+    }
+    pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
             stats.requests,
             stats.bytes_in,
             stats.errors,
-            stats.svc_time
+            stats.svc_time,
+            stats.accepts,
+            stats.conns,
+            stats.waits,
+            stats.clients
              );
     buf[pos] = '\0';
     set_mod_record(mod, buf);
@@ -262,5 +294,5 @@ read_swift_fwd_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift_fwd", swift_fwd_usage, swift_fwd_info, 4, read_swift_fwd_stats, set_swift_fwd_record);
+    register_mod_fileds(mod, "--swift_fwd", swift_fwd_usage, swift_fwd_info, 8, read_swift_fwd_stats, set_swift_fwd_record);
 }

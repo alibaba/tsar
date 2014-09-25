@@ -145,14 +145,14 @@ static void read_swift_esi_value(char *buf,
         long long *r1, long long *r2, long long *r3, long long *r4, long long *r5)
 {
     int       ret;
-    char      token[1024][9];
+    char      token[1024][11];
     long long ereq, emiss, ehit, ecomb, preload;
 
     memset(token, 0, sizeof(token));
-    ret = sscanf(buf, "%s%s%s%s%s%s%s%s%s%lld%lld%lld%lld%lld", token[0], token[1], token[2],
-                 token[3], token[4], token[5], token[6], token[7], token[8], &ereq, &emiss,
-                 &ehit, &ecomb, &preload);
-    if (ret != 14) {
+    ret = sscanf(buf, "%s%s%s%s%s%s%s%s%s%s%s%lld%lld%lld%lld%lld", token[0], token[1], token[2],
+                 token[3], token[4], token[5], token[6], token[7], token[8], token[9], token[10],
+                 &ereq, &emiss, &ehit, &ecomb, &preload);
+    if (ret != 16) {
         return;
     }
 
