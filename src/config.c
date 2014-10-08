@@ -384,7 +384,7 @@ set_special_field(const char *s)
             while (*p  == ' ') {
                 p++;
             }
-            if (strstr(s, p)) {
+            if (strcmp(s, p)) {
                 info[j].summary_bit = SPEC_BIT;
                 mod->spec = 1;
             }
