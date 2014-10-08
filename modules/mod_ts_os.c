@@ -27,7 +27,7 @@ static char *ts_os_usage = "    --ts_os             trafficserver origin server 
 static struct mod_info ts_os_info[] = {
     {"   qps", DETAIL_BIT, 0, STATS_NULL},
     {"  cons", DETAIL_BIT, 0, STATS_NULL},
-    {"  mbps", DETAIL_BIT, 0, STATS_NULL},
+    {"  Bps", DETAIL_BIT, 0, STATS_NULL},
     {"   rpc", DETAIL_BIT, 0, STATS_NULL},
 };
 
