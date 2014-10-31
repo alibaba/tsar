@@ -6,7 +6,7 @@ all:
 clean:
 	for i in $(DIRS); do cd $$i;make clean;cd ..; done
 
-install:
+install: all
 	#mkdir for tsar
 	mkdir -p /usr/local/tsar/modules
 	mkdir -p /etc/tsar
@@ -42,7 +42,9 @@ uninstall:
 	#rm tsardevel
 	rm -f /usr/bin/tsardevel
 	#backup configure file
-	mv /etc/tsar/tsar.conf /etc/tsar/tsar.conf.rpmsave
+	if [ -f /etc/tsar/tsar.conf ]; then mv /etc/tsar/tsar.conf /etc/tsar/tsar.conf.rpmsave; fi
+	#backup the log data file
+	if [ -f /var/log/tsar.data ]; then mv /var/log/tsar.data /var/log/tsar.data.bak; fi
 
 tags:
 	ctags -R
