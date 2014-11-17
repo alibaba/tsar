@@ -170,6 +170,9 @@ read_nginx_stats(struct module *mod, char *parameter)
             ;
         }
     }
+    if (st_nginx.nrequest == 0) {
+        write_flag = 0;
+    }
 
 writebuf:
     if (stream) {

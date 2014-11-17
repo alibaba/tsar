@@ -37,7 +37,7 @@ struct module {
     char    record[LEN_10240];
     char    usage[LEN_256];
     char    parameter[LEN_256];
-    char    print_item[LEN_32];
+    char    print_item[LEN_256];
 
     struct  mod_info *info;
     void   *lib;

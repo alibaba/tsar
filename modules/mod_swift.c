@@ -38,6 +38,7 @@ const static char *SWIFT_STORE[] = {
     "Number of clients accessing cache",
     "client_http.accepts",
     "client_http.conns",
+    "server_http.bytes_in",
 };
 
 /* struct for swift counters */
@@ -54,6 +55,7 @@ struct status_swift {
     unsigned long long clients;
     unsigned long long accepts;
     unsigned long long conns;
+    unsigned long long s_bytes_in;
 } stats;
 
 /* swift register info for tsar */
@@ -64,6 +66,7 @@ struct mod_info swift_info[] = {
     {" b_hit", DETAIL_BIT,  0,  STATS_NULL},
     {"  objs", DETAIL_BIT,  0,  STATS_NULL},
     {" in_bw", DETAIL_BIT,  0,  STATS_NULL},
+    {"hit_bw", DETAIL_BIT,  0,  STATS_NULL},
     {"out_bw", DETAIL_BIT,  0,  STATS_NULL},
     {"   cpu", DETAIL_BIT,  0,  STATS_NULL},
     {"client", DETAIL_BIT,  0,  STATS_NULL},
@@ -178,6 +181,7 @@ parse_swift_info(char *buf)
         read_swift_value(line, SWIFT_STORE[6], &stats.clients);
         read_swift_value(line, SWIFT_STORE[7], &stats.accepts);
         read_swift_value(line, SWIFT_STORE[8], &stats.conns);
+        read_swift_value(line, SWIFT_STORE[9], &stats.s_bytes_in);
         /* Byte Hit Ratios:        5min: 96.6%, 60min: 96.6% */
         if (strstr(line, "Byte Hit Ratios") != NULL) {
             float a, b;
@@ -229,47 +233,55 @@ set_swift_record(struct module *mod, double st_array[],
         st_array[3] = cur_array[3] * 1.0 / 1000;
     else
         st_array[3] = 0;
-
     /* objs */
     if (cur_array[4] > 0)
         st_array[4] = cur_array[4];
     else
         st_array[4] = 0;
-    /* in_bw out_bw */
+    /* in_bw */
     if (cur_array[5] >= pre_array[5]) {
         st_array[5] = (cur_array[5] -  pre_array[5]) / inter;
 
     } else {
         st_array[5] = 0;
     }
-    if (cur_array[6] >= pre_array[6]) {
-        st_array[6] = (cur_array[6] -  pre_array[6]) / inter;
+    /* hit_bw = client_http.bytes_out - server_http.bytes_in */
+    if (cur_array[6] >= pre_array[6] && cur_array[7] >= pre_array[7]
+            && cur_array[7] - pre_array[7] >= cur_array[6] - pre_array[6]) {
+        st_array[6] = ((cur_array[7] -  pre_array[7]) - (cur_array[6] -  pre_array[6])) / inter;
 
     } else {
         st_array[6] = 0;
     }
-    /* cpu */
-    if(cur_array[7] > pre_array[7] && cur_array[8] >= pre_array[8]) {
-        st_array[7] = (cur_array[8] - pre_array[8]) * 100.0 / (cur_array[7] - pre_array[7]);
+    /* out_bw */
+    if (cur_array[7] >= pre_array[7]) {
+        st_array[7] = (cur_array[7] -  pre_array[7]) / inter;
 
     } else {
         st_array[7] = 0;
     }
+    /* cpu */
+    if(cur_array[8] > pre_array[8] && cur_array[9] >= pre_array[9]) {
+        st_array[8] = (cur_array[9] - pre_array[9]) * 100.0 / (cur_array[8] - pre_array[8]);
+
+    } else {
+        st_array[8] = 0;
+    }
     /* clients */
-    st_array[8] = cur_array[9];
+    st_array[9] = cur_array[10];
 
     /* accepts */
-    if (cur_array[10] >= pre_array[10]) {
-        st_array[9] = (cur_array[10] -  pre_array[10]) / inter;
+    if (cur_array[11] >= pre_array[11]) {
+        st_array[10] = (cur_array[11] -  pre_array[11]) / inter;
     } else {
-        st_array[9] = 0;
+        st_array[10] = 0;
     }
 
     /* conns */
-    st_array[10] = cur_array[11];
+    st_array[11] = cur_array[12];
 
     /* live */
-    st_array[11] = cur_array[12];
+    st_array[12] = cur_array[13];
 }
 
 int
@@ -419,13 +431,14 @@ read_swift_stats(struct module *mod, char *parameter)
 
     unsigned long long live = read_swift_health();
 
-    pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
+    pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
             stats.requests,
             stats.total_svc_time,
             stats.hits,
             stats.b_hit,
             stats.objs,
             stats.bytes_in,
+            stats.s_bytes_in,
             stats.bytes_out,
             stats.t_cpu,
             stats.s_cpu,
@@ -442,5 +455,5 @@ read_swift_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift", swift_usage, swift_info, 13, read_swift_stats, set_swift_record);
+    register_mod_fileds(mod, "--swift", swift_usage, swift_info, 14, read_swift_stats, set_swift_record);
 }

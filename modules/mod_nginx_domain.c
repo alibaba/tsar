@@ -278,7 +278,7 @@ read_nginx_domain_stats(struct module *mod, char *parameter)
         top_domain = NUM_DOMAIN_MAX;
     }
 
-    qsort(nginx_domain_stats, domain_num, sizeof(nginx_domain_stats[0]), nginxcmp2);
+    qsort(nginx_domain_stats, domain_num, sizeof(nginx_domain_stats[0]), nginxcmp);
 
     for (i=0; i< top_domain; i++) {
         pos += snprintf(buf + pos, LEN_10240 - pos, "%s=%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT,
