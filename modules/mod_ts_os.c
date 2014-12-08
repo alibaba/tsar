@@ -40,6 +40,10 @@ set_ts_os_record(struct module *mod, double st_array[],
         st_array[i] = 0;
     }
     for (i = 0; i < 3; ++i) {
+        if (!cur_array[i])
+        {
+            cur_array[i] = pre_array[i];
+        }
         if (cur_array[i] >= pre_array[i]) {
             st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
         }
