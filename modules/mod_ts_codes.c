@@ -71,6 +71,10 @@ set_ts_code_record(struct module *mod, double st_array[],
 {
     int i;
     for (i = 0; i < 12; i++) {
+        if (!cur_array[i])
+        {
+            cur_array[i] = pre_array[i];
+        }
         if (cur_array[i] >= pre_array[i]) {
             st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
         }
