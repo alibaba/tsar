@@ -42,7 +42,7 @@ set_pharos_record(struct module *mod, double st_array[],
     st_array[1] = sub(cur_array[1], pre_array[1]);
     st_array[2] = sub(cur_array[2], pre_array[2]);
     st_array[3] = st_array[0] * 1.0 / inter;
-    st_array[4] = cur_array[3];
+    st_array[4] = sub(cur_array[3], pre_array[3]) * 1.0 / st_array[0];
 }
 
 
