@@ -372,9 +372,19 @@ get_threshold()
 void
 set_special_field(const char *s)
 {
-    int    i = 0, j = 0;
+    int    i=0,j=0,t=0,k=0;
     struct module *mod = NULL;
-
+    char * parms[100];
+    char* token = strtok((char *)s, ",");
+    
+    while(token != NULL)
+    {
+        if(t<100){
+            parms[t++]=token;
+            token = strtok(NULL,",");
+        }else{break;}
+    }
+   
     for (i = 0; i < statis.total_mod_num; i++)
     {
         mod = &mods[i];
@@ -384,10 +394,13 @@ set_special_field(const char *s)
             while (*p  == ' ') {
                 p++;
             }
-            if (strstr(s, p)) {
-                info[j].summary_bit = SPEC_BIT;
-                mod->spec = 1;
+            for(k=0;k<t;k++){
+                if (strcmp(parms[k],p) == 0) {
+                    info[j].summary_bit = SPEC_BIT;
+                    mod->spec = 1;
+                }
             }
+          
         }
     }
 }

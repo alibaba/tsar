@@ -966,7 +966,7 @@ running_check(int check_type)
     /*display check detail*/
     /* ---------------------------RUN_CHECK_NEW--------------------------------------- */
     if (check_type == RUN_CHECK_NEW) {
-        printf("%s\ttsar\t", host_name);
+        printf("{\"hostname\":\"%s\",\"from\":\"tsar\"", host_name);
         for (i = 0; i < statis.total_mod_num; i++) {
             mod = &mods[i];
             if (!mod->enable) {
@@ -1000,16 +1000,16 @@ running_check(int check_type)
                             if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[k].summary_bit))
                                     || ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[k].summary_bit)))
                             {
-                                printf("%s:%s%s=-%s", mod_name, opt, trim(info[k].hdr, LEN_128), " ");
+                                printf(",\"%s:%s%s\":-%s", mod_name, opt, trim(info[k].hdr, LEN_128), "\" \"");
                             }
 
                         } else {
                             if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[k].summary_bit))
                                     || ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[k].summary_bit)))
                             {
-                                printf("%s:%s%s=", mod_name, opt, trim(info[k].hdr, LEN_128));
-                                printf("%0.1f ", st_array[k]);
-                            }
+                                printf(",\"%s:%s%s\":", mod_name, opt, trim(info[k].hdr, LEN_128));
+                                printf("\"%0.1f\"", st_array[k]);
+                            }	
                         }
 
                     } else {
@@ -1017,15 +1017,15 @@ running_check(int check_type)
                             if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[k].summary_bit))
                                     || ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[k].summary_bit)))
                             {
-                                printf("%s:%s%s=-%s", mod_name, opt, trim(info[k].hdr, LEN_128), " ");
+                                printf(",\"%s:%s%s\":-%s", mod_name, opt, trim(info[k].hdr, LEN_128), "\" \"");
                             }
 
                         } else {
                             if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[k].summary_bit))
                                     || ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[k].summary_bit)))
                             {
-                                printf("%s:%s%s=", mod_name, opt, trim(info[k].hdr, LEN_128));
-                                printf("%0.1f ", st_array[k]);
+                                printf(",\"%s:%s%s\":", mod_name, opt, trim(info[k].hdr, LEN_128));
+                                printf("\"%0.1f\"", st_array[k]);
                             }
                         }
 
@@ -1040,7 +1040,7 @@ running_check(int check_type)
                 n_record = NULL;
             }
         }
-        printf("\n");
+        printf("}\n");
         if (fclose(fp) < 0) {
             do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
         }
