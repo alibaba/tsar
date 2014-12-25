@@ -41,11 +41,7 @@ static int nginxcmp(const void *a, const void *b)
     struct stats_nginx_domain *pa = (struct stats_nginx_domain *)a, *pb = (struct stats_nginx_domain *)b;
     return strcmp(pa->domain, pb->domain);
 }
-static int nginxcmp2(const void *a, const void *b)
-{
-    struct stats_nginx_domain *pa = (struct stats_nginx_domain *)a, *pb = (struct stats_nginx_domain *)b;
-    return (pa->nreq < pb->nreq);
-}
+
 struct hostinfo {
     char *host;
     int   port;

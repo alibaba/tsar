@@ -21,7 +21,7 @@ struct stats_traffic {
 static void
 read_traffic_stats(struct module *mod)
 {
-    int                   len = 0;
+    int                   len = 0, num = 0;
     FILE                 *fp;
     char                 *p = NULL;
     char                  line[LEN_4096] = {0};
@@ -49,6 +49,7 @@ read_traffic_stats(struct module *mod)
                     &cur_st.byteout,
                     &cur_st.pktout);
 
+            num++;
             total_st.bytein  += cur_st.bytein;
             total_st.byteout += cur_st.byteout;
             total_st.pktin   += cur_st.pktin;
@@ -62,7 +63,9 @@ read_traffic_stats(struct module *mod)
             total_st.pktin,
             total_st.pktout);
     buf[len] = '\0';
-    set_mod_record(mod, buf);
+    if(num > 0) {
+        set_mod_record(mod, buf);
+    }
     fclose(fp);
 }
 

@@ -833,8 +833,8 @@ running_check(int check_type)
     /* check file update time */
     stat(filename, &statbuf);
     time(&nowtime);
-    if (nowtime - statbuf.st_ctime > 300) {
-        do_debug(LOG_FATAL, "/var/log/tsar.data is far away from now, last time is %s", ctime(&statbuf.st_ctime));
+    if (nowtime - statbuf.st_mtime > 300) {
+        do_debug(LOG_FATAL, "/var/log/tsar.data is far away from now, now time is %d, last time is %d", nowtime, statbuf.st_mtime);
     }
     /* get file len */
     memset(&line[0], 0, LEN_40960);

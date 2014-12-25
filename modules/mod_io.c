@@ -291,10 +291,13 @@ static void
 set_io_record(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {
-    int i;
+    int i, j;
     for(i = 0; i < 11; i++){
         if(cur_array[i] < pre_array[i]){
-            pre_array[i] = cur_array[i];
+            for(j = 0; j < 11; j++){
+                st_array[j] = -1;
+            }
+            return;
         }
     }
     unsigned long long rd_ios = cur_array[0] - pre_array[0];

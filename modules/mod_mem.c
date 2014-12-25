@@ -96,6 +96,12 @@ static void
 set_mem_record(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {
+    int i;
+    if ((cur_array[4] - cur_array[0] -cur_array[2] -cur_array[3]) < 0) {
+        for (i = 0; i < 6; i++) 
+            st_array[i] = -1;
+        return;
+    }
     st_array[0] = cur_array[0]<<10;
     st_array[1] = (cur_array[4] - cur_array[0] -cur_array[2] -cur_array[3])<<10;
     st_array[2] = cur_array[2]<<10;

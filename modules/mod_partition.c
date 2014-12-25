@@ -110,6 +110,9 @@ set_part_record(struct module *mod, double st_array[], U_64 pre_array[], U_64 cu
     if(nonroot_total != 0) {
         st_array[3]= (used * 100.0) / nonroot_total + ((used * 100) % nonroot_total != 0);
     }
+    if (st_array[3] > 100) {
+        st_array[3] = 100;
+    }
 }
 
 static struct mod_info part_info[] = {
