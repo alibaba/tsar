@@ -41,6 +41,7 @@
 #include "output_file.h"
 #include "output_print.h"
 #include "output_db.h"
+#include "output_tcp.h"
 #include "output_nagios.h"
 #include "common.h"
 

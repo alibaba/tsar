@@ -335,6 +335,70 @@ top=10 #指定最多采集的域名个数，按照请求总个数排列
 domain=a.com b.com #指定特定需要采集的域名列表,分隔符为空格,逗号,或者制表符  
 在/etc/tsar/tsar.conf中指定配置文件的路径:mod_nginx_domain on /tmp/my.conf  
 
+####nginx_domain_traffic
+nginx配置是:
+
+        req_status_zone server "$host" 20M;
+        req_status server;
+
+        # req_status_zone_add_indecator 指令：可以在req status输出的每一行最后添加新的字段
+        # 这里添加的字段用于统计nginx的变量: $2xx_bytes_sent, $3xx_bytes_sent, $4xx_bytes_sent, $5xx_bytes_sent
+        # $2xx_bytes_sent: 请求返回2xx时候，发送给客户端的数据量(如果请求非2xx则该变量为0)
+        req_status_zone_add_indecator server $2xx_bytes_sent $3xx_bytes_sent $4xx_bytes_sent $5xx_bytes_sent;
+
+        location /traffic_status {
+                req_status_show;
+        } 
+
+输出实例:
+
+       module004033.sqa.cm4 tsar $ tsar --nginx_domain_traffic -li1
+       Time              -----------------localhost:8080----------------- ----------------www.foo.com:8080----------------
+       Time               bytin  bytout  2XXout  3XXout  4XXout  5XXout    bytin  bytout  2XXout  3XXout  4XXout  5XXout
+       09/01/15-13:45:48   0.00    0.00    0.00    0.00    0.00    0.00   410.1K   16.6M   16.6M    0.00    0.00    0.00
+       09/01/15-13:45:49   0.00    0.00    0.00    0.00    0.00    0.00   407.8K   16.5M   16.5M    0.00    0.00    0.00
+       09/01/15-13:45:51 159.0K  287.4K    0.00    0.00    0.00  287.4K   258.6K   10.5M   10.5M    0.00    0.00    0.00
+       09/01/15-13:45:52 245.5K  443.5K    0.00    0.00    0.00  443.5K   224.2K    9.1M    9.1M    0.00    0.00    0.00
+
+字段含义:
+* bytin:   收到的请求字节数byte/s
+* bytout:  输出的应答字节数byte/s
+* 2XXout:  输出的2XX应答字节数byte/s
+* 3XXout:  输出的3XX应答字节数byte/s
+* 4XXout:  输出的4XX应答字节数byte/s
+* 5XXout:  输出的5XX应答字节数byte/s
+
+####nginx_ups
+用于输出nginx upstream想关信息
+nginx配置是:
+
+        req_status_zone server "$host" 20M;
+        req_status server;
+        req_status_zone_add_indecator server $response_fbt_time $upstream_response_fbt_time $upstream_response_length;
+
+        location /traffic_status {
+                req_status_show;
+        } 
+
+输出实例:
+
+         module004033.sqa.cm4 tsar $ tsar --nginx_ups -li1
+         Time              ----------------------------nginx_ups---------------------------
+         Time               traff     qps     4XX     5XX    rqps      rt     fbt    ufbt
+         09/01/15-16:26:29  15.8M    3.9K    3.9K    0.00    0.00    9.7K    9.7K    9.7K
+         09/01/15-16:26:30  15.8M    3.9K    3.9K    0.00    0.00    9.7K    9.7K    9.7K
+         09/01/15-16:26:31   4.9M    1.2K    1.2K    0.00    0.00    3.0K    3.0K    3.0K
+
+字段含义:
+* traff: 后端返回的应答body的流量(不包括http应答头部)
+* qps:   后端qps
+* rqps:  后端总qps(包含重试的qps + 后端qps)
+* 4XX:   后端返回4XX状态码的qps
+* 5XX:   后端返回5XX状态码的qps
+* rt:    后端应答时间
+* fbt:   tengine首字节时间
+* ufbt:  后端应答首字节时间
+
 ###squid
 ####字段含义
 * qps:   每秒请求数

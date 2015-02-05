@@ -188,6 +188,13 @@ parse_line(char *buff)
     } else if (!strcmp(token, "output_db_mod")) {
         parse_add_string(conf.output_db_mod);
 
+    } else if (!strcmp(token, "output_tcp_mod")) {
+        parse_add_string(conf.output_tcp_mod);
+    } else if (!strcmp(token, "output_tcp_addr")) {
+        parse_string(conf.output_tcp_addr);
+    } else if (!strcmp(token, "output_tcp_merge")) {
+        parse_string(conf.output_tcp_merge);
+
     } else if (!strcmp(token, "output_nagios_mod")) {
         parse_add_string(conf.output_nagios_mod);
 

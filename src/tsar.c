@@ -238,6 +238,9 @@ running_cron()
     if (strstr(conf.output_interface, "nagios")) {
         output_nagios();
     }
+    if (strstr(conf.output_interface, "tcp")) {
+        output_tcp(have_collect);
+    }
 }
 
 

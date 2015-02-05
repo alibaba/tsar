@@ -54,6 +54,11 @@ struct configure {
     char    output_db_mod[LEN_512];     /* which mod will output */
     char    output_db_addr[LEN_512];    /* db addr */
 
+    /* output tcp */
+    char    output_tcp_mod[LEN_512];
+    char    output_tcp_addr[LEN_256];
+    char    output_tcp_merge[LEN_256];
+
     /* output nagios */
     char    server_addr[LEN_512];
     int     server_port;
