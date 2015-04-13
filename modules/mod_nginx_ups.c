@@ -82,7 +82,7 @@ static void
 read_nginx_domain_ups_stats(struct module *mod, char *parameter)
 {
     int                 i, addr_len, domain, m, sockfd, send, pos = 0;
-    char                buf[LEN_10240], request[LEN_4096], line[LEN_4096];
+    char                buf[LEN_1M], request[LEN_4096], line[LEN_4096];
     char               *p;
     void               *addr;
     FILE               *stream = NULL;

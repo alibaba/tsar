@@ -35,8 +35,8 @@
 #define LEN_512     512
 #define LEN_1024    1024
 #define LEN_4096    4096
-#define LEN_10240   10240
-#define LEN_40960   40960
+#define LEN_1M      1048576
+#define LEN_10M     10485760
 
 #define MAX_COL_NUM 64
 #define MAX_MOD_NUM 32

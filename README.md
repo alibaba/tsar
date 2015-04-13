@@ -4,6 +4,8 @@ Tsar (Taobao System Activity Reporter) is a monitoring tool, which can be used t
 
 Tsar can be easily extended by writing modules, which makes it a powerful and versatile reporting tool.
 
+Module introduction: [info](https://github.com/alibaba/tsar/blob/master/info.md)
+
 Installation
 -------------
 Tsar is available on GitHub, you can clone and install it as follows:

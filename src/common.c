@@ -44,7 +44,7 @@ convert_record_to_array(U_64 *array, int l_array, const char *record)
 {
     int     i = 0;
     char   *token;
-    char    n_str[LEN_10240] = {0};
+    char    n_str[LEN_1M] = {0};
 
     if (!record || !strlen(record)) {
         return 0;
@@ -148,7 +148,7 @@ int
 get_strtok_num(const char *str, const char *split)
 {
     int    num = 0;
-    char  *token, n_str[LEN_10240] = {0};
+    char  *token, n_str[LEN_1M] = {0};
 
     if (!str || !strlen(str)) {
         return 0;
@@ -204,14 +204,14 @@ get_mod_hdr(char hdr[], const struct module *mod)
 int
 get_st_array_from_file(int have_collect)
 {
-    int    i, ret = 0;
-    char   pre_line[LEN_40960] = {0};
-    char   line[LEN_40960] = {0};
-    char   detail[LEN_1024] = {0};
-    char   pre_time[32] = {0};
-    char  *s_token;
-    FILE  *fp;
-    struct module *mod;
+    int         i, ret = 0;
+    char        detail[LEN_1M] = {0};
+    char        pre_time[32] = {0};
+    char       *s_token;
+    FILE       *fp;
+    struct      module *mod;
+    static char pre_line[LEN_10M] = {0};
+    static char line[LEN_10M] = {0};
 
     if (!have_collect) {
         collect_record(0);
@@ -237,7 +237,7 @@ get_st_array_from_file(int have_collect)
 
     /* if fopen PRE_RECORD_FILE sucess then store data to pre_record */
     if ((fp = fopen(PRE_RECORD_FILE, "r"))) {
-        if (!fgets(pre_line, LEN_40960, fp)) {
+        if (!fgets(pre_line, LEN_10M, fp)) {
             if (fclose(fp) < 0) {
                 do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
             }

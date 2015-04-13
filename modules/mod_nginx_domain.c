@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 #define NUM_DOMAIN_MAX 64
-#define MAX 40960
+#define MAX 1024
 #define DOMAIN_LIST_DELIM ", \t"
 
 int nginx_port = 80;
@@ -173,7 +173,7 @@ void
 read_nginx_domain_stats(struct module *mod, char *parameter)
 {
     int                 i, addr_len, domain, m, sockfd, send, pos = 0;
-    char                buf[LEN_10240], request[LEN_4096], line[LEN_4096];
+    char                buf[LEN_1M], request[LEN_4096], line[LEN_4096];
     char               *p;
     void               *addr;
     FILE               *stream = NULL;
@@ -273,13 +273,16 @@ read_nginx_domain_stats(struct module *mod, char *parameter)
     if (top_domain > NUM_DOMAIN_MAX) {
         top_domain = NUM_DOMAIN_MAX;
     }
+    if (domain_num == 0) {
+        return;
+    }
 
     qsort(nginx_domain_stats, domain_num, sizeof(nginx_domain_stats[0]), nginxcmp);
 
     for (i=0; i< top_domain; i++) {
-        pos += snprintf(buf + pos, LEN_10240 - pos, "%s=%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT,
+        pos += snprintf(buf + pos, LEN_1M - pos, "%s=%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT,
                        nginx_domain_stats[i].domain, nginx_domain_stats[i].nconn, nginx_domain_stats[i].nreq, nginx_domain_stats[i].n2XX, nginx_domain_stats[i].n3XX, nginx_domain_stats[i].n4XX, nginx_domain_stats[i].n5XX, nginx_domain_stats[i].rt, nginx_domain_stats[i].uprt, nginx_domain_stats[i].upreq, nginx_domain_stats[i].upactreq);
-        if (strlen(buf) == LEN_10240 - 1) {
+        if (strlen(buf) == LEN_1M - 1) {
             fclose(stream);
             close(sockfd);
             return;

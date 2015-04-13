@@ -87,7 +87,7 @@ set_erpc_record(struct module *mod, double st_array[],
 {
     int i;
     if (cur_array[0] >= pre_array[0] && cur_array[3] > pre_array[3]) {
-        st_array[0] = (cur_array[0] - pre_array[0]) / (cur_array[3] - pre_array[3]) / 1000;
+        st_array[0] = (cur_array[0] - pre_array[0]) * 1.0 / (cur_array[3] - pre_array[3]) / 1000;
     } else {
         st_array[0] = 0;
     }
@@ -104,7 +104,7 @@ void
 read_erpc_stats(struct module *mod, char *parameter)
 {
     int                 i, addr_len,  m, sockfd, send, pos = 0, mark = 0;
-    char                buf[LEN_10240], request[LEN_4096], line[LEN_4096];
+    char                buf[LEN_1M], request[LEN_4096], line[LEN_4096];
     void               *addr;
     FILE               *stream = NULL;
     struct sockaddr_in  servaddr;
@@ -173,9 +173,9 @@ read_erpc_stats(struct module *mod, char *parameter)
     }
 
     for (i = 0; i < method_num; i++) {
-        pos += snprintf(buf + pos, LEN_10240 - pos, "%d_%s=%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT, erpc_stats[i].port, erpc_stats[i].name, erpc_stats[i].rt, erpc_stats[i].reqc, erpc_stats[i].reqs, erpc_stats[i].rspc, erpc_stats[i].rsps);
+        pos += snprintf(buf + pos, LEN_1M - pos, "%d_%s=%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT, erpc_stats[i].port, erpc_stats[i].name, erpc_stats[i].rt, erpc_stats[i].reqc, erpc_stats[i].reqs, erpc_stats[i].rspc, erpc_stats[i].rsps);
 
-        if (strlen(buf) == LEN_10240 - 1) {
+        if (strlen(buf) == LEN_1M - 1) {
             return;
         }
     }

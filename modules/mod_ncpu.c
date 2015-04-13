@@ -24,28 +24,28 @@ static void
 read_cpu_stats(struct module *mod)
 {
     int               pos = 0;
-    char              line[LEN_10240];
-    char              buf[LEN_10240];
+    char              line[LEN_1M];
+    char              buf[LEN_1M];
     char              cpuname[16];
     FILE             *fp;
     struct stats_cpu  st_cpu;
 
-    memset(buf, 0, LEN_10240);
+    memset(buf, 0, LEN_1M);
     memset(&st_cpu, 0, sizeof(struct stats_cpu));
     if ((fp = fopen(STAT, "r")) == NULL) {
         return;
     }
-    while (fgets(line, LEN_10240, fp) != NULL) {
+    while (fgets(line, LEN_1M, fp) != NULL) {
         if (!strncmp(line, "cpu", 3)) {
             /*
              * Read the number of jiffies spent in the different modes
              * (user, nice, etc.) among all proc. CPU usage is not reduced
              * to one processor to avoid rounding problems.
              */
-            sscanf(line, "%4s", cpuname);
+            sscanf(line, "%s", cpuname);
             if(strcmp(cpuname, "cpu") == 0)
                 continue;
-            sscanf(line + 5, "%llu %llu %llu %llu %llu %llu %llu %llu %llu",
+            sscanf(line + strlen(cpuname), "%llu %llu %llu %llu %llu %llu %llu %llu %llu",
                     &st_cpu.cpu_user,
                     &st_cpu.cpu_nice,
                     &st_cpu.cpu_sys,
@@ -56,7 +56,7 @@ read_cpu_stats(struct module *mod)
                     &st_cpu.cpu_steal,
                     &st_cpu.cpu_guest);
 
-            pos += snprintf(buf + pos, LEN_10240 - pos, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu" ITEM_SPLIT,
+            pos += snprintf(buf + pos, LEN_1M - pos, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu" ITEM_SPLIT,
                     /* the store order is not same as read procedure */
                     cpuname,
                     st_cpu.cpu_user,
@@ -68,7 +68,7 @@ read_cpu_stats(struct module *mod)
                     st_cpu.cpu_nice,
                     st_cpu.cpu_steal,
 		    st_cpu.cpu_guest);
-	    if (strlen(buf) == LEN_10240 - 1) {
+	    if (strlen(buf) == LEN_1M - 1) {
                 fclose(fp);
                 return;
 	    }

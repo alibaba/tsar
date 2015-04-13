@@ -238,12 +238,12 @@ void
 print_partition_stats(struct module *mod)
 {
     int pos = 0;
-    char buf[LEN_10240];
-    memset(buf, 0, LEN_10240);
+    char buf[LEN_1M];
+    memset(buf, 0, LEN_1M);
     unsigned int p;
 
     for (p = 0; p < n_partitions; p++) {
-        pos += snprintf(buf + pos, LEN_10240 - pos, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%d" ITEM_SPLIT,
+        pos += snprintf(buf + pos, LEN_1M - pos, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%d" ITEM_SPLIT,
                 partition[p].name,
                 new_blkio[p].rd_ios,
                 new_blkio[p].rd_merges,
@@ -256,7 +256,7 @@ print_partition_stats(struct module *mod)
                 new_blkio[p].ticks,
                 new_blkio[p].aveq,
                 pos);
-        if (strlen(buf) == LEN_10240 - 1) {
+        if (strlen(buf) == LEN_1M - 1) {
             fclose(iofp);
             return;
         }

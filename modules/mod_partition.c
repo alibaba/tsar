@@ -45,12 +45,14 @@ store_single_partition(char *buf, char *mntpath, struct stats_partition *sp, int
     } else {
 	    k = sp->bsize / 1024;
     }
-    len += snprintf(buf + len, size, "%s=%d,%lld,%lld,%lld" ITEM_SPLIT,
+    len += snprintf(buf + len, size, "%s=%d,%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT,
             mntpath,
             sp->bsize / k,
             sp->bfree * k,
             sp->blocks * k,
-            sp->bavail * k);
+            sp->bavail * k,
+            sp->ifree,
+            sp->itotal);
     return len;
 }
 
@@ -59,12 +61,12 @@ void
 read_partition_stat(struct module *mod)
 {
     int                     part_nr, pos = 0;
-    char                    buf[LEN_10240];
+    char                    buf[LEN_1M];
     FILE                   *mntfile;
     struct mntent          *mnt = NULL;
     struct stats_partition  temp;
 
-    memset(buf, 0, LEN_10240);
+    memset(buf, 0, LEN_1M);
     memset(&temp, 0, sizeof(temp));
 
     /* part_nr = count_partition_nr(NULL); */
@@ -83,8 +85,8 @@ read_partition_stat(struct module *mod)
             __read_partition_stat(mnt->mnt_dir, &temp);
 
             /* print log to the buffer */
-	    pos += store_single_partition(buf + pos, mnt->mnt_dir, &temp, LEN_10240 - pos);
-            if (strlen(buf) == LEN_10240 - 1) {
+	    pos += store_single_partition(buf + pos, mnt->mnt_dir, &temp, LEN_1M - pos);
+            if (strlen(buf) == LEN_1M - 1) {
                 return;
             }
             /* successful read */
@@ -113,6 +115,11 @@ set_part_record(struct module *mod, double st_array[], U_64 pre_array[], U_64 cu
     if (st_array[3] > 100) {
         st_array[3] = 100;
     }
+    st_array[4] = cur_array[4];
+    st_array[5] = cur_array[5];
+    if (cur_array[5] >= cur_array[4] && cur_array[5] != 0) {
+        st_array[6] = (cur_array[5] - cur_array[4]) * 100.0 / cur_array[5];
+    }
 }
 
 static struct mod_info part_info[] = {
@@ -120,10 +127,13 @@ static struct mod_info part_info[] = {
     {" bused", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
     {" btotl", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
     {"  util", DETAIL_BIT, MERGE_SUM,  STATS_NULL},
+    {" ifree", DETAIL_BIT, MERGE_SUM,  STATS_NULL},
+    {" itotl", DETAIL_BIT, MERGE_SUM,  STATS_NULL},
+    {" iutil", DETAIL_BIT, MERGE_SUM,  STATS_NULL},
 };
 
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--partition", partition_usage, part_info, 4, read_partition_stat, set_part_record);
+    register_mod_fileds(mod, "--partition", partition_usage, part_info, 7, read_partition_stat, set_part_record);
 }

@@ -170,7 +170,7 @@ static void
 read_nginx_domain_traffic_stats(struct module *mod, char *parameter)
 {
     int                 i, addr_len, domain, m, sockfd, send, pos = 0;
-    char                buf[LEN_10240], request[LEN_4096], line[LEN_4096];
+    char                buf[LEN_1M], request[LEN_4096], line[LEN_4096];
     char               *p;
     void               *addr;
     FILE               *stream = NULL;
@@ -298,11 +298,14 @@ read_nginx_domain_traffic_stats(struct module *mod, char *parameter)
     if (top_domain > NUM_DOMAIN_MAX) {
         top_domain = NUM_DOMAIN_MAX;
     }
+    if (domain_num == 0) {
+        return;
+    }
 
     qsort(nginx_domain_stats, domain_num, sizeof(nginx_domain_stats[0]), nginxcmp);
 
     for (i=0; i< top_domain; i++) {
-        pos += snprintf(buf + pos, LEN_10240 - pos, "%s=%lld,%lld,%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT,
+        pos += snprintf(buf + pos, LEN_1M - pos, "%s=%lld,%lld,%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT,
                   nginx_domain_stats[i].domain,
                   nginx_domain_stats[i].nbytesin,
                   nginx_domain_stats[i].nbytesout,
@@ -311,7 +314,7 @@ read_nginx_domain_traffic_stats(struct module *mod, char *parameter)
                   nginx_domain_stats[i].nbytesout4XX,
                   nginx_domain_stats[i].nbytesout5XX,
                   nginx_domain_stats[i].nspdyreq);
-        if (strlen(buf) == LEN_10240 - 1) {
+        if (strlen(buf) == LEN_1M - 1) {
             fclose(stream);
             close(sockfd);
             return;

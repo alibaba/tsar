@@ -25,16 +25,16 @@ read_percpu_stats(struct module *mod)
 {
     int                  pos = 0, cpus = 0;
     FILE                *fp;
-    char                 line[LEN_10240];
-    char                 buf[LEN_10240];
+    char                 line[LEN_1M];
+    char                 buf[LEN_1M];
     struct stats_percpu  st_percpu;
 
-    memset(buf, 0, LEN_10240);
+    memset(buf, 0, LEN_1M);
     memset(&st_percpu, 0, STATS_PERCPU_SIZE);
     if ((fp = fopen(STAT_PATH, "r")) == NULL) {
         return;
     }
-    while (fgets(line, LEN_10240, fp) != NULL) {
+    while (fgets(line, LEN_1M, fp) != NULL) {
         if (!strncmp(line, "cpu", 3)) {
             /*
              * Read the number of jiffies spent in the different modes
@@ -55,7 +55,7 @@ read_percpu_stats(struct module *mod)
             if (st_percpu.cpu_name[3] == '\0') //ignore cpu summary stat
                 continue;
 
-            pos += snprintf(buf + pos, LEN_10240 - pos, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu" ITEM_SPLIT,
+            pos += snprintf(buf + pos, LEN_1M - pos, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu" ITEM_SPLIT,
                     /* the store order is not same as read procedure */
                     st_percpu.cpu_name,
                     st_percpu.cpu_user,
@@ -67,7 +67,7 @@ read_percpu_stats(struct module *mod)
                     st_percpu.cpu_nice,
                     st_percpu.cpu_steal,
 		    st_percpu.cpu_guest);
-	    if (strlen(buf) == LEN_10240 - 1) {
+	    if (strlen(buf) == LEN_1M - 1) {
 		    fclose(fp);
 		    return;
 	    }

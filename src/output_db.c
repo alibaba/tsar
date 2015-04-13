@@ -27,11 +27,11 @@
 void
 send_sql_txt(int fd, int have_collect)
 {
-    int    i = 0, j, len;
-    char   sqls[LEN_40960] = {0};
-    char   s_time[LEN_64] = {0};
-    char   host_name[LEN_64] = {0};
-    struct module *mod;
+    int         i = 0, j, len;
+    char        s_time[LEN_64] = {0};
+    char        host_name[LEN_64] = {0};
+    struct      module *mod;
+    static char sqls[LEN_10M] = {0};
 
     /* get hostname */
     if (0 != gethostname(host_name, sizeof(host_name))) {

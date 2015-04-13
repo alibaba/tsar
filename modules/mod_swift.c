@@ -2,14 +2,12 @@
 #include <fcntl.h>
 #include <string.h>
 #include "tsar.h"
-
+#include "mod_swift.h"
 
 #define RETRY_NUM 3
 /* swift default port should not changed */
 #define HOSTNAME "localhost"
 #define PORT 82
-#define EQUAL ":="
-#define DEBUG 1
 
 char *swift_usage = "    --swift             Swift object storage infomation";
 int mgrport = 82;
@@ -75,96 +73,6 @@ struct mod_info swift_info[] = {
     {"  live", DETAIL_BIT,  0,  STATS_NULL},
     {"  null", HIDE_BIT,  0,  STATS_NULL}
 };
-/* opens a tcp or udp connection to a remote host or local socket */
-int
-my_swift_net_connect(const char *host_name, int port, int *sd, char* proto)
-{
-    int                 result;
-    struct protoent    *ptrp;
-    struct sockaddr_in  servaddr;
-
-    bzero((char *)&servaddr, sizeof(servaddr));
-    servaddr.sin_family=AF_INET;
-    servaddr.sin_port=htons(port);
-    inet_pton(AF_INET, host_name, &servaddr.sin_addr);
-
-    /* map transport protocol name to protocol number */
-    if (((ptrp=getprotobyname(proto)))==NULL) {
-        if (DEBUG) {
-            printf("Cannot map \"%s\" to protocol number\n", proto);
-        }
-        return 3;
-    }
-
-    /* create a socket */
-    *sd = socket(PF_INET, (!strcmp(proto, "udp"))?SOCK_DGRAM:SOCK_STREAM, ptrp->p_proto);
-    if (*sd < 0) {
-        close(*sd);
-        if (DEBUG) {
-            printf("Socket creation failed\n");
-        }
-        return 3;
-    }
-    /* open a connection */
-    result = connect(*sd, (struct sockaddr *)&servaddr, sizeof(servaddr));
-    if (result < 0) {
-        close(*sd);
-        switch (errno) {
-            case ECONNREFUSED:
-                if (DEBUG) {
-                    printf("Connection refused by host\n");
-                }
-                break;
-            case ETIMEDOUT:
-                if (DEBUG) {
-                    printf("Timeout while attempting connection\n");
-                }
-                break;
-            case ENETUNREACH:
-                if (DEBUG) {
-                    printf("Network is unreachable\n");
-                }
-                break;
-            default:
-                if (DEBUG) {
-                    printf("Connection refused or timed out\n");
-                }
-        }
-
-        return 2;
-    }
-    return 0;
-}
-
-ssize_t
-mywrite_swift(int fd, void *buf, size_t len)
-{
-    return send(fd, buf, len, 0);
-}
-
-ssize_t
-myread_swift(int fd, void *buf, size_t len)
-{
-    return recv(fd, buf, len, 0);
-}
-
-/* get value from counter */
-int
-read_swift_value(char *buf, const char *key, unsigned long long *ret)
-{
-    int    k = 0;
-    char  *tmp;
-    /* is str match the keywords? */
-    if ((tmp = strstr(buf, key)) != NULL) {
-        /* compute the offset */
-        k = strcspn(tmp, EQUAL);
-        sscanf(tmp + k + 1, "%lld", ret);
-        return 1;
-
-    } else {
-        return 0;
-    }
-}
 
 int
 parse_swift_info(char *buf)
@@ -285,7 +193,7 @@ set_swift_record(struct module *mod, double st_array[],
 }
 
 int
-read_swift_stat(char *cmd)
+read_swift_stat(char *cmd, parse_swift_info_func parse_func)
 {
     char msg[LEN_1024];
     char buf[1024*1024];
@@ -293,11 +201,11 @@ read_swift_stat(char *cmd)
             "GET cache_object://localhost/%s "
             "HTTP/1.1\r\n"
             "Host: localhost\r\n"
-            "Accept:*/*\r\n"
+            "Accept: */*\r\n"
             "Connection: close\r\n\r\n",
             cmd);
 
-    int len, conn, bytesWritten, fsize = 0;
+    int len, conn = 0, bytesWritten, fsize = 0;
 
     if (my_swift_net_connect(HOSTNAME, mgrport, &conn, "tcp") != 0) {
         close(conn);
@@ -306,7 +214,6 @@ read_swift_stat(char *cmd)
 
     int flags;
 
-    /* set socket fd noblock */
     if ((flags = fcntl(conn, F_GETFL, 0)) < 0) {
         close(conn);
         return -1;
@@ -336,13 +243,12 @@ read_swift_stat(char *cmd)
         fsize += len;
     }
 
-    /* read error */
     if (fsize < 100) {
         close(conn);
         return -1;
     }
 
-    if (parse_swift_info(buf) < 0) {
+    if (parse_func && parse_func(buf) < 0) {
         close(conn);
         return -1;
     }
@@ -360,7 +266,7 @@ read_swift_health()
             "GET /status?SERVICE=swift HTTP/1.1\r\nConnection: close\r\n"
             "Host: cdn.hc.org\r\n\r\n");
 
-    int len, conn, bytesWritten, fsize = 0;
+    int len, conn = 0, bytesWritten, fsize = 0;
     int port = mgrport - 1;
 
     if (my_swift_net_connect(HOSTNAME, port, &conn, "tcp") != 0) {
@@ -421,11 +327,11 @@ read_swift_stats(struct module *mod, char *parameter)
     if (!mgrport) {
         mgrport = 82;
     }
-    while (read_swift_stat("info") < 0 && retry < RETRY_NUM) {
+    while (read_swift_stat("info", parse_swift_info) < 0 && retry < RETRY_NUM) {
         retry++;
     }
     retry = 0;
-    while (read_swift_stat("counters") < 0 && retry < RETRY_NUM) {
+    while (read_swift_stat("counters", parse_swift_info) < 0 && retry < RETRY_NUM) {
         retry++;
     }
 

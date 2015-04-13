@@ -26,14 +26,16 @@
 void
 send_tcp(int fd, int have_collect)
 {
-    char   data[LEN_40960] = {0};
-    int    out_pipe[2];
-    int    len;
+    int           out_pipe[2];
+    int           len;
+    static char   data[LEN_10M] = {0};
 
     /* get st_array */
+    /*
     if (get_st_array_from_file(have_collect)) {
         return;
     }
+    */
 
     /* only output from output_db_mod */
     reload_modules(conf.output_tcp_mod);
@@ -54,7 +56,7 @@ send_tcp(int fd, int have_collect)
     running_check(RUN_CHECK_NEW);
 
     fflush(stdout);
-    len = read(out_pipe[0], data, LEN_40960);
+    len = read(out_pipe[0], data, LEN_10M);
     close(out_pipe[0]);
 
     if (len > 0 && write(fd, data, len) != len) {
@@ -69,6 +71,11 @@ output_tcp(int have_collect)
     fd_set     fdr, fdw;
     struct     timeval timeout;
     struct     sockaddr_in db_addr;
+
+    /* get st_array */
+    if (get_st_array_from_file(have_collect)) {
+        return;
+    }
 
     fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd < 0) {

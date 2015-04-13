@@ -53,16 +53,16 @@ void
 print_cgcpu_stats(struct module *mod)
 {
     int    pos = 0, i=0;
-    char   buf[LEN_10240];
+    char   buf[LEN_1M];
     /*set n group's data to buf*/
     for (i = 0; i < n_group; i++) {
-        pos += snprintf(buf + pos, LEN_10240, "%s=%llu", cgcpu_groups[i].group_name, (
+        pos += snprintf(buf + pos, LEN_1M, "%s=%llu", cgcpu_groups[i].group_name, (
                         unsigned long long int)(cgcpu_groups[i].sum_exec_runtime * 1000));
-        if (pos >= LEN_10240) {
+        if (pos >= LEN_1M) {
             break;
         }
-        pos += snprintf(buf + pos, LEN_10240, ITEM_SPLIT);
-        if (pos >= LEN_10240) {
+        pos += snprintf(buf + pos, LEN_1M, ITEM_SPLIT);
+        if (pos >= LEN_1M) {
             break;
         }
     }

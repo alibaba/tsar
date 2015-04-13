@@ -27,12 +27,12 @@
 void
 output_nagios()
 {
-    int    i = 0, j = 0, k = 0, l = 0, result = 0, now_time;
-    char   output[LEN_4096] = {0};
-    char   output_err[LEN_4096] = {0};
-    char   s_time[LEN_64] = {0};
-    char   host_name[LEN_64] = {0};
-    struct module *mod;
+    int         i = 0, j = 0, k = 0, l = 0, result = 0, now_time;
+    char        s_time[LEN_64] = {0};
+    char        host_name[LEN_64] = {0};
+    struct      module *mod;
+    static char output[LEN_10M] = {0};
+    static char output_err[LEN_10M] = {0};
 
     /* if cycle time ok*/
     now_time = statis.cur_time - statis.cur_time%60;

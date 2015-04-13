@@ -96,10 +96,10 @@ void
 print_cgblkio_stats(struct module *mod)
 {
     int    pos = 0, i = 0;
-    char   buf[LEN_10240];
+    char   buf[LEN_1M];
     /*set n group's data to buf*/
     for(i = 0; i < n_group; i++){
-        pos += snprintf(buf + pos, LEN_10240, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu",
+        pos += snprintf(buf + pos, LEN_1M, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu",
                 blkio_groups[i].group_name,
                 blkio_groups[i].rd_merges,
                 blkio_groups[i].wr_merges,
@@ -110,10 +110,10 @@ print_cgblkio_stats(struct module *mod)
                 blkio_groups[i].qusize,
                 blkio_groups[i].wait,
                 blkio_groups[i].svctm);
-        if(pos >= LEN_10240)
+        if(pos >= LEN_1M)
             break;
-        pos += snprintf(buf + pos, LEN_10240, ITEM_SPLIT);
-        if(pos >= LEN_10240)
+        pos += snprintf(buf + pos, LEN_1M, ITEM_SPLIT);
+        if(pos >= LEN_1M)
             break;
     }
     /*notice tsar to store my mult item data*/

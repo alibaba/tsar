@@ -75,7 +75,7 @@ init_tmd4_host_info(struct hostinfo *p)
 
 
 void
-read_tmd4_stats(struct module *mod)
+read_tmd4_stats(struct module *mod, char *parameter)
 {
     int    write_flag = 0, addr_len, domain;
     int    m, sockfd, send, pos;
@@ -87,6 +87,9 @@ read_tmd4_stats(struct module *mod)
     FILE  *stream = NULL;
     struct hostinfo hinfo;
     init_tmd4_host_info(&hinfo);
+    if (atoi(parameter) != 0) {
+       hinfo.port = atoi(parameter);
+    }
     struct stats_tmd4 st_tmd;
     memset(&st_tmd, 0, sizeof(struct stats_tmd4));
 

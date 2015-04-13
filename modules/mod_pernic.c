@@ -26,18 +26,18 @@ read_pernic_stats(struct module *mod)
 {
     int                   pos = 0, nics = 0;
     FILE                 *fp;
-    char                  line[LEN_10240] = {0};
-    char                  buf[LEN_10240] = {0};
+    char                  line[LEN_1M] = {0};
+    char                  buf[LEN_1M] = {0};
     struct stats_pernic   st_pernic;
 
-    memset(buf, 0, LEN_10240);
+    memset(buf, 0, LEN_1M);
     memset(&st_pernic, 0, sizeof(struct stats_pernic));
 
     if ((fp = fopen(NET_DEV, "r")) == NULL) {
         return;
     }
 
-    while (fgets(line, LEN_10240, fp) != NULL) {
+    while (fgets(line, LEN_1M, fp) != NULL) {
         memset(&st_pernic, 0, sizeof(st_pernic));
         if (!strstr(line, ":")) {
             continue;
@@ -54,13 +54,13 @@ read_pernic_stats(struct module *mod)
             continue;
         }
 
-        pos += snprintf(buf + pos, LEN_10240 - pos, "%s=%lld,%lld,%lld,%lld" ITEM_SPLIT,
+        pos += snprintf(buf + pos, LEN_1M - pos, "%s=%lld,%lld,%lld,%lld" ITEM_SPLIT,
                 st_pernic.name,
                 st_pernic.bytein,
                 st_pernic.byteout,
                 st_pernic.pktin,
 		st_pernic.pktout);
-        if (strlen(buf) == LEN_10240 - 1) {
+        if (strlen(buf) == LEN_1M - 1) {
             fclose(fp);
             return;
         }

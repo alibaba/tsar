@@ -1,173 +1,200 @@
+#include <sys/sysinfo.h>
+#include <linux/param.h>
+#include <unistd.h>
+#include <time.h>
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <string.h>
 #include "tsar.h"
-
+#include "mod_swift.h"
 
 #define RETRY_NUM 3
-/* swift default port should not changed */
 #define HOSTNAME "localhost"
 #define PORT 82
-#define EQUAL ":="
-#define DEBUG 1
+/* swift's bin file path */
+#define SWIFT_FILE_PATH "/usr/sbin/swift"
+/* starttime field number(start with 0) in /proc/[pid]/stat */
+#define SWIFT_PID_FILE "/var/run/swift.81.pid"
+#define START_TIME_FIELD_NO 21
 
-char *swift_sys_usage = "    --swift_sys         Swift connection infomation";
+#define SWIFT_FORK_CNT "fork_count"
+
+static const char *usage = "    --swift_sys             Swift System infomation";
 int mgrport = 82;
 
-/* string at swiftclient -p 82 mgr:info */
-/*
- * Average HTTP respone time:      5min: 11.70 ms, 60min: 10.06 ms
- * Request Hit Ratios:     5min: 95.8%, 60min: 95.7%
- * Byte Hit Ratios:        5min: 96.6%, 60min: 96.6%
- * UP Time:        247256.904 seconds
- * CPU Time:       23487.042 seconds
- * StoreEntries           : 20776287
- * client_http.requests = 150291472
- * client_http.bytes_in = 6380253436
- * client_http.bytes_out = 5730106537327
+static struct mod_info swift_proc_mod_info[] = {
+    {"   pid", DETAIL_BIT,  0,  STATS_NULL}, /* swift pid */
+    {"  ppid", DETAIL_BIT,  0,  STATS_NULL}, /* swift's parent pid */
+    {"sstart", DETAIL_BIT,  0,  STATS_NULL}, /* swift start time */
+    {"pstart", DETAIL_BIT,  0,  STATS_NULL}, /* swift's parent start time */
+    {"  core", DETAIL_BIT,  0,  STATS_NULL}, /* swfit's coredump times */
+};
+
+/* swift process's info, see swift_proc_info */
+struct proc_info_t {
+    pid_t pid;
+    pid_t ppid;
+    unsigned long start_time;
+    unsigned long pstart_time;
+    unsigned long long coredump_times;
+};
+
+/* parent's pid and start time*/
+pid_t swift_ppid = 0;
+unsigned long swift_pstart_time = 0;
+struct proc_info_t swift_proc_info;
+
+/**
+ * get system's booting time
+ * @retval <0 some error occured.
  */
-const static char *SWIFT_STORE[] = {
-    "client_http.accepts",
-    "client_http.conns",
-};
-
-/* struct for swift counters */
-struct status_swift_sys {
-    unsigned long long accepts;
-    unsigned long long conns;
-} stats;
-
-/* swift register info for tsar */
-struct mod_info swift_sys_info[] = {
-    {"accept", DETAIL_BIT,  0,  STATS_NULL},
-    {"  conn", DETAIL_BIT,  0,  STATS_NULL},
-    {"  null", HIDE_BIT,  0,  STATS_NULL}
-};
-/* opens a tcp or udp connection to a remote host or local socket */
-static int
-my_swift_net_connect(const char *host_name, int port, int *sd, char* proto)
+static time_t get_boot_time()
 {
-    int                 result;
-    struct protoent    *ptrp;
-    struct sockaddr_in  servaddr;
+    struct sysinfo info;
+    time_t cur_time = 0;
 
-    bzero((char *)&servaddr, sizeof(servaddr));
-    servaddr.sin_family=AF_INET;
-    servaddr.sin_port=htons(port);
-    inet_pton(AF_INET, host_name, &servaddr.sin_addr);
+    if (sysinfo(&info))
+        return -1;
 
-    /* map transport protocol name to protocol number */
-    if (((ptrp=getprotobyname(proto)))==NULL) {
-        if (DEBUG) {
-            printf("Cannot map \"%s\" to protocol number\n", proto);
+    time(&cur_time);
+
+    if (cur_time > info.uptime)
+        return cur_time - info.uptime;
+    else
+        return info.uptime - cur_time;
+}
+
+/**
+ * get process's start time(jiffies) from the string in /proc/pid/stat
+ */
+static unsigned long parse_proc_start_time(const char *proc_stat)
+{
+    /* proc_stat has several fields seperated by ' ',
+    * now getting the START_TIME_FIELD_NO th field as process' start time
+    */
+    if (!proc_stat) return 0;
+    unsigned long start_time = 0;
+    int spaces = 0;
+    while (*proc_stat) {
+        if (' ' == *proc_stat++) ++spaces;
+
+        if (spaces == START_TIME_FIELD_NO) {
+            sscanf(proc_stat, "%lu", &start_time);
+            break;
         }
-        return 3;
     }
 
-    /* create a socket */
-    *sd = socket(PF_INET, (!strcmp(proto, "udp"))?SOCK_DGRAM:SOCK_STREAM, ptrp->p_proto);
-    if (*sd < 0) {
-        close(*sd);
-        if (DEBUG) {
-            printf("Socket creation failed\n");
-        }
-        return 3;
-    }
-    /* open a connection */
-    result = connect(*sd, (struct sockaddr *)&servaddr, sizeof(servaddr));
-    if (result < 0) {
-        close(*sd);
-        switch (errno) {
-            case ECONNREFUSED:
-                if (DEBUG) {
-                    printf("Connection refused by host\n");
-                }
-                break;
-            case ETIMEDOUT:
-                if (DEBUG) {
-                    printf("Timeout while attempting connection\n");
-                }
-                break;
-            case ENETUNREACH:
-                if (DEBUG) {
-                    printf("Network is unreachable\n");
-                }
-                break;
-            default:
-                if (DEBUG) {
-                    printf("Connection refused or timed out\n");
-                }
-        }
+    return start_time;
+}
 
-        return 2;
+/**
+ * check a process whos pid is pid and  absolute path is abs_path
+ * is running or not.
+ * @retval 1 running
+ * @retval 0 not running
+ */
+static int is_proc_running(pid_t pid, const char *abs_path)
+{
+    char exe_file[LEN_4096];
+    char line[LEN_4096] = {0};
+    snprintf(exe_file, LEN_4096 - 1, "/proc/%d/exe", pid);
+
+    if (readlink(exe_file, line, LEN_4096) != 0 &&
+        strncmp(line, abs_path, strlen(abs_path)) == 0) {
+        return 1;
     }
     return 0;
 }
-
-static ssize_t
-mywrite_swift(int fd, void *buf, size_t len)
+/*
+ * read SWIFT_PID_FILE, and get swift's pid, then get the proc's
+ * and its parent's infos.
+ * if swift is not running, we cannt get its parent's any info.
+ */
+static void get_proc_info(const char *swift_pid_file, struct proc_info_t *proc_info)
 {
-    return send(fd, buf, len, 0);
-}
 
-static ssize_t
-myread_swift(int fd, void *buf, size_t len)
-{
-    return recv(fd, buf, len, 0);
-}
+    if (!swift_pid_file || !proc_info) return ;
+    FILE *fp;
+    char stat_file[LEN_4096];
+    char line[LEN_4096];
+    pid_t pid;
+    char dummy_char;
+    char dummy_str[LEN_4096];
 
-/* get value from counter */
-static int
-read_swift_value(char *buf, const char *key, unsigned long long *ret)
-{
-    int    k = 0;
-    char  *tmp;
-    /* is str match the keywords? */
-    if ((tmp = strstr(buf, key)) != NULL) {
-        /* compute the offset */
-        k = strcspn(tmp, EQUAL);
-        sscanf(tmp + k + 1, "%lld", ret);
-        return 1;
-
-    } else {
-        return 0;
+    /* get pid */
+    if ((fp = fopen(swift_pid_file, "r")) == NULL) {
+        return ;
     }
+
+    if (fgets(line, LEN_4096, fp) == NULL) {
+        fclose(fp);
+        return ;
+    }
+    fclose(fp);
+
+    pid = atoi(line);
+    if (pid <= 0) {
+        return;
+    }
+    snprintf(stat_file, LEN_4096 - 1, "/proc/%d/stat", pid);
+
+    /* read stat file */
+    if ((fp = fopen(stat_file, "r")) == NULL) {
+        return;
+    }
+
+    if (fgets(line, LEN_4096, fp) != NULL) {
+        fclose(fp);
+
+        sscanf(line, "%d %s %c %d", &proc_info->pid, dummy_str,
+            &dummy_char, &proc_info->ppid);
+        swift_ppid = proc_info->ppid;
+        proc_info->start_time = parse_proc_start_time(line);
+    } else {
+        fclose(fp);
+        return;
+    }
+
+    /* read parent's stat file and get start_time */
+    snprintf(stat_file, LEN_4096 - 1, "/proc/%d/stat", proc_info->ppid);
+
+    if ((fp = fopen(stat_file, "r")) == NULL) {
+        return;
+    }
+
+    if (fgets(line, LEN_4096, fp) != NULL) {
+        fclose(fp);
+        proc_info->pstart_time = parse_proc_start_time(line);
+    } else {
+        fclose(fp);
+        return;
+    }
+
+    /* convert jiffies to second */
+    proc_info->start_time /= HZ;
+    proc_info->pstart_time /= HZ;
+
+    static time_t boot_time = 0;
+    if (boot_time == 0) boot_time = get_boot_time();
+    proc_info->start_time += boot_time;
+    proc_info->pstart_time += boot_time;
+    swift_pstart_time = proc_info->pstart_time;
 }
 
-static int
-parse_swift_info(char *buf)
+static int parse_swift_info(char *buf)
 {
     char *line;
     line = strtok(buf, "\n");
     while (line != NULL) {
-        read_swift_value(line, SWIFT_STORE[0], &stats.accepts);
-        read_swift_value(line, SWIFT_STORE[1], &stats.conns);
+        read_swift_value(line, SWIFT_FORK_CNT, &swift_proc_info.coredump_times);
         line = strtok(NULL, "\n");
     }
     return 0;
 }
 
-static void
-set_swift_record(struct module *mod, double st_array[],
-    U_64 pre_array[], U_64 cur_array[], int inter)
+static int read_swift_stat(char *cmd, parse_swift_info_func parse_func)
 {
-    /* accepts */
-    if (cur_array[0] > pre_array[0])
-        st_array[0] = (cur_array[0] - pre_array[0]) / inter;
-    else
-        st_array[0] = 0;
-
-    /* conns */
-    if (cur_array[1] > 0)
-        st_array[1] = cur_array[1];
-    else
-        st_array[1] = 0;
-}
-
-static int
-read_swift_stat(char *cmd)
-{
-    char msg[LEN_512];
+    char msg[LEN_1024];
     char buf[1024*1024];
     sprintf(msg,
             "GET cache_object://localhost/%s "
@@ -186,7 +213,6 @@ read_swift_stat(char *cmd)
 
     int flags;
 
-    /* set socket fd noblock */
     if ((flags = fcntl(conn, F_GETFL, 0)) < 0) {
         close(conn);
         return -1;
@@ -216,13 +242,12 @@ read_swift_stat(char *cmd)
         fsize += len;
     }
 
-    /* read error */
     if (fsize < 100) {
         close(conn);
         return -1;
     }
 
-    if (parse_swift_info(buf) < 0) {
+    if (parse_func && parse_func(buf) < 0) {
         close(conn);
         return -1;
     }
@@ -231,31 +256,55 @@ read_swift_stat(char *cmd)
     return 0;
 }
 
-static void
-read_swift_stats(struct module *mod, char *parameter)
+static void read_proc_stat(struct module *mod, char *parameter)
 {
-    int    retry = 0, pos = 0;
-    char   buf[LEN_4096];
+    struct proc_info_t *info;
+    int    retry = 0;
 
-    memset(&stats, 0, sizeof(stats));
-    mgrport = atoi(parameter);
-    if (!mgrport) {
-        mgrport = 82;
+    info = &swift_proc_info;
+    memset(info, 0, sizeof(struct proc_info_t));
+    /* parameter is swift's pid file path */
+    if (parameter && parameter[0] == '/') {
+        get_proc_info(parameter, info);
+    } else {
+        if (parameter)
+            mgrport = atoi(parameter);
+        if (!mgrport) {
+            mgrport = PORT;
+        }
+        get_proc_info(SWIFT_PID_FILE, info);
     }
-    retry = 0;
-    while (read_swift_stat("counters") < 0 && retry < RETRY_NUM) {
+    /* if swift has cored, info.ppid has no value, then we set it mannully */
+    if (info->ppid == 0 && is_proc_running(swift_ppid, SWIFT_FILE_PATH)) {
+        info->ppid = swift_ppid;
+        info->pstart_time = swift_pstart_time;
+    }
+
+    while (read_swift_stat("counters", parse_swift_info) < 0 && retry < RETRY_NUM) {
         retry++;
     }
-    pos = sprintf(buf, "%lld,%lld",
-            stats.accepts,
-            stats.conns
-             );
+
+    char buf[LEN_4096];
+    memset(buf, 0, sizeof(buf));
+    int pos = snprintf(buf, LEN_4096 - 1, "%d,%d,%lu,%lu,%llu",
+        info->pid, info->ppid, info->start_time, info->pstart_time, info->coredump_times);
     buf[pos] = '\0';
     set_mod_record(mod, buf);
 }
 
-void
-mod_register(struct module *mod)
+static void set_proc_stat(struct module *mod, double st_array[],
+    U_64 pre_array[], U_64 cur_array[], int inter)
 {
-    register_mod_fileds(mod, "--swift_sys", swift_sys_usage, swift_sys_info, 2, read_swift_stats, set_swift_record);
+    int i;
+    for (i = 0; i < 5; ++i) {
+        st_array[i] = cur_array[i];
+    }
 }
+
+void mod_register(struct module *mod)
+{
+    register_mod_fileds(mod, "--swift_sys", usage,
+        swift_proc_mod_info, 5, read_proc_stat, set_proc_stat);
+}
+
+
