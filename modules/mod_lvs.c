@@ -106,5 +106,5 @@ set_lvs_record(struct module *mod, double st_array[],
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--lvs", lvs_usage, info, sizeof(info)/sizeof(struct mod_info), read_lvs, set_lvs_record);
+    register_mod_fields(mod, "--lvs", lvs_usage, info, sizeof(info)/sizeof(struct mod_info), read_lvs, set_lvs_record);
 }

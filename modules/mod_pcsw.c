@@ -62,6 +62,6 @@ static struct mod_info pcsw_info[] = {
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--pcsw", pcsw_usage, pcsw_info, 2, read_stat_pcsw, NULL);
+    register_mod_fields(mod, "--pcsw", pcsw_usage, pcsw_info, 2, read_stat_pcsw, NULL);
 }
 

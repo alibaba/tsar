@@ -133,10 +133,12 @@ read_erpc_stats(struct module *mod, char *parameter)
                 "/monitor", "127.0.0.1");
 
         if ((m = connect(sockfd, (struct sockaddr *) addr, addr_len)) == -1 ) {
+            close(sockfd);
             return;
         }
 
         if ((send = write(sockfd, request, strlen(request))) == -1) {
+            close(sockfd);
             return;
         }
 
@@ -186,5 +188,5 @@ read_erpc_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--erpc", erpc_usage, erpc_info, 5, read_erpc_stats, set_erpc_record);
+    register_mod_fields(mod, "--erpc", erpc_usage, erpc_info, 5, read_erpc_stats, set_erpc_record);
 }

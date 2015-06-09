@@ -56,12 +56,12 @@ print_cgcpu_stats(struct module *mod)
     char   buf[LEN_1M];
     /*set n group's data to buf*/
     for (i = 0; i < n_group; i++) {
-        pos += snprintf(buf + pos, LEN_1M, "%s=%llu", cgcpu_groups[i].group_name, (
+        pos += snprintf(buf + pos, LEN_1M - pos, "%s=%llu", cgcpu_groups[i].group_name, (
                         unsigned long long int)(cgcpu_groups[i].sum_exec_runtime * 1000));
         if (pos >= LEN_1M) {
             break;
         }
-        pos += snprintf(buf + pos, LEN_1M, ITEM_SPLIT);
+        pos += snprintf(buf + pos, LEN_1M - pos, ITEM_SPLIT);
         if (pos >= LEN_1M) {
             break;
         }
@@ -108,6 +108,7 @@ read_cgcpu_stats(struct module *mod)
             }
             n_task --;
             if (fclose(taskfd) < 0) {
+                closedir(dir);
                 return;
             }
 
@@ -126,6 +127,8 @@ read_cgcpu_stats(struct module *mod)
                     struct sched_info cur;
 
                     if (sscanf(buffer, scan_fmt, &cur.name, &cur.none, &cur.time) < 0){
+                        closedir(dir);
+                        fclose(schedfd);
                         return;
                     }
                     if (memcmp(cur.name, title, strlen(title)) == 0) {
@@ -134,6 +137,7 @@ read_cgcpu_stats(struct module *mod)
                     }
                 }
                 if (fclose(schedfd) < 0) {
+                    closedir(dir);
                     return;
                 }
             }
@@ -148,5 +152,5 @@ read_cgcpu_stats(struct module *mod)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--cgcpu", cgcpu_usage, cgcpu_info, 1, read_cgcpu_stats, set_cgcpu_record);
+    register_mod_fields(mod, "--cgcpu", cgcpu_usage, cgcpu_info, 1, read_cgcpu_stats, set_cgcpu_record);
 }

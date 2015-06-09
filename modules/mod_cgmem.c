@@ -54,7 +54,7 @@ print_cgmem_stats(struct module *mod)
 
     /*set n group's data to buf*/
     for (i = 0; i < n_group; i++) {
-        pos += snprintf(buf + pos, LEN_4096, "%s=%lu,%lu,%lu,%lu,%lu,%lu",
+        pos += snprintf(buf + pos, LEN_4096 - pos, "%s=%lu,%lu,%lu,%lu,%lu,%lu",
                 cgmem_groups[i].group_name,
                 cgmem_groups[i].cache + cgmem_groups[i].rss,
                 cgmem_groups[i].swap,
@@ -65,7 +65,7 @@ print_cgmem_stats(struct module *mod)
         if (pos >= LEN_4096) {
             break;
         }
-        pos += snprintf(buf + pos, LEN_4096, ITEM_SPLIT);
+        pos += snprintf(buf + pos, LEN_4096 - pos, ITEM_SPLIT);
         if (pos >= LEN_4096) {
             break;
         }
@@ -124,6 +124,7 @@ read_cgmem_stats(struct module *mod)
             }
 
             if (fclose(memfd) < 0) {
+                closedir(dir);
                 return;
             }
             n_group ++;
@@ -139,5 +140,5 @@ read_cgmem_stats(struct module *mod)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--cgmem", cgmem_usage, cgmem_info, 6, read_cgmem_stats, set_cgmem_record);
+    register_mod_fields(mod, "--cgmem", cgmem_usage, cgmem_info, 6, read_cgmem_stats, set_cgmem_record);
 }

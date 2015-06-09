@@ -69,5 +69,5 @@ static struct mod_info udp_info[] = {
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--udp", udp_usage, udp_info, 4, read_udp_stats, NULL);
+    register_mod_fields(mod, "--udp", udp_usage, udp_info, 4, read_udp_stats, NULL);
 }

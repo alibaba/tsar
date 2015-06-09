@@ -279,5 +279,5 @@ read_swift_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift_conn", swift_conn_usage, swift_conn_info, 5, read_swift_stats, set_swift_record);
+    register_mod_fields(mod, "--swift_conn", swift_conn_usage, swift_conn_info, 5, read_swift_stats, set_swift_record);
 }

@@ -455,7 +455,7 @@ static void read_swift_esi_stats(struct module *mod, char *parameter)
 
 void mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift_esi", swift_esi_usage,
+    register_mod_fields(mod, "--swift_esi", swift_esi_usage,
                         swift_esi_info, 5, read_swift_esi_stats,
                         set_swift_esi_record);
 }

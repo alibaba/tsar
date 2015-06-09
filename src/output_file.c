@@ -23,7 +23,7 @@
 void
 output_file()
 {
-    int         i, ret, n = 0;
+    int         i, ret = 0, n = 0;
     FILE       *fp = NULL;
     char        detail[LEN_1M] = {0};
     char        s_time[LEN_256] = {0};

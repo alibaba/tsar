@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 #define NUM_DOMAIN_MAX 64
-#define MAX 40960
+#define MAX 1024
 #define DOMAIN_LIST_DELIM ", \t"
 
 int nginx_port = 80;
@@ -18,7 +18,7 @@ int top_domain = 0;
 int all_domain = 0;
 
 struct stats_nginx_domain {
-    char domain[256];                   /* domain name */
+    char domain[LEN_4096];                   /* domain name */
     unsigned long long nbytesin;        /* total bytes in */
     unsigned long long nbytesout;       /* total bytes out */
     unsigned long long nconn;       /* total connections */
@@ -219,10 +219,12 @@ read_nginx_domain_traffic_stats(struct module *mod, char *parameter)
             hinfo.uri, hinfo.server_name);
 
     if ((m = connect(sockfd, (struct sockaddr *) addr, addr_len)) == -1 ) {
+        close(sockfd);
         return;
     }
 
     if ((send = write(sockfd, request, strlen(request))) == -1) {
+        close(sockfd);
         return;
     }
 
@@ -295,10 +297,11 @@ read_nginx_domain_traffic_stats(struct module *mod, char *parameter)
     if (top_domain == 0 || top_domain > domain_num) {
         top_domain = domain_num;
     }
-    if (top_domain > NUM_DOMAIN_MAX) {
-        top_domain = NUM_DOMAIN_MAX;
+    if (top_domain > MAX) {
+        top_domain = MAX;
     }
     if (domain_num == 0) {
+        fclose(stream);
         return;
     }
 
@@ -330,6 +333,6 @@ read_nginx_domain_traffic_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--nginx_domain_traffic", nginx_domain_traffic_usage, nginx_info, 7,
+    register_mod_fields(mod, "--nginx_domain_traffic", nginx_domain_traffic_usage, nginx_info, 7,
                         read_nginx_domain_traffic_stats, set_nginx_domain_record);
 }

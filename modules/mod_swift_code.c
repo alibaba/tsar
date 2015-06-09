@@ -260,9 +260,10 @@ read_swift_code_stat()
         return -3;
     }
 
-    while ((len = myread_swift_code(conn, buf + fsize, sizeof(buf) - fsize)) > 0) {
+    while ((len = myread_swift_code(conn, buf + fsize, sizeof(buf) - fsize - 1)) > 0) {
         fsize += len;
     }
+    buf[fsize] = '\0';
 
     /* read error */
     if (fsize < 100) {
@@ -316,5 +317,5 @@ read_swift_code_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift_code", swift_code_usage, swift_code_info, 15, read_swift_code_stats, set_swift_code_record);
+    register_mod_fields(mod, "--swift_code", swift_code_usage, swift_code_info, 15, read_swift_code_stats, set_swift_code_record);
 }

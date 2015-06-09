@@ -44,6 +44,7 @@
 #define LEN_512     512
 #define LEN_1024    1024
 #define LEN_4096    4096
+#define LEN_1M      1048576
 
 #define ITEM_SPLIT      ";"
 #define DATA_SPLIT      ","
@@ -60,10 +61,10 @@ struct module {
 
     char    name[LEN_32];
     char    opt_line[LEN_32];
-    char    record[LEN_4096];
+    char    record[LEN_1M];
     char    usage[LEN_256];
     char    parameter[LEN_256];
-    char    print_item[LEN_32];
+    char    print_item[LEN_256];
 
     struct  mod_info *info;
     void   *lib;
@@ -94,7 +95,7 @@ struct module {
     void (*mod_register) (struct module *);
 };
 
-void register_mod_fileds(struct module *mod, const char *opt, const char *usage,
+void register_mod_fields(struct module *mod, const char *opt, const char *usage,
         struct mod_info *info, int n_col, void *data_collect, void *set_st_record);
 void set_mod_record(struct module *mod, const char *record);
 

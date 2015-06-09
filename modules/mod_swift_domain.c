@@ -399,7 +399,7 @@ static void read_swift_domain_stats(struct module *mod, char *parameter)
 
 void mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift_domain", swift_domain_usage,
+    register_mod_fields(mod, "--swift_domain", swift_domain_usage,
                         swift_domain_info, 3, read_swift_domain_stats,
                         set_swift_domain_record);
 }

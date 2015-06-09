@@ -120,10 +120,14 @@ char *
 a_trim(char *str, int len)
 {
     int    i = 0;
-    char  *dest, *l_str;
+    char  *dest = NULL, *l_str;
     dest = (char *)malloc(len);
+    if (dest == NULL ){
+        return NULL;
+    }
     l_str = str;
     if (l_str == NULL) {
+        free(dest);
         return NULL;
     }
     while (*l_str++ != '\0' && len--) {
@@ -483,9 +487,10 @@ __get_squid_info(char *squidoption, char *squidcmd, int port, int index)
         close(conn);
         return -3;
     }
-    while ((len = myread(conn, buf, sizeof(buf) - fsize)) > 0) {
+    while ((len = myread(conn, buf, sizeof(buf) - fsize -1)) > 0) {
         fsize += len;
     }
+    buf[fsize] = '\0';
     /* read error */
     if (fsize < 1000) {
         close(conn);
@@ -647,5 +652,5 @@ static struct mod_info s_info[] = {
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--squid", squid_usage, s_info, 14, read_squid_stat, set_squid_record);
+    register_mod_fields(mod, "--squid", squid_usage, s_info, 14, read_squid_stat, set_squid_record);
 }

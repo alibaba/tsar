@@ -150,5 +150,5 @@ writebuf:
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--nginx_sys", nginx_sys_usage, nginx_sys_info, 1, read_nginx_sys_stats, set_nginx_sys_record);
+    register_mod_fields(mod, "--nginx_sys", nginx_sys_usage, nginx_sys_info, 1, read_nginx_sys_stats, set_nginx_sys_record);
 }

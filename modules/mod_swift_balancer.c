@@ -237,9 +237,10 @@ read_swift_balancer_stat(char *cmd)
         return -3;
     }
 
-    while ((len = myread_swift_balancer(conn, buf + fsize, sizeof(buf) - fsize)) > 0) {
+    while ((len = myread_swift_balancer(conn, buf + fsize, sizeof(buf) - fsize - 1)) > 0) {
         fsize += len;
     }
+    buf[fsize] = '\0';
 
     /* read error */
     if (fsize < 100) {
@@ -284,5 +285,5 @@ read_swift_balancer_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift_balancer", swift_balancer_usage, swift_balancer_info, 5, read_swift_balancer_stats, set_swift_balancer_record);
+    register_mod_fields(mod, "--swift_balancer", swift_balancer_usage, swift_balancer_info, 5, read_swift_balancer_stats, set_swift_balancer_record);
 }

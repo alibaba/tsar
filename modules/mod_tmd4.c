@@ -173,6 +173,6 @@ writebuf:
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--tmd4", tmd4_usage, tmd4_info, 9,
+    register_mod_fields(mod, "--tmd4", tmd4_usage, tmd4_info, 9,
             read_tmd4_stats, set_tmd4_record);
 }

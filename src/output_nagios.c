@@ -148,6 +148,7 @@ output_nagios()
                         }
                     }
                 }
+                free(n_record);
             }
         }
     }

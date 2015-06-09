@@ -161,5 +161,5 @@ writebuf:
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--pharos", pharos_usage, pharos_info, 5, read_pharos_stats, set_pharos_record);
+    register_mod_fields(mod, "--pharos", pharos_usage, pharos_info, 5, read_pharos_stats, set_pharos_record);
 }

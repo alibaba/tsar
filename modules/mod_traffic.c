@@ -95,5 +95,5 @@ static struct mod_info traffic_info[] ={
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--traffic", traffic_usage, traffic_info, 6, read_traffic_stats, NULL);
+    register_mod_fields(mod, "--traffic", traffic_usage, traffic_info, 6, read_traffic_stats, NULL);
 }

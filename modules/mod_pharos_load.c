@@ -214,6 +214,6 @@ writebuf:
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--pharos_load", pharos_load_usage, pharos_load_info,
+    register_mod_fields(mod, "--pharos_load", pharos_load_usage, pharos_load_info,
                         13, read_pharos_load_stats, set_pharos_load_record);
 }

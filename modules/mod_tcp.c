@@ -109,5 +109,5 @@ static struct mod_info tcp_info[] = {
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--tcp", tcp_usage, tcp_info, 8, read_tcp_stats, set_tcp_record);
+    register_mod_fields(mod, "--tcp", tcp_usage, tcp_info, 8, read_tcp_stats, set_tcp_record);
 }

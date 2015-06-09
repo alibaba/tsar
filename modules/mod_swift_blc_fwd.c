@@ -216,9 +216,10 @@ read_swift_blc_fwd_stat()
         return -3;
     }
 
-    while ((len = myread_swift_blc_fwd(conn, buf + fsize, sizeof(buf) - fsize)) > 0) {
+    while ((len = myread_swift_blc_fwd(conn, buf + fsize, sizeof(buf) - fsize - 1)) > 0) {
         fsize += len;
     }
+    buf[fsize] = '\0';
 
     /* read error */
     if (fsize < 100) {
@@ -261,5 +262,5 @@ read_swift_blc_fwd_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift_blc_fwd", swift_blc_fwd_usage, swift_blc_fwd_info, 4, read_swift_blc_fwd_stats, set_swift_blc_fwd_record);
+    register_mod_fields(mod, "--swift_blc_fwd", swift_blc_fwd_usage, swift_blc_fwd_info, 4, read_swift_blc_fwd_stats, set_swift_blc_fwd_record);
 }

@@ -115,5 +115,5 @@ static struct mod_info cpu_info[] = {
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--ncpu", cpu_usage, cpu_info, 9, read_cpu_stats, set_cpu_record);
+    register_mod_fields(mod, "--ncpu", cpu_usage, cpu_info, 9, read_cpu_stats, set_cpu_record);
 }

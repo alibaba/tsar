@@ -149,9 +149,11 @@ main_init(int argc, char **argv)
                 break;
             case 'h':
                 usage();
+                break;
             case ':':
                 printf("must have parameter\n");
                 usage();
+                break;
             case '?':
                 if (argv[oind] && strstr(argv[oind], "--")) {
                     strcat(conf.output_print_mod, argv[oind]);

@@ -88,6 +88,6 @@ static struct mod_info load_info[] = {
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--load", load_usage, load_info, 5, read_stat_load, set_load_record);
+    register_mod_fields(mod, "--load", load_usage, load_info, 5, read_stat_load, set_load_record);
 }
 

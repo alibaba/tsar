@@ -51,6 +51,7 @@ read_rpi_stats(struct module *mod, char *parameter)
     }
 
     if (cpu_temp == 85 * 1000 || cpu_temp < 1) {
+        fclose(fp);
         return;
     }
 
@@ -79,5 +80,5 @@ set_rpi_record(struct module *mod, double st_array[],
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--rpi", rpi_usage, rpi_info, 1, read_rpi_stats, set_rpi_record);
+    register_mod_fields(mod, "--rpi", rpi_usage, rpi_info, 1, read_rpi_stats, set_rpi_record);
 }

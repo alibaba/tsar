@@ -193,5 +193,5 @@ static struct mod_info rndc_info[] = {
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--rndc", rndc_usage, rndc_info, sizeof(rndc_info) / sizeof(struct mod_info), read_rndc_stats, set_rndc_stats);
+    register_mod_fields(mod, "--rndc", rndc_usage, rndc_info, sizeof(rndc_info) / sizeof(struct mod_info), read_rndc_stats, set_rndc_stats);
 }

@@ -119,5 +119,5 @@ mod_register(struct module *mod)
     }
     fclose(fp);
 
-    register_mod_fileds(mod, "--shell", shell_usage, shell_info, count, read_shell_stats, set_shell_record);
+    register_mod_fields(mod, "--shell", shell_usage, shell_info, count, read_shell_stats, set_shell_record);
 }

@@ -331,5 +331,5 @@ set_io_record(struct module *mod, double st_array[],
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--io", io_usage, io_info, 11, read_io_stat, set_io_record);
+    register_mod_fields(mod, "--io", io_usage, io_info, 11, read_io_stat, set_io_record);
 }

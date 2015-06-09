@@ -69,7 +69,7 @@ struct module {
 };
 
 
-void register_mod_fileds(struct module *mod, const char *opt, const char *usage,
+void register_mod_fields(struct module *mod, const char *opt, const char *usage,
         struct mod_info *info, int n_col, void *data_collect, void *set_st_record);
 void set_mod_record(struct module *mod, const char *record);
 void init_module_fields();

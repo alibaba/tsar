@@ -122,5 +122,5 @@ static struct mod_info mem_info[] = {
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--mem", mem_usage, mem_info, 6, read_mem_stats, set_mem_record);
+    register_mod_fields(mod, "--mem", mem_usage, mem_info, 6, read_mem_stats, set_mem_record);
 }

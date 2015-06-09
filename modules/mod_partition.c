@@ -135,5 +135,5 @@ static struct mod_info part_info[] = {
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--partition", partition_usage, part_info, 7, read_partition_stat, set_part_record);
+    register_mod_fields(mod, "--partition", partition_usage, part_info, 7, read_partition_stat, set_part_record);
 }

@@ -5,11 +5,10 @@
 #include <fcntl.h>
 #include "tsar.h"
 
-struct stats_tmd {
-    unsigned long long nprocess;    /* tmd process requests */
-    unsigned long long ncheckcode;  /* return checkcode requests */
-    unsigned long long nwait;       /* return wait requests */
-    unsigned long long ndeny;       /* return deny requests */
+struct stats_keyserver {
+    unsigned long long nrequests;   /* key server requests */
+    unsigned long long nfailed;     /* failed requests */
+    unsigned long long nrt;         /* average dec/enc time */
 };
 
 struct hostinfo {
@@ -19,22 +18,21 @@ struct hostinfo {
     char  *uri;
 };
 
-static char *tmd_usage = "    --tmd               tmd statistics";
+static char *keyserver_usage = "    --keyserver              key server statistics";
 
-static struct mod_info tmd_info[] = {
-    {"proces", DETAIL_BIT,  0,  STATS_NULL},
-    {" check", DETAIL_BIT,  0,  STATS_NULL},
-    {"  wait", DETAIL_BIT,  0,  STATS_NULL},
-    {"  deny", DETAIL_BIT,  0,  STATS_NULL}
+static struct mod_info keyserver_info[] = {
+    {"  reqs", DETAIL_BIT,  0,  STATS_NULL},
+    {"failed", DETAIL_BIT,  0,  STATS_NULL},
+    {"    rt", SUMMARY_BIT,  0,  STATS_NULL},
 };
 
 
 static void
-set_tmd_record(struct module *mod, double st_array[],
+set_keyserver_record(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {
     int i;
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 3; i++) {
         if (cur_array[i] >= pre_array[i]) {
             st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
 
@@ -46,26 +44,26 @@ set_tmd_record(struct module *mod, double st_array[],
 
 
 static void
-init_tmd_host_info(struct hostinfo *p)
+init_keyserver_host_info(struct hostinfo *p)
 {
     char *port;
 
-    p->host = getenv("TMD_TSAR_HOST");
+    p->host = getenv("KEYSERVER_TSAR_HOST");
     p->host = p->host ? p->host : "127.0.0.1";
 
-    port = getenv("TMD_TSAR_PORT");
+    port = getenv("KEYSERVER_TSAR_PORT");
     p->port = port ? atoi(port) : 80;
 
-    p->uri = getenv("TMD_TSAR_URI");
-    p->uri = p->uri ? p->uri : "/tmd_status";
+    p->uri = getenv("KEYSERVER_TSAR_URI");
+    p->uri = p->uri ? p->uri : "/keyserver_status";
 
-    p->server_name = getenv("TMD_TSAR_SERVER_NAME");
-    p->server_name = p->server_name ? p->server_name : "tmd.status.taobao.com";
+    p->server_name = getenv("KEYSERVER_TSAR_SERVER_NAME");
+    p->server_name = p->server_name ? p->server_name : "keyserver.status.taobao.com";
 }
 
 
 void
-read_tmd_stats(struct module *mod)
+read_keyserver_stats(struct module *mod, char *parameter)
 {
     int    write_flag = 0, addr_len, domain;
     int    m, sockfd, send, pos;
@@ -76,9 +74,12 @@ read_tmd_stats(struct module *mod)
     struct sockaddr_un servaddr_un;
     FILE  *stream = NULL;
     struct hostinfo hinfo;
-    init_tmd_host_info(&hinfo);
-    struct stats_tmd st_tmd;
-    memset(&st_tmd, 0, sizeof(struct stats_tmd));
+    init_keyserver_host_info(&hinfo);
+    if (atoi(parameter) != 0) {
+       hinfo.port = atoi(parameter);
+    }
+    struct stats_keyserver st_ks;
+    memset(&st_ks, 0, sizeof(struct stats_keyserver));
 
     if (*hinfo.host == '/') {
         addr = &servaddr_un;
@@ -128,9 +129,8 @@ read_tmd_stats(struct module *mod)
 
         if (!strncmp(line, " ", 1)) {
 
-            sscanf(line + 1, "%llu %llu %llu %llu",
-                    &st_tmd.nprocess, &st_tmd.ncheckcode, &st_tmd.nwait,
-                    &st_tmd.ndeny);
+            sscanf(line + 1, "%llu %llu %llu",
+                    &st_ks.nrequests, &st_ks.nfailed, &st_ks.nrt);
 
             write_flag = 1;
         }
@@ -146,8 +146,8 @@ writebuf:
     }
 
     if (write_flag) {
-        pos = sprintf(buf, "%lld,%lld,%lld,%lld", st_tmd.nprocess,
-                st_tmd.ncheckcode, st_tmd.nwait, st_tmd.ndeny);
+        pos = sprintf(buf, "%lld,%lld,%lld",
+                    st_ks.nrequests, st_ks.nfailed, st_ks.nrt);
 
         buf[pos] = '\0';
         set_mod_record(mod, buf);
@@ -158,6 +158,6 @@ writebuf:
 void
 mod_register(struct module *mod)
 {
-    register_mod_fields(mod, "--tmd", tmd_usage, tmd_info, 4,
-            read_tmd_stats, set_tmd_record);
+    register_mod_fields(mod, "--keyserver", keyserver_usage, keyserver_info, 3,
+            read_keyserver_stats, set_keyserver_record);
 }

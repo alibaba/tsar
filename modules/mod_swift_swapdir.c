@@ -148,6 +148,8 @@ parse_swift_swapdir_info(char *buf)
             n_swapdir += 1;
             snprintf(partition[n_swapdir].name, 128, "%s", path);
             snprintf(partition[n_swapdir].type, 128, "%s", type);
+        } else if (n_swapdir < 0){
+            return n_swapdir + 1;
         } else if (strstr(line, "start offset") != NULL) {
             /* start offset: 16777216 */
             unsigned long long size = 0;
@@ -251,9 +253,10 @@ read_swift_swapdir_stat(char *cmd)
         return -3;
     }
 
-    while ((len = myread_swift(conn, buf + fsize, sizeof(buf) - fsize)) > 0) {
+    while ((len = myread_swift(conn, buf + fsize, sizeof(buf) - fsize - 1)) > 0) {
         fsize += len;
     }
+    buf[fsize] = '\0';
 
     /* read error */
     if (fsize < 100) {
@@ -314,5 +317,5 @@ read_swift_swapdir_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift_swapdir", swift_usage, swift_swapdir_info, 6, read_swift_swapdir_stats, set_swift_swapdir_record);
+    register_mod_fields(mod, "--swift_swapdir", swift_usage, swift_swapdir_info, 6, read_swift_swapdir_stats, set_swift_swapdir_record);
 }

@@ -44,6 +44,7 @@ read_apache_stats(struct module *mod)
     struct stats_apache st_apache;
     memset(&st_apache, 0, sizeof(struct stats_apache));
     struct hostinfo hinfo;
+    memset(&hinfo, 0, sizeof(struct hostinfo));
 
     if ((fd = open(APACHERT, O_RDONLY , 0644)) < 0 ){
         return;
@@ -146,5 +147,5 @@ static struct mod_info apache_info[] = {
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--apache", apache_usage, apache_info, 5, read_apache_stats, set_apache_record);
+    register_mod_fields(mod, "--apache", apache_usage, apache_info, 5, read_apache_stats, set_apache_record);
 }

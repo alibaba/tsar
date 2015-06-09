@@ -310,6 +310,7 @@ read_swift_health()
 
     char *p = strstr(buf, "\r\n");
     if (p && memcmp(buf, "HTTP/1.1 200 OK", 15) == 0) {
+        close(conn);
         return 1;
     }
 
@@ -361,5 +362,5 @@ read_swift_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift", swift_usage, swift_info, 14, read_swift_stats, set_swift_record);
+    register_mod_fields(mod, "--swift", swift_usage, swift_info, 14, read_swift_stats, set_swift_record);
 }

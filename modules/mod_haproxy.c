@@ -110,7 +110,7 @@ set_haproxy_record(struct module *mod, double st_array[],
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--haproxy", haproxy_usage, info, sizeof(info) / sizeof(struct mod_info), read_haproxy, set_haproxy_record);
+    register_mod_fields(mod, "--haproxy", haproxy_usage, info, sizeof(info) / sizeof(struct mod_info), read_haproxy, set_haproxy_record);
 }
 
 
@@ -309,7 +309,6 @@ get_haproxy_detail(void)
     struct sockaddr_un  remote;
     /*result for tsar to show*/
     if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
-        close(s);
         if (DEBUG) {
             perror("socket");
         }
@@ -347,8 +346,8 @@ get_haproxy_detail(void)
         return -1;
     }
     if (!strstr(str, "Uptime_sec")) {
+        close(s);
         if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
-            close(s);
             if (DEBUG) {
                 perror("socket");
             }

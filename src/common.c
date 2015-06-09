@@ -130,7 +130,7 @@ merge_mult_item_to_array(U_64 *array, struct module *mod)
 {
     int    pos = 0;
     int    n_item = 1;
-    char   item[LEN_128] = {0};
+    char   item[LEN_1M] = {0};
 
     memset(array, 0, sizeof(U_64) * mod->n_col);
     while (strtok_next_item(item, mod->record, &pos)) {
@@ -243,8 +243,11 @@ get_st_array_from_file(int have_collect)
             }
             ret = -1;
             goto out;
+        } else {
+             if (fclose(fp) < 0) {
+                do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
+            }
         }
-
     } else {
         ret = -1;
         goto out;
@@ -258,6 +261,7 @@ get_st_array_from_file(int have_collect)
     }
     memcpy(pre_time, pre_line, s_token - pre_line);
     if (!(conf.print_interval = statis.cur_time - atol(pre_time))) {
+        ret = -1;
         goto out;
     }
 

@@ -129,5 +129,5 @@ static struct mod_info percpu_info[] = {
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--percpu", percpu_usage, percpu_info, 9, read_percpu_stats, set_percpu_record);
+    register_mod_fields(mod, "--percpu", percpu_usage, percpu_info, 9, read_percpu_stats, set_percpu_record);
 }

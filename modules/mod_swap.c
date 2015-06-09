@@ -97,5 +97,5 @@ static struct mod_info swap_info[] = {
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swap", swap_usage, swap_info, 4, read_vmstat_swap, set_swap_record);
+    register_mod_fields(mod, "--swap", swap_usage, swap_info, 4, read_vmstat_swap, set_swap_record);
 }

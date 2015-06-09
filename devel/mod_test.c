@@ -80,5 +80,5 @@ set_test_record(struct module *mod, double st_array[],
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--test", test_usage, test_info, 3, read_test_stats, set_test_record);
+    register_mod_fields(mod, "--test", test_usage, test_info, 3, read_test_stats, set_test_record);
 }

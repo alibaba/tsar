@@ -279,15 +279,15 @@ read_swift_tcmalloc_stat()
         return -3;
     }
 
-    while ((len = myread_swift_tcmalloc(conn, buf + fsize, sizeof(buf) - fsize)) > 0) {
+    while ((len = myread_swift_tcmalloc(conn, buf + fsize, sizeof(buf) - fsize -1 )) > 0) {
         fsize += len;
     }
-
     /* read error */
     if (fsize < 0) {
         close(conn);
         return -1;
     }
+    buf[fsize] = '\0';
 
     if (parse_swift_tcmalloc_info(buf) < 0) {
         close(conn);
@@ -333,6 +333,6 @@ read_swift_tcmalloc_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift_tcmalloc", swift_tcmalloc_usage, swift_tcmalloc_info, DATA_COUNT,
+    register_mod_fields(mod, "--swift_tcmalloc", swift_tcmalloc_usage, swift_tcmalloc_info, DATA_COUNT,
         read_swift_tcmalloc_stats, set_swift_tcmalloc_record);
 }

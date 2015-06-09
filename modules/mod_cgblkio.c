@@ -99,7 +99,7 @@ print_cgblkio_stats(struct module *mod)
     char   buf[LEN_1M];
     /*set n group's data to buf*/
     for(i = 0; i < n_group; i++){
-        pos += snprintf(buf + pos, LEN_1M, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu",
+        pos += snprintf(buf + pos, LEN_1M - pos, "%s=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu",
                 blkio_groups[i].group_name,
                 blkio_groups[i].rd_merges,
                 blkio_groups[i].wr_merges,
@@ -112,7 +112,7 @@ print_cgblkio_stats(struct module *mod)
                 blkio_groups[i].svctm);
         if(pos >= LEN_1M)
             break;
-        pos += snprintf(buf + pos, LEN_1M, ITEM_SPLIT);
+        pos += snprintf(buf + pos, LEN_1M - pos, ITEM_SPLIT);
         if(pos >= LEN_1M)
             break;
     }
@@ -154,6 +154,7 @@ read_cgblkio_stats(struct module *mod)
                 }
             }
             if (fclose(iofd) < 0) {
+                closedir(dir);
                 return;
             }
 
@@ -171,6 +172,7 @@ read_cgblkio_stats(struct module *mod)
                 }
             }
             if (fclose(iofd) < 0) {
+                closedir(dir);
                 return;
             }
 
@@ -188,6 +190,7 @@ read_cgblkio_stats(struct module *mod)
                 }
             }
             if (fclose(iofd) < 0) {
+                closedir(dir);
                 return;
             }
 
@@ -205,6 +208,7 @@ read_cgblkio_stats(struct module *mod)
                 }
             }
             if (fclose(iofd) < 0) {
+                closedir(dir);
                 return;
             }
 
@@ -222,6 +226,7 @@ read_cgblkio_stats(struct module *mod)
                 }
             }
             if (fclose(iofd) < 0) {
+                closedir(dir);
                 return;
             }
 
@@ -239,6 +244,7 @@ read_cgblkio_stats(struct module *mod)
                 }
             }
             if (fclose(iofd) < 0) {
+                closedir(dir);
                 return;
             }
 
@@ -253,5 +259,5 @@ read_cgblkio_stats(struct module *mod)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--cgblkio", cgblkio_usage, cgblkio_info, 11, read_cgblkio_stats, set_cgblkio_record);
+    register_mod_fields(mod, "--cgblkio", cgblkio_usage, cgblkio_info, 11, read_cgblkio_stats, set_cgblkio_record);
 }

@@ -145,10 +145,12 @@ read_nginx_code_stats(struct module *mod, char *parameter)
             hinfo.uri, hinfo.server_name);
 
     if ((m = connect(sockfd, (struct sockaddr *) addr, addr_len)) == -1 ) {
+        close(sockfd);
         return;
     }
 
     if ((send = write(sockfd, request, strlen(request))) == -1) {
+        close(sockfd);
         return;
     }
 
@@ -234,5 +236,5 @@ read_nginx_code_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--nginx_code", nginx_code_usage, nginx_code_info, 19, read_nginx_code_stats, set_nginx_code_record);
+    register_mod_fields(mod, "--nginx_code", nginx_code_usage, nginx_code_info, 19, read_nginx_code_stats, set_nginx_code_record);
 }

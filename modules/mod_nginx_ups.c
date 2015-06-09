@@ -127,10 +127,12 @@ read_nginx_domain_ups_stats(struct module *mod, char *parameter)
             hinfo.uri, hinfo.server_name);
 
     if ((m = connect(sockfd, (struct sockaddr *) addr, addr_len)) == -1 ) {
+        close(sockfd);
         return;
     }
 
     if ((send = write(sockfd, request, strlen(request))) == -1) {
+        close(sockfd);
         return;
     }
 
@@ -207,6 +209,6 @@ read_nginx_domain_ups_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--nginx_ups", nginx_ups_usage, nginx_info, 8,
+    register_mod_fields(mod, "--nginx_ups", nginx_ups_usage, nginx_info, 8,
                         read_nginx_domain_ups_stats, set_nginx_ups_record);
 }

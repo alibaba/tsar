@@ -89,12 +89,12 @@ read_ts_code_stats(struct module *mod)
     char                   buf[LINE_4096];
     struct sockaddr_un     un;
     struct stats_ts_codes  st_ts;
-
+    bzero(&st_ts, sizeof(st_ts));
+    bzero(&un, sizeof(un));
+  
     if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
         goto done;
     }
-    bzero(&st_ts, sizeof(st_ts));
-    bzero(&un, sizeof(un));
     un.sun_family = AF_UNIX;
     strcpy(un.sun_path, sock_path);
     if (connect(fd, (struct sockaddr *)&un, sizeof(un)) < 0) {
@@ -172,5 +172,5 @@ done:
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--ts_codes", ts_codes_usage, ts_code_info, 12, read_ts_code_stats, set_ts_code_record);
+    register_mod_fields(mod, "--ts_codes", ts_codes_usage, ts_code_info, 12, read_ts_code_stats, set_ts_code_record);
 }

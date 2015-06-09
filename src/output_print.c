@@ -954,6 +954,13 @@ running_check(int check_type)
             do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
         }
     }
+
+    /*as fp is not used after here,close it */
+    if (fclose(fp) < 0) {
+        do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
+    }
+    fp = NULL;
+
     /* set struct module fields */
     init_module_fields();
 
@@ -1041,10 +1048,6 @@ running_check(int check_type)
             }
         }
         printf("\n");
-        if (fclose(fp) < 0) {
-            do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
-        }
-        fp = NULL;
         return;
     }
 #ifdef OLDTSAR
@@ -1205,10 +1208,6 @@ running_check(int check_type)
             strcat(check, tmp[j]);
         }
         printf("%s\n", check);
-        if (fclose(fp) < 0) {
-            do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
-        }
-        fp = NULL;
     }
 #endif
 }

@@ -86,5 +86,5 @@ static struct mod_info pernic_info[] = {
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--pernic", pernic_usage, pernic_info, 4, read_pernic_stats, NULL);
+    register_mod_fields(mod, "--pernic", pernic_usage, pernic_info, 4, read_pernic_stats, NULL);
 }

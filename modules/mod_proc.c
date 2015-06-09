@@ -44,6 +44,7 @@ read_proc_stats(struct module *mod, char *parameter)
         return;
     }
     if(fscanf(fp, "%s", spid) == EOF) {
+        pclose(fp);
         return;
     }
     pclose(fp);
@@ -70,6 +71,7 @@ read_proc_stats(struct module *mod, char *parameter)
         }
         unsigned long long cpudata[4];
         if (fgets(line, 256, fp) == NULL) {
+            fclose(fp);
             return;
         }
 
@@ -208,5 +210,5 @@ static struct mod_info proc_info[] = {
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--proc", proc_usage, proc_info, 7, read_proc_stats, set_proc_record);
+    register_mod_fields(mod, "--proc", proc_usage, proc_info, 7, read_proc_stats, set_proc_record);
 }

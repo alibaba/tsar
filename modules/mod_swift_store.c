@@ -258,9 +258,10 @@ read_swift_store_stat()
         return -3;
     }
 
-    while ((len = myread_swift_store(conn, buf + fsize, sizeof(buf) - fsize)) > 0) {
+    while ((len = myread_swift_store(conn, buf + fsize, sizeof(buf) - fsize - 1)) > 0) {
         fsize += len;
     }
+    buf[fsize] = '\0';
 
     /* read error */
     if (fsize < 100) {
@@ -308,5 +309,5 @@ read_swift_store_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift_store", swift_store_usage, swift_store_info, 9, read_swift_store_stats, set_swift_store_record);
+    register_mod_fields(mod, "--swift_store", swift_store_usage, swift_store_info, 9, read_swift_store_stats, set_swift_store_record);
 }

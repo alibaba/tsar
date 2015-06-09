@@ -36,8 +36,9 @@ void prepare_data(char* shell_string)
         if(!b_data_open){
             remove(DATA_PATH);
             fd = open(DATA_PATH, O_WRONLY|O_CREAT, 0666);
-            if(fd <= 0){
+            if(fd < 0){
                 printf("open file %s failed. maybe access authority, try to delete it and exec again\n",DATA_PATH);
+                pclose( stream );
                 return;
             }
 
@@ -104,6 +105,7 @@ read_tcprt_stats(struct module *mod)
     }
 
     if (pos == 0) {
+        fclose(fp);
         return;
     }
 
@@ -142,5 +144,5 @@ set_tcprt_record(struct module *mod, double st_array[],
     void
 mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--tcprt", tcprt_usage, tcprt_info, 7, read_tcprt_stats, set_tcprt_record);
+    register_mod_fields(mod, "--tcprt", tcprt_usage, tcprt_info, 7, read_tcprt_stats, set_tcprt_record);
 }

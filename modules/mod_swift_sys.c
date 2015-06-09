@@ -303,7 +303,7 @@ static void set_proc_stat(struct module *mod, double st_array[],
 
 void mod_register(struct module *mod)
 {
-    register_mod_fileds(mod, "--swift_sys", usage,
+    register_mod_fields(mod, "--swift_sys", usage,
         swift_proc_mod_info, 5, read_proc_stat, set_proc_stat);
 }
 
