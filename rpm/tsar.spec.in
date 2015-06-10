@@ -2,7 +2,7 @@ Name: tsar
 Version: _VERSION_
 Release: _RELEASE_
 Summary: Taobao System Activity Reporter
-URL: http://svn.simba.taobao.com/svn/cdn/trunk/tsar/Revision_SVN_REVISION
+URL: https://github.com/alibaba/tsar
 Group: Taobao/Common
 License: Commercial
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
