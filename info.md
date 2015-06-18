@@ -288,7 +288,7 @@ tcprecvq tcpsendq tcpest tcptimewait tcpfinwait1 tcpfinwait2 tcplistenq tcpliste
          24 24 7 0
         Reading: 0 Writing: 1 Waiting: 0
         SSL: 0 SPDY: 0
-（注：对于上述返回数据中的server accepts handled requests request_time，当前是通过“ 24 24 7 0”数据行首的空格作为前导
+（注：对于上述返回数据中的server accepts handled requests request_time，当前是通过“ 24 24 7 0”数据行首的空格作为前导  
 现tsar在本模块中同时支持“Server accepts: 24 handled: 24 requests: 7 request_time 0”格式返回该数据行。今后将升级tengine改用此方式。）
 
 需要确保nginx配置该location,并且能够访问`curl http://localhost/nginx_status`得到上面的数据  
