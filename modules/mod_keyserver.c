@@ -9,6 +9,16 @@ struct stats_keyserver {
     unsigned long long nrequests;   /* key server requests */
     unsigned long long nfailed;     /* failed requests */
     unsigned long long nrt;         /* average dec/enc time */
+    unsigned long long nnokey;      /* no private key */
+    unsigned long long nbadop;      /* invalid operation */
+    unsigned long long nformat;     /* invalid packet format */
+    unsigned long long ninternal;   /* internal error */
+    unsigned long long ndecrypt;    /* decryption error */
+    unsigned long long nsign;       /* signature error */
+    unsigned long long nconn;       /* client connection error */
+    unsigned long long ncclose;     /* client close connection */
+    unsigned long long nrtime;      /* read timeout */
+    unsigned long long nwtime;      /* write timeout */
 };
 
 struct hostinfo {
@@ -24,6 +34,16 @@ static struct mod_info keyserver_info[] = {
     {"  reqs", DETAIL_BIT,  0,  STATS_NULL},
     {"failed", DETAIL_BIT,  0,  STATS_NULL},
     {"    rt", SUMMARY_BIT,  0,  STATS_NULL},
+    {" nokey", DETAIL_BIT,  0,  STATS_NULL},
+    {" badop", DETAIL_BIT,  0,  STATS_NULL},
+    {"format", DETAIL_BIT,  0,  STATS_NULL},
+    {" inter", DETAIL_BIT,  0,  STATS_NULL},
+    {"   dec", DETAIL_BIT,  0,  STATS_NULL},
+    {"  sign", DETAIL_BIT,  0,  STATS_NULL},
+    {"  conn", DETAIL_BIT,  0,  STATS_NULL},
+    {"cclose", DETAIL_BIT,  0,  STATS_NULL},
+    {" rtime", DETAIL_BIT,  0,  STATS_NULL},
+    {" wtime", DETAIL_BIT,  0,  STATS_NULL},
 };
 
 
@@ -32,7 +52,7 @@ set_keyserver_record(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {
     int i;
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 13; i++) {
         if (cur_array[i] >= pre_array[i]) {
             st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
 
@@ -129,8 +149,12 @@ read_keyserver_stats(struct module *mod, char *parameter)
 
         if (!strncmp(line, " ", 1)) {
 
-            sscanf(line + 1, "%llu %llu %llu",
-                    &st_ks.nrequests, &st_ks.nfailed, &st_ks.nrt);
+            sscanf(line + 1, "%llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu",
+                    &st_ks.nrequests, &st_ks.nfailed, &st_ks.nrt,
+                    &st_ks.nnokey, &st_ks.nbadop, &st_ks.nformat,
+                    &st_ks.ninternal, &st_ks.ndecrypt, &st_ks.nsign,
+                    &st_ks.nconn, &st_ks.ncclose, &st_ks.nrtime,
+                    &st_ks.nwtime);
 
             write_flag = 1;
         }
@@ -146,8 +170,12 @@ writebuf:
     }
 
     if (write_flag) {
-        pos = sprintf(buf, "%lld,%lld,%lld",
-                    st_ks.nrequests, st_ks.nfailed, st_ks.nrt);
+        pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
+                    st_ks.nrequests, st_ks.nfailed, st_ks.nrt,
+                    st_ks.nnokey, st_ks.nbadop, st_ks.nformat,
+                    st_ks.ninternal, st_ks.ndecrypt, st_ks.nsign,
+                    st_ks.nconn, st_ks.ncclose, st_ks.nrtime,
+                    st_ks.nwtime);
 
         buf[pos] = '\0';
         set_mod_record(mod, buf);
@@ -158,6 +186,6 @@ writebuf:
 void
 mod_register(struct module *mod)
 {
-    register_mod_fields(mod, "--keyserver", keyserver_usage, keyserver_info, 3,
+    register_mod_fields(mod, "--keyserver", keyserver_usage, keyserver_info, 13,
             read_keyserver_stats, set_keyserver_record);
 }
