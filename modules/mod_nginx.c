@@ -14,6 +14,8 @@ struct stats_nginx {
     unsigned long long nwriting;    /* nginx reads request body, processes request, or writes response to a client */
     unsigned long long nwaiting;    /* keep-alive connections, actually it is active - (reading + writing) */
     unsigned long long nrstime;     /* reponse time of handled requests */
+    unsigned long long nspdy;       /* spdy requests */
+    unsigned long long nssl;        /* ssl requests */
 };
 
 struct hostinfo {
@@ -35,6 +37,8 @@ static struct mod_info nginx_info[] = {
     {"  wait", DETAIL_BIT,  0,  STATS_NULL},
     {"   qps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
     {"    rt", SUMMARY_BIT, 0,  STATS_NULL},
+    {"sslqps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
+    {"spdyps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
 };
 
 
@@ -68,6 +72,15 @@ set_nginx_record(struct module *mod, double st_array[],
             st_array[8] = 0;
         }
     }
+    for (i = 9; i < 11;  i++){
+        if (cur_array[i] >= pre_array[i]) {
+            st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
+        } else {
+            st_array[i] = 0;
+        } 
+    }
+   
+
 }
 
 
@@ -158,13 +171,25 @@ read_nginx_stats(struct module *mod, char *parameter)
             sscanf(line + sizeof("Active connections:"), "%llu", &st_nginx.nactive);
 
         } else if (!strncmp(line, " ", 1)) {
+/*TODO this if brach should be deleted after the tengine is all updated */
+/* as the next if branch will get string starting with Server accepts*/            
+/*mingzhou 2015-06-18*/           
             sscanf(line + 1, "%llu %llu %llu %llu",
+                    &st_nginx.naccept, &st_nginx.nhandled, &st_nginx.nrequest, &st_nginx.nrstime);
+            write_flag = 1;
+
+        } else if (!strncmp(line, "Server accepts:", sizeof("Server accepts:") - 1)) {
+            sscanf(line , "Server accepts: %llu handled: %llu requests: %llu request_time: %llu",
                     &st_nginx.naccept, &st_nginx.nhandled, &st_nginx.nrequest, &st_nginx.nrstime);
             write_flag = 1;
 
         } else if (!strncmp(line, "Reading:", sizeof("Reading:") - 1)) {
             sscanf(line, "Reading: %llu Writing: %llu Waiting: %llu",
                     &st_nginx.nreading, &st_nginx.nwriting, &st_nginx.nwaiting);
+
+        } else if (!strncmp(line, "SSL:", sizeof("SSL:") - 1)) {
+            sscanf(line, "SSL: %llu SPDY: %llu",
+                    &st_nginx.nssl, &st_nginx.nspdy);
 
         } else {
             ;
@@ -184,7 +209,7 @@ writebuf:
     }
 
     if (write_flag) {
-        pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
+        pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
                 st_nginx.naccept,
                 st_nginx.nhandled,
                 st_nginx.nrequest,
@@ -193,7 +218,9 @@ writebuf:
                 st_nginx.nwriting,
                 st_nginx.nwaiting,
                 st_nginx.nrequest,
-                st_nginx.nrstime
+                st_nginx.nrstime,
+                st_nginx.nssl,
+                st_nginx.nspdy
                  );
 
         buf[pos] = '\0';
@@ -204,5 +231,5 @@ writebuf:
 void
 mod_register(struct module *mod)
 {
-    register_mod_fields(mod, "--nginx", nginx_usage, nginx_info, 9, read_nginx_stats, set_nginx_record);
+    register_mod_fields(mod, "--nginx", nginx_usage, nginx_info, 11, read_nginx_stats, set_nginx_record);
 }
