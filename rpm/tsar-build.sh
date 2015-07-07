@@ -28,7 +28,7 @@ git_info()
   echo $git_revision
 }
 
-##git_info
+git_info
 
 if [ `cat /etc/redhat-release|cut -d " " -f 7|cut -d "." -f 1` = 4 ]
 then
