@@ -42,11 +42,11 @@ static struct mod_info pharos_status_info[] = {
     {"nx",          DETAIL_BIT,  0, STATS_NULL},   // 3
     {"refuse",      DETAIL_BIT,  0, STATS_NULL},   // 4
     {"global",      SUMMARY_BIT, 0, STATS_NULL},   // 5
-    {"continent",   SUMMARY_BIT, 0, STATS_NULL},   // 6
-    {"country",     SUMMARY_BIT, 0, STATS_NULL},   // 7
+    {"contnt",      SUMMARY_BIT, 0, STATS_NULL},   // 6
+    {"coutry",      SUMMARY_BIT, 0, STATS_NULL},   // 7
     {"isp",         SUMMARY_BIT, 0, STATS_NULL},   // 8
     {"area",        SUMMARY_BIT, 0, STATS_NULL},   // 9
-    {"province",    SUMMARY_BIT, 0, STATS_NULL},   // 10
+    {"provic",      SUMMARY_BIT, 0, STATS_NULL},   // 10
     {"city",        SUMMARY_BIT, 0, STATS_NULL}    // 11
 };
 
