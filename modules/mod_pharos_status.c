@@ -67,7 +67,7 @@ set_pharos_status_record(struct module *mod, double st_array[],
     st_array[0] = sub(cur_array[0], pre_array[0]);                      // noerr
     st_array[1] = sub(cur_array[1], pre_array[1]);                      // formerr
     st_array[2] = sub(cur_array[2], pre_array[2]);                      // srvfail
-    st_array[3] = sub(cur_array[3], pre_array[2]);                      // nx
+    st_array[3] = sub(cur_array[3], pre_array[3]);                      // nx
     st_array[4] = sub(cur_array[4], pre_array[4]);                      // refused
     st_array[5] = sub(cur_array[5], pre_array[5]) * 1.0 / t * 100;      // global
     st_array[6] = sub(cur_array[6], pre_array[6]) * 1.0 / t * 100;      // continent
@@ -233,7 +233,7 @@ mod_register(struct module *mod)
     register_mod_fields(mod, "--pharos-status",
                         pharos_status_usage,
                         pharos_status_info,
-                        13,
+                        12,
                         read_pharos_status_stats,
                         set_pharos_status_record);
 }
