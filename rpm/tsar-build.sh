@@ -6,6 +6,7 @@ export name=$2
 export version=$3
 export release=$4
 
+
 TOP_DIR="/tmp/.rpm_create_"$2"_"`whoami`
 
 LANG=C
@@ -19,7 +20,7 @@ usage()
 }
 
 git_path="Unknown_path"
-git_revision="Unknown_revision"
+git_revision=$release
 git_info()
 {
   base=19000
@@ -28,7 +29,13 @@ git_info()
   echo $git_revision
 }
 
-git_info
+building_tag()
+{
+    git_revision=$release.`git log --pretty=oneline -1 |cut -c1-7`
+    echo "new subversion is:"$version
+}
+building_tag
+##git_info
 
 if [ `cat /etc/redhat-release|cut -d " " -f 7|cut -d "." -f 1` = 4 ]
 then
