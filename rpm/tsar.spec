@@ -1,75 +1,82 @@
-##############################################################
-# http://baike.corp.taobao.com/index.php/%E6%B7%98%E5%AE%9Drpm%E6%89%93%E5%8C%85%E8%A7%84%E8%8C%83 # 
-# http://www.rpm.org/max-rpm/ch-rpm-inside.html              #
-##############################################################
 Name: tsar
-Version: 1.0.0
-Release: %(echo $RELEASE)%{?dist} 
-# if you want use the parameter of rpm_create on build time,
-# uncomment below
-Summary: Please write somethings about the package here in English. 
-Group: alibaba/application
+Version: 2.1.1
+Release: 19200.aone
+Summary: Taobao System Activity Reporter
+URL: https://github.com/alibaba/tsar
+Group: Taobao/Common
 License: Commercial
-AutoReqProv: none
-%define _prefix /home/a/project/tsar 
-
-# uncomment below, if depend on other packages
-
-#Requires: package_name = 1.0.0
-
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Source: tsar-%{version}.tar.gz
 
 %description
-# if you want publish current svn URL or Revision use these macros
-请你在这里描述一下关于此包的信息,并在上面的Summary后面用英文描述一下简介。
+tsar is Taobao monitor tool for collect system activity status, and report it.
+It have a plugin system that is easy for collect plugin development. and may
+setup different output target such as local logfile and remote nagios host.
 
-%debug_package
-# support debuginfo package, to reduce runtime package size
+%package devel
+Summary: Taobao Tsar Devel
+Group: Taobao/Common
+%description devel
+devel package include tsar header files and module template for the development
 
-# prepare your files
+%prep
+%setup -q
+
+%build
+make clean;make
+
 %install
-# OLDPWD is the dir of rpm_create running
-# _prefix is an inner var of rpmbuild,
-# can set by rpm_create, default is "/home/a"
-# _lib is an inner var, maybe "lib" or "lib64" depend on OS
 
-# create dirs
-mkdir -p .%{_prefix}
-cd $OLDPWD/../;
-make;
-make install DESTDIR=${RPM_BUILD_ROOT}/%{_prefix};
+rm -rf %{buildroot}
+mkdir -p %{buildroot}/usr/local/tsar/
+mkdir -p %{buildroot}/usr/local/tsar/modules/
+mkdir -p %{buildroot}/usr/local/tsar/conf/
+mkdir -p %{buildroot}/usr/local/tsar/devel/
+mkdir -p %{buildroot}/usr/local/man/man8/
+mkdir -p %{buildroot}/etc/logrotate.d/
+mkdir -p %{buildroot}/etc/tsar/
+mkdir -p %{buildroot}/etc/cron.d/
+mkdir -p %{buildroot}/usr/bin
 
-# create a crontab of the package
-#echo "
-#* * * * * root /home/a/bin/every_min
-#3 * * * * ads /home/a/bin/every_hour
-#" > %{_crontab}
+install -p -D -m 0755 src/tsar  %{buildroot}/usr/bin/tsar
+install -p -D -m 0644 conf/tsar.conf %{buildroot}/etc/tsar/tsar.conf
+install -p -D -m 0644 modules/*.so %{buildroot}/usr/local/tsar/modules/
+install -p -D -m 0644 conf/tsar.cron %{buildroot}/etc/cron.d/tsar
+install -p -D -m 0644 conf/tsar.logrotate %{buildroot}/etc/logrotate.d/tsar
+install -p -D -m 0644 conf/tsar.8 %{buildroot}/usr/local/man/man8/tsar.8
 
-# package infomation
+install -p -D -m 0755 devel/tsardevel %{buildroot}/usr/bin/tsardevel
+install -p -D -m 0644 devel/mod_test.c %{buildroot}/usr/local/tsar/devel/mod_test.c
+install -p -D -m 0644 devel/mod_test.conf %{buildroot}/usr/local/tsar/devel/mod_test.conf
+install -p -D -m 0644 devel/Makefile.test %{buildroot}/usr/local/tsar/devel/Makefile.test
+install -p -D -m 0644 devel/tsar.h %{buildroot}/usr/local/tsar/devel/tsar.h
+
+%clean
+[ "%{buildroot}" != "/" ] && %{__rm} -rf %{buildroot}
+
+
 %files
-# set file attribute here
 %defattr(-,root,root)
-# need not list every file here, keep it as this
-%{_prefix}
-## create an empy dir
+/usr/local/tsar/modules/*.so
 
-# %dir %{_prefix}/var/log
+%attr(755,root,root) %dir /usr/bin/tsar
+%config(noreplace) /etc/tsar/tsar.conf
+%attr(644,root,root) %dir /etc/cron.d/tsar
+%attr(644,root,root) %dir /etc/logrotate.d/tsar
+%attr(644,root,root) %dir /usr/local/man/man8/tsar.8
 
-## need bakup old config file, so indicate here
-
-# %config %{_prefix}/etc/sample.conf
-
-## or need keep old config file, so indicate with "noreplace"
-
-# %config(noreplace) %{_prefix}/etc/sample.conf
-
-## indicate the dir for crontab
-
-# %{_crondir}
-
-%post -p /sbin/ldconfig
-
-%postun -p /sbin/ldconfig 
+%files devel
+%defattr(-,root,root)
+/usr/local/tsar/devel/tsar.h
+/usr/local/tsar/devel/Makefile.test
+/usr/local/tsar/devel/mod_test.c
+/usr/local/tsar/devel/mod_test.conf
+%attr(755,root,root) %dir /usr/bin/tsardevel
 
 %changelog
-* Wed Jul 8 2015 xiaokaikai.xk 
-- add spec of tsar
+* Wed Jan  6 2013 Ke Li <kongjian@taobao.com>
+- merge inner and opensource tsar
+* Thu Dec  9 2010 Ke Li <kongjian@taobao.com>
+- add logrotate for tsar.data
+* Tue Apr 26 2010 Bin Chen <kuotai@taobao.com>
+- first create tsar rpm package
