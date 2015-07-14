@@ -170,14 +170,24 @@ read_nginx_stats(struct module *mod, char *parameter)
         if (!strncmp(line, "Active connections:", sizeof("Active connections:") - 1)) {
             sscanf(line + sizeof("Active connections:"), "%llu", &st_nginx.nactive);
 
-        } else if (!strncmp(line, " ", 1)) {
+        } else if (!strncmp(line, 
+                            "server accepts handled requests request_time",
+                            sizeof("server accepts handled requests request_time") - 1)
+                  ) {
+/*please update the tengine status module to delete these kinds of data
+ *mingzhou 2015-07-14
+ */
+            if (fgets(line, LEN_4096, stream) != NULL) {
+                 if (!strncmp(line, " ", 1)) {
 /*TODO this if brach should be deleted after the tengine is all updated */
 /* as the next if branch will get string starting with Server accepts*/            
 /*mingzhou 2015-06-18*/           
-            sscanf(line + 1, "%llu %llu %llu %llu",
-                    &st_nginx.naccept, &st_nginx.nhandled, &st_nginx.nrequest, &st_nginx.nrstime);
-            write_flag = 1;
+                    sscanf(line + 1, "%llu %llu %llu %llu",
+                             &st_nginx.naccept, &st_nginx.nhandled, &st_nginx.nrequest, &st_nginx.nrstime);
+                    write_flag = 1;
 
+                }    
+            }  
         } else if (!strncmp(line, "Server accepts:", sizeof("Server accepts:") - 1)) {
             sscanf(line , "Server accepts: %llu handled: %llu requests: %llu request_time: %llu",
                     &st_nginx.naccept, &st_nginx.nhandled, &st_nginx.nrequest, &st_nginx.nrstime);
