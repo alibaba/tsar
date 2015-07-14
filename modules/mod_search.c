@@ -92,42 +92,42 @@ read_search_record(struct module *mod)
         }
         else {
             if(idx == 0) {
-                sscanf(line + 24, "%f", &f);
+                sscanf(line + 24, "%lf", &f);
                 search_stat.rt += f;
                 search_stat.rt_count++;
             }
             else if(idx == 1) {
-                sscanf(line + 24, "%f", &f);
+                sscanf(line + 24, "%lf", &f);
                 search_stat.qps += f;
                 search_stat.qps_count++;
             }
             else if(idx == 2) {
-                sscanf(line + 24, "%f", &f);
+                sscanf(line + 24, "%lf", &f);
                 search_stat.fail += f;
                 search_stat.fail_count++;
             }
             else if(idx == 3) {
-                sscanf(line + 24, "%f", &f);
+                sscanf(line + 24, "%lf", &f);
                 search_stat.empty += f;
                 search_stat.empty_count++;
             }
             else if(idx == 4) {
-                sscanf(line + 24, "%f", &f);
+                sscanf(line + 24, "%lf", &f);
                 search_stat.rank_rt += f;
                 search_stat.rank_rt_count++;
             }
             else if(idx == 5) {
-                sscanf(line + 24, "%f", &f);
+                sscanf(line + 24, "%lf", &f);
                 search_stat.rank_qps += f;
                 search_stat.rank_qps_count++;
             }
             else if(idx == 6) {
-                sscanf(line + 24, "%f", &f);
+                sscanf(line + 24, "%lf", &f);
                 search_stat.rank_to += f;
                 search_stat.rank_to_count++;
             }
             else if(idx == 7) {
-                sscanf(line + 24, "%f", &f);
+                sscanf(line + 24, "%lf", &f);
                 search_stat.rank_fail += f;
                 search_stat.rank_fail_count++;
             }
