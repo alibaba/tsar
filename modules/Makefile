@@ -20,7 +20,7 @@ ifeq ($(UNAME_S),Darwin)
             mod_tmd.so mod_percpu.so mod_rpi.so mod_tcprt.so mod_shell.so mod_nginx_domain.so mod_pharos.so mod_pharos_load.so mod_pharos_status.so\
 	    mod_tmd4.so mod_nginx_domain_traffic.so mod_nginx_ups.so mod_nginx_sys.so mod_network.so mod_lvsx.so mod_keyserver.so
 else
-    OBJS =  mod_swap.so mod_partition.so mod_cpu.so mod_mem.so mod_lvs.so mod_haproxy.so \
+    OBJS =  mod_search.so mod_swap.so mod_partition.so mod_cpu.so mod_mem.so mod_lvs.so mod_haproxy.so \
             mod_traffic.so mod_pernic.so mod_squid.so mod_load.so mod_tcp.so mod_udp.so mod_tcpx.so mod_proc.so\
             mod_apache.so mod_pcsw.so mod_io.so mod_nginx.so mod_nginx_code.so mod_cgblkio.so \
             mod_cgcpu.so mod_cgmem.so mod_ncpu.so mod_rndc.so mod_erpc.so \
