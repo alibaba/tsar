@@ -16,6 +16,7 @@ struct stats_nginx {
     unsigned long long nrstime;     /* reponse time of handled requests */
     unsigned long long nspdy;       /* spdy requests */
     unsigned long long nssl;        /* ssl requests */
+    unsigned long long nsslhst;     /* ssl handshake time*/
 };
 
 struct hostinfo {
@@ -39,6 +40,7 @@ static struct mod_info nginx_info[] = {
     {"    rt", SUMMARY_BIT, 0,  STATS_NULL},
     {"sslqps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
     {"spdyps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
+    {"sslhst", SUMMARY_BIT, 0,  STATS_NULL},
 };
 
 
@@ -72,6 +74,7 @@ set_nginx_record(struct module *mod, double st_array[],
             st_array[8] = 0;
         }
     }
+
     for (i = 9; i < 11;  i++){
         if (cur_array[i] >= pre_array[i]) {
             st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
@@ -79,8 +82,14 @@ set_nginx_record(struct module *mod, double st_array[],
             st_array[i] = 0;
         } 
     }
-   
-
+ 
+    if (cur_array[11] >= pre_array[11]) {
+        if (cur_array[9] > pre_array[9]) {
+            st_array[11] = (cur_array[11] - pre_array[11]) * 1.0 / (cur_array[9] - pre_array[9]);
+        } else {
+            st_array[11] = 0;
+        }
+    }   
 }
 
 
@@ -201,6 +210,9 @@ read_nginx_stats(struct module *mod, char *parameter)
             sscanf(line, "SSL: %llu SPDY: %llu",
                     &st_nginx.nssl, &st_nginx.nspdy);
 
+        } else if (!strncmp(line, "SSL_Handshake:", sizeof("SSL_Handshake:") - 1)) {
+            sscanf(line, "SSL_Handshake: %llu", &st_nginx.nsslhst);
+
         } else {
             ;
         }
@@ -230,7 +242,8 @@ writebuf:
                 st_nginx.nrequest,
                 st_nginx.nrstime,
                 st_nginx.nssl,
-                st_nginx.nspdy
+                st_nginx.nspdy,
+                st_nginx.nsslhst
                  );
 
         buf[pos] = '\0';
@@ -241,5 +254,5 @@ writebuf:
 void
 mod_register(struct module *mod)
 {
-    register_mod_fields(mod, "--nginx", nginx_usage, nginx_info, 11, read_nginx_stats, set_nginx_record);
+    register_mod_fields(mod, "--nginx", nginx_usage, nginx_info, 12, read_nginx_stats, set_nginx_record);
 }
