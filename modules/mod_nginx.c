@@ -17,6 +17,7 @@ struct stats_nginx {
     unsigned long long nspdy;       /* spdy requests */
     unsigned long long nssl;        /* ssl requests */
     unsigned long long nsslhst;     /* ssl handshake time*/
+    unsigned long long nsslhsc;     /* ssl handshake count*/
 };
 
 struct hostinfo {
@@ -41,6 +42,7 @@ static struct mod_info nginx_info[] = {
     {"sslqps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
     {"spdyps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
     {"sslhst", SUMMARY_BIT, 0,  STATS_NULL},
+    {"sslhsc", HIDE_BIT,    0,  STATS_NULL},
 };
 
 
@@ -84,12 +86,13 @@ set_nginx_record(struct module *mod, double st_array[],
     }
  
     if (cur_array[11] >= pre_array[11]) {
-        if (cur_array[9] > pre_array[9]) {
-            st_array[11] = (cur_array[11] - pre_array[11]) * 1.0 / (cur_array[9] - pre_array[9]);
+        if (cur_array[12] > pre_array[12]) {
+            /*sslhst= ( nsslhstB-nsslhstA)/(nsslhscB - nsslhscA)*/
+            st_array[11] = (cur_array[11] - pre_array[11]) * 1.0 / (cur_array[12] - pre_array[12]);
         } else {
             st_array[11] = 0;
         }
-    }   
+    }
 }
 
 
@@ -178,23 +181,16 @@ read_nginx_stats(struct module *mod, char *parameter)
     while (fgets(line, LEN_4096, stream) != NULL) {
         if (!strncmp(line, "Active connections:", sizeof("Active connections:") - 1)) {
             sscanf(line + sizeof("Active connections:"), "%llu", &st_nginx.nactive);
-
+            write_flag = 1;
         } else if (!strncmp(line, 
                             "server accepts handled requests request_time",
                             sizeof("server accepts handled requests request_time") - 1)
                   ) {
-/*please update the tengine status module to delete these kinds of data
- *mingzhou 2015-07-14
- */
             if (fgets(line, LEN_4096, stream) != NULL) {
                  if (!strncmp(line, " ", 1)) {
-/*TODO this if brach should be deleted after the tengine is all updated */
-/* as the next if branch will get string starting with Server accepts*/            
-/*mingzhou 2015-06-18*/           
                     sscanf(line + 1, "%llu %llu %llu %llu",
                              &st_nginx.naccept, &st_nginx.nhandled, &st_nginx.nrequest, &st_nginx.nrstime);
                     write_flag = 1;
-
                 }    
             }  
         } else if (!strncmp(line, "Server accepts:", sizeof("Server accepts:") - 1)) {
@@ -205,14 +201,15 @@ read_nginx_stats(struct module *mod, char *parameter)
         } else if (!strncmp(line, "Reading:", sizeof("Reading:") - 1)) {
             sscanf(line, "Reading: %llu Writing: %llu Waiting: %llu",
                     &st_nginx.nreading, &st_nginx.nwriting, &st_nginx.nwaiting);
-
+            write_flag = 1;
         } else if (!strncmp(line, "SSL:", sizeof("SSL:") - 1)) {
             sscanf(line, "SSL: %llu SPDY: %llu",
                     &st_nginx.nssl, &st_nginx.nspdy);
-
-        } else if (!strncmp(line, "SSL_Handshake:", sizeof("SSL_Handshake:") - 1)) {
-            sscanf(line, "SSL_Handshake: %llu", &st_nginx.nsslhst);
-
+            write_flag = 1;
+        } else if (!strncmp(line, "SSL_Requests:", sizeof("SSL_Requests:") - 1)) {
+            sscanf(line, "SSL_Requests: %llu SSL_Handshake: %llu SSL_Handshake_Time: %llu",
+                    &st_nginx.nssl, &st_nginx.nsslhsc, &st_nginx.nsslhst);
+            write_flag = 1;
         } else {
             ;
         }
@@ -231,7 +228,7 @@ writebuf:
     }
 
     if (write_flag) {
-        pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
+        pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
                 st_nginx.naccept,
                 st_nginx.nhandled,
                 st_nginx.nrequest,
@@ -243,9 +240,9 @@ writebuf:
                 st_nginx.nrstime,
                 st_nginx.nssl,
                 st_nginx.nspdy,
-                st_nginx.nsslhst
+                st_nginx.nsslhst,
+                st_nginx.nsslhsc
                  );
-
         buf[pos] = '\0';
         set_mod_record(mod, buf);
     }
@@ -254,5 +251,5 @@ writebuf:
 void
 mod_register(struct module *mod)
 {
-    register_mod_fields(mod, "--nginx", nginx_usage, nginx_info, 12, read_nginx_stats, set_nginx_record);
+    register_mod_fields(mod, "--nginx", nginx_usage, nginx_info, 13, read_nginx_stats, set_nginx_record);
 }
