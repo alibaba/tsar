@@ -8,12 +8,13 @@
 
 #define sub(a, b) ((a) <= (b) ? 0 : (a) - (b))
 
-struct stats_pharos {
-    unsigned long long requests;
-    unsigned long long tcp_reqs;
-    unsigned long long udp_reqs;
-    unsigned long long tcp_accepts;
-    unsigned long long rt;
+struct stats_pharos_qtype {
+    unsigned long long a;
+    unsigned long long aaaa;
+    unsigned long long cname;
+    unsigned long long srv;
+    unsigned long long ns;
+    unsigned long long mx;
 };
 
 struct hostinfo {
@@ -23,35 +24,32 @@ struct hostinfo {
     char *uri;
 };
 
-static char *pharos_usage = "    --pharos            Pharos statistics";
+static char *pharos_qtype_usage = "    --pharos-qtype            Pharos qtype statistics";
 
-static struct mod_info pharos_info[] = {
-    {"  reqs",  DETAIL_BIT,  0,  STATS_NULL},
-    {"   tcp",  DETAIL_BIT,  0,  STATS_NULL},
-    {"   udp",  DETAIL_BIT,  0,  STATS_NULL},
-    {"   qps",  SUMMARY_BIT, 0,  STATS_SUB_INTER},
-    {"    rt",  DETAIL_BIT,  0,  STATS_NULL},
+static struct mod_info pharos_qtype_info[] = {
+    {"     a",  DETAIL_BIT,  0, STATS_NULL},
+    {"  aaaa",  DETAIL_BIT,  0, STATS_NULL},
+    {" cname",  DETAIL_BIT,  0, STATS_NULL},
+    {"   srv",  DETAIL_BIT,  0, STATS_NULL},
+    {"    ns",  DETAIL_BIT,  0, STATS_NULL},
+    {"    mx",  DETAIL_BIT,  0, STATS_NULL},
 };
 
 
 static void
-set_pharos_record(struct module *mod, double st_array[],
+set_pharos_qtype_record(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {
-    st_array[0] = sub(cur_array[0], pre_array[0]);
-    st_array[1] = sub(cur_array[1], pre_array[1]);
-    st_array[2] = sub(cur_array[2], pre_array[2]);
-    st_array[3] = st_array[0] * 1.0 / inter;
-
-    st_array[4] = 0;
-    if (st_array[0] != 0) {
-        st_array[4] = sub(cur_array[3], pre_array[3]) * 1.0 / st_array[0];
-    }
+    st_array[0] = sub(cur_array[0], pre_array[0]); // a
+    st_array[1] = sub(cur_array[1], pre_array[1]); // aaaa
+    st_array[2] = sub(cur_array[2], pre_array[2]); // cname
+    st_array[3] = sub(cur_array[3], pre_array[3]); // srv
+    st_array[4] = sub(cur_array[4], pre_array[4]); // ns
+    st_array[5] = sub(cur_array[5], pre_array[5]); // mx
 }
 
-
 static void
-init_pharos_host_info(struct hostinfo *p)
+init_pharos_qtype_host_info(struct hostinfo *p)
 {
     char *port;
 
@@ -70,7 +68,7 @@ init_pharos_host_info(struct hostinfo *p)
 
 
 void
-read_pharos_stats(struct module *mod, char *parameter)
+read_pharos_qtype_stats(struct module *mod, char *parameter)
 {
     int                 write_flag = 0, addr_len, domain;
     int                 m, sockfd, send, pos;
@@ -82,12 +80,12 @@ read_pharos_stats(struct module *mod, char *parameter)
     struct sockaddr_un  servaddr_un;
     struct hostinfo     hinfo;
 
-    init_pharos_host_info(&hinfo);
+    init_pharos_qtype_host_info(&hinfo);
     if (atoi(parameter) != 0) {
        hinfo.port = atoi(parameter);
     }
-    struct stats_pharos st_pharos;
-    memset(&st_pharos, 0, sizeof(struct stats_pharos));
+    struct stats_pharos_qtype st_pharos_qtype;
+    memset(&st_pharos_qtype, 0, sizeof(struct stats_pharos_qtype));
 
     if (*hinfo.host == '/') {
         addr = &servaddr_un;
@@ -106,7 +104,6 @@ read_pharos_stats(struct module *mod, char *parameter)
         servaddr.sin_port = htons(hinfo.port);
         inet_pton(AF_INET, hinfo.host, &servaddr.sin_addr);
     }
-
 
     if ((sockfd = socket(domain, SOCK_STREAM, 0)) == -1) {
         goto writebuf;
@@ -133,10 +130,16 @@ read_pharos_stats(struct module *mod, char *parameter)
     }
 
     while (fgets(line, LEN_4096, stream) != NULL) {
-        if (!strncmp(line, "request_status:", sizeof("request_status:") - 1)) {
-            sscanf(line, "request_status:requests=%llu,tcp_reqs=%llu,udp_reqs=%llu,tcp_accepts=%llu,rt=%llu",
-                    &st_pharos.requests, &st_pharos.tcp_reqs, &st_pharos.udp_reqs,
-                    &st_pharos.tcp_accepts, &st_pharos.rt);
+        // read retcode
+        if (!strncmp(line, "qtype:", sizeof("qtype:") - 1)) {
+            sscanf(line, "qtype:A=%lld,AAAA=%lld,CNAME=%lld,SRV=%lld,NS=%lld,MX=%lld",
+                    &st_pharos_qtype.a,
+                    &st_pharos_qtype.aaaa,
+                    &st_pharos_qtype.cname,
+                    &st_pharos_qtype.srv,
+                    &st_pharos_qtype.ns,
+                    &st_pharos_qtype.mx);
+
             write_flag = 1;
         }
     }
@@ -151,19 +154,23 @@ writebuf:
     }
 
     if (write_flag) {
-        pos = sprintf(buf, "%lld,%lld,%lld,%lld",
-                      st_pharos.requests,
-                      st_pharos.tcp_reqs,
-                      st_pharos.udp_reqs,
-                      st_pharos.rt);
+        pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld",
+                      st_pharos_qtype.a,
+                      st_pharos_qtype.aaaa,
+                      st_pharos_qtype.cname,
+                      st_pharos_qtype.srv,
+                      st_pharos_qtype.ns,
+                      st_pharos_qtype.mx);
 
         buf[pos] = '\0';
         set_mod_record(mod, buf);
     }
 }
 
+
 void
 mod_register(struct module *mod)
 {
-    register_mod_fields(mod, "--pharos", pharos_usage, pharos_info, 5, read_pharos_stats, set_pharos_record);
+    register_mod_fields(mod, "--pharos-qtype", pharos_qtype_usage, pharos_qtype_info, 6,
+                        read_pharos_qtype_stats, set_pharos_qtype_record);
 }
