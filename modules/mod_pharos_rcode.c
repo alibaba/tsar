@@ -8,12 +8,14 @@
 
 #define sub(a, b) ((a) <= (b) ? 0 : (a) - (b))
 
-struct stats_pharos {
-    unsigned long long requests;
-    unsigned long long tcp_reqs;
-    unsigned long long udp_reqs;
-    unsigned long long tcp_accepts;
-    unsigned long long rt;
+struct stats_pharos_rcode {
+    unsigned long long total;
+    unsigned long long noerror;
+    unsigned long long formerr;
+    unsigned long long servfail;
+    unsigned long long nxdomain;
+    unsigned long long notimp;
+    unsigned long long refused;
 };
 
 struct hostinfo {
@@ -23,35 +25,34 @@ struct hostinfo {
     char *uri;
 };
 
-static char *pharos_usage = "    --pharos            Pharos statistics";
+static char *pharos_rcode_usage = "    --pharos-rcode            Pharos rcode statistics";
 
-static struct mod_info pharos_info[] = {
-    {"  reqs",  DETAIL_BIT,  0,  STATS_NULL},
-    {"   tcp",  DETAIL_BIT,  0,  STATS_NULL},
-    {"   udp",  DETAIL_BIT,  0,  STATS_NULL},
-    {"   qps",  SUMMARY_BIT, 0,  STATS_SUB_INTER},
-    {"    rt",  DETAIL_BIT,  0,  STATS_NULL},
+static struct mod_info pharos_rcode_info[] = {
+    {" total",    DETAIL_BIT,  0, STATS_NULL},
+    {" noerr",    DETAIL_BIT,  0, STATS_NULL},
+    {"  nxdm",    DETAIL_BIT,  0, STATS_NULL},
+    {"refuse",    DETAIL_BIT,  0, STATS_NULL},
+    {"fmterr",    DETAIL_BIT,  0, STATS_NULL},
+    {"svfail",    DETAIL_BIT,  0, STATS_NULL},
+    {"notimp",    DETAIL_BIT,  0, STATS_NULL},
 };
 
 
 static void
-set_pharos_record(struct module *mod, double st_array[],
+set_pharos_rcode_record(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {
-    st_array[0] = sub(cur_array[0], pre_array[0]);
-    st_array[1] = sub(cur_array[1], pre_array[1]);
-    st_array[2] = sub(cur_array[2], pre_array[2]);
-    st_array[3] = st_array[0] * 1.0 / inter;
-
-    st_array[4] = 0;
-    if (st_array[0] != 0) {
-        st_array[4] = sub(cur_array[3], pre_array[3]) * 1.0 / st_array[0];
-    }
+    st_array[0] = sub(cur_array[0], pre_array[0]); // noerror
+    st_array[1] = sub(cur_array[1], pre_array[1]); // nxdomain
+    st_array[2] = sub(cur_array[2], pre_array[2]); // refused
+    st_array[3] = sub(cur_array[3], pre_array[3]); // formaterror
+    st_array[4] = sub(cur_array[4], pre_array[4]); // servfail
+    st_array[5] = sub(cur_array[5], pre_array[5]); // notimp
+    st_array[6] = sub(cur_array[6], pre_array[6]); // total
 }
 
-
 static void
-init_pharos_host_info(struct hostinfo *p)
+init_pharos_rcode_host_info(struct hostinfo *p)
 {
     char *port;
 
@@ -70,7 +71,7 @@ init_pharos_host_info(struct hostinfo *p)
 
 
 void
-read_pharos_stats(struct module *mod, char *parameter)
+read_pharos_rcode_stats(struct module *mod, char *parameter)
 {
     int                 write_flag = 0, addr_len, domain;
     int                 m, sockfd, send, pos;
@@ -82,12 +83,12 @@ read_pharos_stats(struct module *mod, char *parameter)
     struct sockaddr_un  servaddr_un;
     struct hostinfo     hinfo;
 
-    init_pharos_host_info(&hinfo);
+    init_pharos_rcode_host_info(&hinfo);
     if (atoi(parameter) != 0) {
        hinfo.port = atoi(parameter);
     }
-    struct stats_pharos st_pharos;
-    memset(&st_pharos, 0, sizeof(struct stats_pharos));
+    struct stats_pharos_rcode st_pharos_rcode;
+    memset(&st_pharos_rcode, 0, sizeof(struct stats_pharos_rcode));
 
     if (*hinfo.host == '/') {
         addr = &servaddr_un;
@@ -106,7 +107,6 @@ read_pharos_stats(struct module *mod, char *parameter)
         servaddr.sin_port = htons(hinfo.port);
         inet_pton(AF_INET, hinfo.host, &servaddr.sin_addr);
     }
-
 
     if ((sockfd = socket(domain, SOCK_STREAM, 0)) == -1) {
         goto writebuf;
@@ -133,10 +133,23 @@ read_pharos_stats(struct module *mod, char *parameter)
     }
 
     while (fgets(line, LEN_4096, stream) != NULL) {
+        // read retcode
+        if (!strncmp(line, "retcode:", sizeof("retcode:") - 1)) {
+            sscanf(line, "retcode:NOERROR=%llu,FORMERR=%llu,SERVFAIL=%llu,NXDOMAIN=%llu,NOTIMP=%llu,REFUSED=%llu",
+                    &st_pharos_rcode.noerror,
+                    &st_pharos_rcode.formerr,
+                    &st_pharos_rcode.servfail,
+                    &st_pharos_rcode.nxdomain,
+                    &st_pharos_rcode.notimp,
+                    &st_pharos_rcode.refused);
+
+            write_flag = 1;
+        }
+
+        // read requests
         if (!strncmp(line, "request_status:", sizeof("request_status:") - 1)) {
-            sscanf(line, "request_status:requests=%llu,tcp_reqs=%llu,udp_reqs=%llu,tcp_accepts=%llu,rt=%llu",
-                    &st_pharos.requests, &st_pharos.tcp_reqs, &st_pharos.udp_reqs,
-                    &st_pharos.tcp_accepts, &st_pharos.rt);
+            sscanf(line, "request_status:requests=%llu", &st_pharos_rcode.total);
+
             write_flag = 1;
         }
     }
@@ -151,19 +164,24 @@ writebuf:
     }
 
     if (write_flag) {
-        pos = sprintf(buf, "%lld,%lld,%lld,%lld",
-                      st_pharos.requests,
-                      st_pharos.tcp_reqs,
-                      st_pharos.udp_reqs,
-                      st_pharos.rt);
+        pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld",
+                      st_pharos_rcode.total,
+                      st_pharos_rcode.noerror,
+                      st_pharos_rcode.nxdomain,
+                      st_pharos_rcode.refused,
+                      st_pharos_rcode.formerr,
+                      st_pharos_rcode.servfail,
+                      st_pharos_rcode.notimp);
 
         buf[pos] = '\0';
         set_mod_record(mod, buf);
     }
 }
 
+
 void
 mod_register(struct module *mod)
 {
-    register_mod_fields(mod, "--pharos", pharos_usage, pharos_info, 5, read_pharos_stats, set_pharos_record);
+    register_mod_fields(mod, "--pharos-rcode", pharos_rcode_usage, pharos_rcode_info, 7,
+                        read_pharos_rcode_stats, set_pharos_rcode_record);
 }
