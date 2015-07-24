@@ -241,7 +241,7 @@ running_cron()
         output_nagios();
     }
     if (strstr(conf.output_interface, "tcp")) {
-        output_tcp(have_collect);
+        output_multi_tcp(have_collect);
     }
 }
 
