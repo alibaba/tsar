@@ -40,6 +40,7 @@
 
 #define MAX_COL_NUM 64
 #define MAX_MOD_NUM 32
+#define MAX_TCP_ADDR_NUM 4
 
 #define SECTION_SPLIT   "|"
 #define STRING_SPLIT    ":"

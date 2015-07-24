@@ -161,6 +161,7 @@ static int
 parse_line(char *buff)
 {
     char   *token;
+    int     i; 
 
     if ((token = strtok(buff, W_SPACE)) == NULL) {
         /* ignore empty lines */
@@ -191,7 +192,14 @@ parse_line(char *buff)
     } else if (!strcmp(token, "output_tcp_mod")) {
         parse_add_string(conf.output_tcp_mod);
     } else if (!strcmp(token, "output_tcp_addr")) {
-        parse_string(conf.output_tcp_addr);
+        for(i = 0; i < MAX_TCP_ADDR_NUM; i++){
+            parse_string(conf.output_tcp_addr[i]);
+            if(conf.output_tcp_addr[i][0] != 0){
+                conf.output_tcp_addr_num++;
+            } else {
+                break;
+            }
+        }
     } else if (!strcmp(token, "output_tcp_merge")) {
         parse_string(conf.output_tcp_merge);
 
