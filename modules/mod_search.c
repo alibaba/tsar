@@ -48,7 +48,7 @@ read_search_record(struct module *mod)
     int idx = 0;
     double f;
 
-    snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -r node | /usr/bin/head -n2 | /usr/bin/tail -n1 > %s", SEARCH_FILE_1);
+    snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -r node | /bin/grep /master/ | /usr/bin/head -n 1 > %s", SEARCH_FILE_1);
     ret = system(cmd);
     if (ret == -1 || WEXITSTATUS(ret) != 0)
         return;
