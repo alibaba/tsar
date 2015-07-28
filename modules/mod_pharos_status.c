@@ -36,18 +36,18 @@ struct hostinfo {
 static char *pharos_status_usage = "    --pharos-status            Pharos statistics";
 
 static struct mod_info pharos_status_info[] = {
-    {"noerr",       DETAIL_BIT,  0, STATS_NULL},   // 0
-    {"fmerr",       DETAIL_BIT,  0, STATS_NULL},   // 1
+    {" noerr",      DETAIL_BIT,  0, STATS_NULL},   // 0
+    {" fmerr",      DETAIL_BIT,  0, STATS_NULL},   // 1
     {"svfail",      DETAIL_BIT,  0, STATS_NULL},   // 2
-    {"nx",          DETAIL_BIT,  0, STATS_NULL},   // 3
+    {"    nx",      DETAIL_BIT,  0, STATS_NULL},   // 3
     {"refuse",      DETAIL_BIT,  0, STATS_NULL},   // 4
     {"global",      SUMMARY_BIT, 0, STATS_NULL},   // 5
     {"contnt",      SUMMARY_BIT, 0, STATS_NULL},   // 6
     {"coutry",      SUMMARY_BIT, 0, STATS_NULL},   // 7
-    {"isp",         SUMMARY_BIT, 0, STATS_NULL},   // 8
-    {"area",        SUMMARY_BIT, 0, STATS_NULL},   // 9
+    {"   isp",      SUMMARY_BIT, 0, STATS_NULL},   // 8
+    {"  area",      SUMMARY_BIT, 0, STATS_NULL},   // 9
     {"provic",      SUMMARY_BIT, 0, STATS_NULL},   // 10
-    {"city",        SUMMARY_BIT, 0, STATS_NULL}    // 11
+    {"  city",      SUMMARY_BIT, 0, STATS_NULL}    // 11
 };
 
 
@@ -233,7 +233,7 @@ mod_register(struct module *mod)
     register_mod_fields(mod, "--pharos-status",
                         pharos_status_usage,
                         pharos_status_info,
-                        12,
+                        13,
                         read_pharos_status_stats,
                         set_pharos_status_record);
 }
