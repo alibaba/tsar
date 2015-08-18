@@ -47,7 +47,8 @@ static struct mod_info pharos_status_info[] = {
     {"   isp",      SUMMARY_BIT, 0, STATS_NULL},   // 8
     {"  area",      SUMMARY_BIT, 0, STATS_NULL},   // 9
     {"provic",      SUMMARY_BIT, 0, STATS_NULL},   // 10
-    {"  city",      SUMMARY_BIT, 0, STATS_NULL}    // 11
+    {"  city",      SUMMARY_BIT, 0, STATS_NULL},   // 11
+    {" total",      DETAIL_BIT,  0, STATS_NULL}    // 12   
 };
 
 
