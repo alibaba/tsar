@@ -183,9 +183,22 @@ read_nginx_stats(struct module *mod, char *parameter)
             sscanf(line + sizeof("Active connections:"), "%llu", &st_nginx.nactive);
             write_flag = 1;
         } else if (!strncmp(line, 
+                            "server accepts handled requests",
+                            sizeof("server accepts handled requests") - 1)
+                  ) {
+            /*for nginx*/
+            if (fgets(line, LEN_4096, stream) != NULL) {
+                 if (!strncmp(line, " ", 1)) {
+                    sscanf(line + 1, "%llu %llu %llu",
+                             &st_nginx.naccept, &st_nginx.nhandled, &st_nginx.nrequest);
+                    write_flag = 1;
+                }    
+            }  
+        } else if (!strncmp(line, 
                             "server accepts handled requests request_time",
                             sizeof("server accepts handled requests request_time") - 1)
                   ) {
+            /*for tengine*/
             if (fgets(line, LEN_4096, stream) != NULL) {
                  if (!strncmp(line, " ", 1)) {
                     sscanf(line + 1, "%llu %llu %llu %llu",
