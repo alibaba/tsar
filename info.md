@@ -263,17 +263,19 @@ tcprecvq tcpsendq tcpest tcptimewait tcpfinwait1 tcpfinwait2 tcplistenq tcpliste
 
 ###nginx
 ####字段含义
-* Accept:总共接收的新连接数目
-* Handle:总共处理的连接数目
-* Reqs:总共产生请求数目
-* Active:活跃的连接数,等于read+write+wait
-* Read:读取请求数据的连接数目
-* Write:向用户写响应数据的连接数目
-* Wait:长连接等待的连接数目
-* Qps:每秒处理的请求数
-* Rt:平均响应时间ms
-* Sslqps:每秒处理的SSL请求数
-* Spdyps:每秒处理的spdy请求数
+* accept:总共接收的新连接数目
+* handle:总共处理的连接数目
+* reqs:总共产生请求数目
+* active:活跃的连接数,等于read+write+wait
+* read:读取请求数据的连接数目
+* write:向用户写响应数据的连接数目
+* wait:长连接等待的连接数目
+* qps:每秒处理的请求数
+* rt:平均响应时间ms
+* sslqps:每秒处理的SSL请求数
+* spdyps:每秒处理的spdy请求数
+* sslhst:平均ssl握手时间ms
+
 
 ####采集方法
 通过nginx的采集模块配置,访问特定地址,具体参见:https://github.com/taobao/tsar-mod_nginx  
@@ -292,7 +294,8 @@ tcprecvq tcpsendq tcpest tcptimewait tcpfinwait1 tcpfinwait2 tcplistenq tcpliste
 现tsar在本模块中同时支持“Server accepts: 24 handled: 24 requests: 7 request_time 0”格式返回该数据行。今后将升级tengine改用此方式。）
 
 需要确保nginx配置该location,并且能够访问`curl http://localhost/nginx_status`得到上面的数据  
-如果nginx的端口不是80,则需要在配置文件中指定端口,配置文件是/etc/tsar/tsar.conf,修改mod_nginx on为mod_nginx on 8080  
+如果nginx的端口不是80,则需要在配置文件中指定端口,配置文件是/etc/tsar/tsar.conf,修改mod_nginx on为mod_nginx on 8080 。nginx 模块支持多个端口采集，以解决在不同端口启动了nginx的情况，端口号之间以空格隔开即可。
+不同端口的nginx数据以不同item的形式展现，在对各item进行合并的时候（-m），除rt以及sslhst依然为平均值之外，其他的所有值都为所有端口的值的总和
 
 类似的有nginx_code, nginx_domain模块,相应的配置是:
 

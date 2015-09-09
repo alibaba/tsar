@@ -24,7 +24,7 @@
 void
 parse_mod(const char *mod_name)
 {
-    int     i = 0;
+    int     i = 0, j = 0;
     struct  module *mod;
     char   *token;
 
@@ -40,16 +40,31 @@ parse_mod(const char *mod_name)
         do_debug(LOG_ERR, "Max mod number is %d ignore mod %s\n", MAX_MOD_NUM, mod_name);
         return;
     }
-
     mod = &mods[statis.total_mod_num++];
     token = strtok(NULL, W_SPACE);
     if (token && (!strcasecmp(token, "on") || !strcasecmp(token, "enable"))) {
         strncpy(mod->name, mod_name, strlen(mod_name));
         token = strtok(NULL, W_SPACE);
         if (token) {
-            strncpy(mod->parameter, token, strlen(token));
-        }
+            i = strlen(token);
+            if (i < LEN_256) {
+                strncpy(mod->parameter, token, i);
+            } else {
+                i = 0;
+            }
 
+        }
+        /*if exist more parameters, add them */
+        while((token = strtok(NULL, W_SPACE)) != NULL){
+            j = strlen(token);
+            if ((j + i) >= LEN_256) {
+                break;
+            }
+            mod->parameter[i++] = ' ';
+            strncpy(mod->parameter + i, token, j);
+            i += j;
+        }
+        mod->parameter[i] = '\0';
     } else {
         memset(mod, 0, sizeof(struct module));
         statis.total_mod_num--;
