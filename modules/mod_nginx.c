@@ -30,19 +30,24 @@ struct hostinfo {
 static char *nginx_usage = "    --nginx             nginx statistics";
 
 static struct mod_info nginx_info[] = {
-    {"accept", DETAIL_BIT,  0,  STATS_SUB},
-    {"handle", DETAIL_BIT,  0,  STATS_SUB},
-    {"  reqs", DETAIL_BIT,  0,  STATS_SUB},
-    {"active", DETAIL_BIT,  0,  STATS_NULL},
-    {"  read", DETAIL_BIT,  0,  STATS_NULL},
-    {" write", DETAIL_BIT,  0,  STATS_NULL},
-    {"  wait", DETAIL_BIT,  0,  STATS_NULL},
-    {"   qps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
-    {"    rt", SUMMARY_BIT, 0,  STATS_NULL},
-    {"sslqps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
-    {"spdyps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
-    {"sslhst", SUMMARY_BIT, 0,  STATS_NULL},
-    {"sslhsc", HIDE_BIT,    0,  STATS_NULL},
+/*as merge options are realated to the order of
+ * putting data into tsar framework (in function read_nginx_stats)
+ * so, all values are merged by adding data from diffrent ports together 
+ * but rt and sslhst are average values (sum(diff)/sum(diff)== average)*/
+/*                          merge_opt work on ---->         merge_opt work here */
+    {"accept", DETAIL_BIT,  MERGE_SUM,  STATS_SUB},         /*0 st_nginx.naccept*/
+    {"handle", DETAIL_BIT,  MERGE_SUM,  STATS_SUB},         /*1 st_nginx.nhandled*/
+    {"  reqs", DETAIL_BIT,  MERGE_SUM,  STATS_SUB},         /*2 st_nginx.nrequest*/
+    {"active", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},        /*3 st_nginx.nactive*/
+    {"  read", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},        /*4 st_nginx.nreading*/
+    {" write", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},        /*5 st_nginx.nwriting*/
+    {"  wait", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},        /*6 st_nginx.nwaiting*/
+    {"   qps", SUMMARY_BIT, MERGE_SUM,  STATS_SUB_INTER},   /*7 st_nginx.nrequest*/
+    {"    rt", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},        /*8 st_nginx.nrstime*/
+    {"sslqps", SUMMARY_BIT, MERGE_SUM,  STATS_SUB_INTER},   /*9 st_nginx.nssl*/
+    {"spdyps", SUMMARY_BIT, MERGE_SUM,  STATS_SUB_INTER},   /*10st_nginx.nspdy*/
+    {"sslhst", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},        /*11st_nginx.nsslhst*/
+    {"sslhsc", HIDE_BIT,    MERGE_SUM,  STATS_NULL},        /*12st_nginx.nsslhsc*/
 };
 
 
@@ -115,13 +120,16 @@ init_nginx_host_info(struct hostinfo *p)
 }
 
 
-void
-read_nginx_stats(struct module *mod, char *parameter)
+/*
+ *read data from nginx and store the result in buf
+ * */
+int
+read_one_nginx_stats(char *parameter, char * buf, int pos)
 {
     int                 write_flag = 0, addr_len, domain;
-    int                 m, sockfd, send, pos;
+    int                 m, sockfd, send;
     void               *addr;
-    char                buf[LEN_4096], request[LEN_4096], line[LEN_4096];
+    char                request[LEN_4096], line[LEN_4096];
     FILE               *stream = NULL;
 
     struct sockaddr_in  servaddr;
@@ -129,7 +137,7 @@ read_nginx_stats(struct module *mod, char *parameter)
     struct hostinfo     hinfo;
 
     init_nginx_host_info(&hinfo);
-    if (atoi(parameter) != 0) {
+    if (parameter && (atoi(parameter) != 0)) {
        hinfo.port = atoi(parameter);
     }
     struct stats_nginx st_nginx;
@@ -241,7 +249,8 @@ writebuf:
     }
 
     if (write_flag) {
-        pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
+        pos += snprintf(buf + pos, LEN_1M - pos, "%d=%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT,
+                hinfo.port,
                 st_nginx.naccept,
                 st_nginx.nhandled,
                 st_nginx.nrequest,
@@ -255,9 +264,42 @@ writebuf:
                 st_nginx.nspdy,
                 st_nginx.nsslhst,
                 st_nginx.nsslhsc
-                 );
-        buf[pos] = '\0';
-        set_mod_record(mod, buf);
+                );
+        if (strlen(buf) == LEN_1M - 1) {
+            return -1;
+        }
+        return pos;
+    } else {
+        return pos;
+    }
+}
+
+
+void
+read_nginx_stats(struct module *mod, char *parameter)
+{
+    int     write_flag = 0, addr_len, domain;
+    int     pos = 0;
+    int     new_pos = 0;
+    char    buf[LEN_1M];
+    char    *token;
+    char    mod_parameter[LEN_256];
+
+    buf[0] = '\0';
+    strcpy(mod_parameter, parameter);
+    if ((token = strtok(mod_parameter, W_SPACE)) == NULL) {
+        pos = read_one_nginx_stats(token,buf,pos);
+    } else {
+        do {
+            pos = read_one_nginx_stats(token,buf,pos);
+            if(pos == -1){
+                break;
+            } 
+        }
+        while ((token = strtok(NULL, W_SPACE)) != NULL);
+    }
+    if(new_pos != -1) {
+        set_mod_record(mod,buf);
     }
 }
 
