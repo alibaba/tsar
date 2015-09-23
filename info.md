@@ -283,6 +283,9 @@ tcprecvq tcpsendq tcpest tcptimewait tcpfinwait1 tcpfinwait2 tcplistenq tcpliste
         location = /nginx_status {
             stub_status on;
         }
+
+请确保如下方式能得到数据：
+curl 127.0.0.1:80/nginx_status  -H 'Host: status.taobao.com'
 请求到的数据是:  
 
         Active connections: 1
