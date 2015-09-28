@@ -388,11 +388,11 @@ find_offset_from_start(FILE *fp, int number)
             do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
         }
         if (!fgets(line, LEN_10M, fp)) {
-            do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
+            do_debug(LOG_FATAL, "fgets error: maybe %s has not enough data", conf.output_file_path);
         }
         memset(&line, 0, LEN_10M);
         if (!fgets(line, LEN_10M, fp)) {
-            do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
+            do_debug(LOG_FATAL, "fgets error: maybe %s has not enough data", conf.output_file_path);
         }
         if (0 != line[0] && offset > line_len) {
             p_sec_token = strstr(line, SECTION_SPLIT);
