@@ -305,6 +305,7 @@ running_print_live()
 
 
 /* find where start printting
+ * number:the suffix number of record data (tsar.data.number)
  * return
  * 0 ok
  * 1 need find last tsar.data file
@@ -317,11 +318,11 @@ running_print_live()
 int
 find_offset_from_start(FILE *fp, int number)
 {
-    long           fset, fend, file_len, off_start, off_end, offset, line_len;
-    char          *p_sec_token;
-    time_t         now, t_token, t_get;
-    struct         tm stm;
-    static char    line[LEN_10M] = {0};
+    long        fset, fend, file_len, off_start, off_end, offset, line_len;
+    char       *p_sec_token;
+    time_t      now, t_token, t_get;
+    struct tm   stm;
+    static char line[LEN_10M] = {0};
 
     /* get file len */
     if (fseek(fp, 0, SEEK_END) != 0 ) {
@@ -358,6 +359,7 @@ find_offset_from_start(FILE *fp, int number)
         t_token = mktime(&stm);
         conf.print_day = (now - t_token) / (24 * 60 * 60);
     }
+
     if (conf.print_day >= 0) {
         if (conf.print_day > conf.print_max_day) {
             conf.print_day = conf.print_max_day;
@@ -374,7 +376,14 @@ find_offset_from_start(FILE *fp, int number)
             conf.print_ndays = conf.print_max_day;
         }
         now = now - now % (60 * conf.print_nline_interval);
-        t_token = now - conf.print_ndays * (24 * 60 * 60) - (60 * conf.print_nline_interval);
+        if (conf.running_mode == RUN_WATCH) {
+            if (conf.print_nminute > (conf.print_max_day * 24 * 60)) {
+                conf.print_nminute = conf.print_max_day * 24 * 60;
+            }
+            t_token = now - (60 * conf.print_nminute) - (60 * conf.print_nline_interval);
+        } else {
+            t_token = now - conf.print_ndays * (24 * 60 * 60) - (60 * conf.print_nline_interval);
+        }
         conf.print_start_time = t_token;
         conf.print_end_time = now + (60 * conf.print_nline_interval);
     }
@@ -704,12 +713,16 @@ running_print()
     FILE         *fp;
     static char   line[LEN_10M] = {0};
 
+    /*find the position of the first record to be printed. (eg: middle of tsar.data.2)*/
     fp = init_running_print();
 
     /* skip first record */
     if (collect_record_stat() == 0) {
         do_debug(LOG_INFO, "collect_record_stat warn\n");
     }
+
+    /*now ,print all printable records*/
+    /*(eg: second half of tsar.data.2, then all of tsar.data.1, then tsar.data)*/
     while (1) {
         if (!fgets(line, LEN_10M, fp)) {
             if (conf.print_file_number <= 0) {

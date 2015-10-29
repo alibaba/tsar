@@ -49,6 +49,7 @@ struct configure {
     int     print_tail;
     int     print_file_number;          /* which tsar.data file used */
     int     print_max_day;              /* max day for history print */
+    int     print_nminute;              /* these minutes for history watch */
 
     /* output db */
     char    output_db_mod[LEN_512];     /* which mod will output */

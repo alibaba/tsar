@@ -90,10 +90,11 @@ enum {
     RUN_CRON,
 #ifdef OLDTSAR
     RUN_CHECK,
-    RUN_CHECK_NEW,
 #endif
+    RUN_CHECK_NEW,
     RUN_PRINT,
-    RUN_PRINT_LIVE
+    RUN_PRINT_LIVE,
+    RUN_WATCH
 };
 
 
