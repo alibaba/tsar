@@ -40,6 +40,7 @@ usage()
             /*end*/
 #endif
             "    --check/-C     display last record for alert.example:tsar --check / tsar --check --cpu --io\n"
+            "    --watch/-w     display last records in N mimutes. example:tsar --watch 30 / tsar --watch 30 --cpu --io\n"
             "    --cron/-c      run in cron mode, output data to file\n"
             "    --interval/-i  specify intervals numbers, in minutes if with --live, it is in seconds\n"
             "    --list/-L      list enabled modules\n"
@@ -72,6 +73,7 @@ usage()
 struct option longopts[] = {
     { "cron", no_argument, NULL, 'c' },
     { "check", no_argument, NULL, 'C' },
+    { "watch", required_argument, NULL, 'w' },
     { "interval", required_argument, NULL, 'i' },
     { "list", no_argument, NULL, 'L' },
     { "live", no_argument, NULL, 'l' },
@@ -105,7 +107,7 @@ main_init(int argc, char **argv)
     }
     /*end*/
 #endif
-    while ((opt = getopt_long(argc, argv, ":cCi:Llf:n:d:s:I:mhD", longopts, NULL)) != -1) {
+    while ((opt = getopt_long(argc, argv, ":cCw:i:Llf:n:d:s:I:mhD", longopts, NULL)) != -1) {
         oind++;
         switch (opt) {
             case 'c':
@@ -113,6 +115,11 @@ main_init(int argc, char **argv)
                 break;
             case 'C':
                 conf.running_mode = RUN_CHECK_NEW;
+                break;
+            case 'w':
+                conf.running_mode = RUN_WATCH;
+                conf.print_nminute = atoi(optarg);
+                oind++;
                 break;
             case 'i':
                 conf.print_interval = atoi(optarg);
@@ -249,6 +256,7 @@ running_cron()
 int
 main(int argc, char **argv)
 {
+
     parse_config_file(DEFAULT_CONF_FILE_PATH);
 
     load_modules();
@@ -311,6 +319,19 @@ main(int argc, char **argv)
             disable_col_zero();
 
             running_print_live();
+            break;
+        case RUN_WATCH:
+            /* reload module by output_stdio_mod and output_print_mod*/
+            reload_modules(conf.output_stdio_mod);
+            reload_modules(conf.output_print_mod);
+
+            /* disable module when n_col is zero */
+            disable_col_zero();
+
+            /* set conf.print_nline_interval */
+            conf.print_nline_interval = conf.print_interval;
+
+            running_print();
             break;
 
         default:
