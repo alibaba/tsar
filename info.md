@@ -411,6 +411,26 @@ nginx配置是:
 * fbt:   tengine首字节时间
 * ufbt:  后端应答首字节时间
 
+###nginx_live
+####字段含义
+* online:当前总共在线数
+* olhstr:历史总共在线数
+* olvary:历史在线数增长量（待商榷，不显示）
+* upflow:上行总流量
+* uspeed:上行总速度
+* downfl:下行总流量
+* dspeed:下行总速度
+* fmtime:当前平均首播时间
+* fmdata:不显示
+* dropfr:丢帧
+
+
+####采集方法
+请确保如下方式能得到数据：
+curl -x 127.0.0.1:7001 http://status.taobao.com/rtmp_reqstat 
+请求到的数据是:  
+rtmp://pagefault/alicdn/diaoliang123,fm_time:574 drop_frame:0 online:1 online_history:2 down_flow:166096189 up_flow:166096188 internal:0 edge:2 
+
 ###squid
 ####字段含义
 * qps:   每秒请求数
