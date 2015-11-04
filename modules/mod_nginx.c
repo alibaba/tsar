@@ -191,18 +191,6 @@ read_one_nginx_stats(char *parameter, char * buf, int pos)
             sscanf(line + sizeof("Active connections:"), "%llu", &st_nginx.nactive);
             write_flag = 1;
         } else if (!strncmp(line, 
-                            "server accepts handled requests",
-                            sizeof("server accepts handled requests") - 1)
-                  ) {
-            /*for nginx*/
-            if (fgets(line, LEN_4096, stream) != NULL) {
-                 if (!strncmp(line, " ", 1)) {
-                    sscanf(line + 1, "%llu %llu %llu",
-                             &st_nginx.naccept, &st_nginx.nhandled, &st_nginx.nrequest);
-                    write_flag = 1;
-                }    
-            }  
-        } else if (!strncmp(line, 
                             "server accepts handled requests request_time",
                             sizeof("server accepts handled requests request_time") - 1)
                   ) {
@@ -211,6 +199,18 @@ read_one_nginx_stats(char *parameter, char * buf, int pos)
                  if (!strncmp(line, " ", 1)) {
                     sscanf(line + 1, "%llu %llu %llu %llu",
                              &st_nginx.naccept, &st_nginx.nhandled, &st_nginx.nrequest, &st_nginx.nrstime);
+                    write_flag = 1;
+                }    
+            }  
+        } else if (!strncmp(line, 
+                            "server accepts handled requests",
+                            sizeof("server accepts handled requests") - 1)
+                  ) {
+            /*for nginx*/
+            if (fgets(line, LEN_4096, stream) != NULL) {
+                 if (!strncmp(line, " ", 1)) {
+                    sscanf(line + 1, "%llu %llu %llu",
+                             &st_nginx.naccept, &st_nginx.nhandled, &st_nginx.nrequest);
                     write_flag = 1;
                 }    
             }  
