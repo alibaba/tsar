@@ -59,11 +59,11 @@ install -p -D -m 0644 devel/tsar.h %{buildroot}/usr/local/tsar/devel/tsar.h
 %defattr(-,root,root)
 /usr/local/tsar/modules/*.so
 
-%attr(755,root,root) %dir /usr/bin/tsar
+%attr(755,root,root) /usr/bin/tsar
 %config(noreplace) /etc/tsar/tsar.conf
-%attr(644,root,root) %dir /etc/cron.d/tsar
-%attr(644,root,root) %dir /etc/logrotate.d/tsar
-%attr(644,root,root) %dir /usr/local/man/man8/tsar.8
+%attr(644,root,root) /etc/cron.d/tsar
+%attr(644,root,root) /etc/logrotate.d/tsar
+%attr(644,root,root) /usr/local/man/man8/tsar.8
 
 %files devel
 %defattr(-,root,root)
@@ -71,12 +71,12 @@ install -p -D -m 0644 devel/tsar.h %{buildroot}/usr/local/tsar/devel/tsar.h
 /usr/local/tsar/devel/Makefile.test
 /usr/local/tsar/devel/mod_test.c
 /usr/local/tsar/devel/mod_test.conf
-%attr(755,root,root) %dir /usr/bin/tsardevel
+%attr(755,root,root) /usr/bin/tsardevel
 
 %changelog
-* Wed Jan  6 2013 Ke Li <kongjian@taobao.com>
+* Sun Jan  6 2013 Ke Li <kongjian@taobao.com>
 - merge inner and opensource tsar
 * Thu Dec  9 2010 Ke Li <kongjian@taobao.com>
 - add logrotate for tsar.data
-* Tue Apr 26 2010 Bin Chen <kuotai@taobao.com>
+* Mon Apr 26 2010 Bin Chen <kuotai@taobao.com>
 - first create tsar rpm package
