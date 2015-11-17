@@ -37,6 +37,9 @@ building_tag()
 building_tag
 ##git_info
 
+echo "/etc/redhat-release:"
+cat /etc/redhat-release
+
 if [ `cat /etc/redhat-release|cut -d " " -f 7|cut -d "." -f 1` = 4 ]
 then
         release="$git_revision".el4
@@ -46,6 +49,9 @@ then
 elif [ `cat /etc/redhat-release|cut -d " " -f 7|cut -d "." -f 1` = 6 ]
 then
         release="$git_revision".el6
+elif [ `cat /etc/redhat-release|cut -d " " -f 7|cut -d "." -f 1` = 7 ]
+then
+        release="$git_revision".el7
 else
         release="$git_revision".el5
 fi
@@ -90,7 +96,7 @@ sed -e "s/_VERSION_/$version/g" -e "s/_RELEASE_/$release/g"  -e "s/SVN_REVISION/
 rpmbuild --ba $TOP_DIR/SPECS/$name.spec
 
 find $TOP_DIR/RPMS -name "*.rpm"  -exec mv {} ./rpm \;
-
+echo "dir: $TOP_DIR"
 rm -rf $TOP_DIR $RPM_MACROS
 if [ -e $RPM_MACROS.bak ]; then
   mv -f $RPM_MACROS.bak $RPM_MACROS
