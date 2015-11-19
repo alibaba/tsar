@@ -19,7 +19,7 @@
 
 #define SWIFT_FORK_CNT "fork_count"
 
-static const char *usage = "    --swift_sys             Swift System infomation";
+static const char *usage = "    --swift_sys         Swift System infomation";
 int mgrport = 82;
 
 static struct mod_info swift_proc_mod_info[] = {

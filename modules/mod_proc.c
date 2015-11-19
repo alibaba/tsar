@@ -18,7 +18,7 @@ struct stats_proc {
 #define PID_STATUS      "/proc/%u/status"
 #define STATS_PROC_SIZE (sizeof(struct stats_proc))
 
-static char *proc_usage = "    --proc               PROC info (mem cpu usage & io/fd info)";
+static char *proc_usage = "    --proc              PROC info (mem cpu usage & io/fd info)";
 
 
 static void

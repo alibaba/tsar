@@ -28,7 +28,7 @@ struct hostinfo {
     char *uri;
 };
 
-static char *nginx_live_usage = "    --nginx_live      nginx live statistics";
+static char *nginx_live_usage = "    --nginx_live        nginx live statistics";
 
 static struct mod_info nginx_info[] = {
     {"online", SUMMARY_BIT, MERGE_NULL,  STATS_NULL},  /*0 sum(online of all uri)*/
