@@ -92,8 +92,8 @@ read_mtraffic_stats(struct module *mod, const char *parameter) {
 
 
 static struct mod_info mtraffic_info[] ={
-    {" bytin", SUMMARY_BIT,  0,  STATS_SUB_INTER},
-    {"bytout", SUMMARY_BIT,  0,  STATS_SUB_INTER},
+    {" bitin", SUMMARY_BIT,  0,  STATS_SUB_INTER},
+    {"bitout", SUMMARY_BIT,  0,  STATS_SUB_INTER},
     {" pktin", DETAIL_BIT,  0,  STATS_SUB_INTER},
     {"pktout", DETAIL_BIT,  0,  STATS_SUB_INTER},
     {"pkterr", DETAIL_BIT,  0,  STATS_SUB_INTER},
@@ -109,8 +109,8 @@ set_mtraffic_record(struct module *mod, double st_array[],
     unsigned long long pktout = cur_array[3] - pre_array[3];;
     unsigned long long pkterrin = cur_array[4] - pre_array[4];
     unsigned long long pktdrpin = cur_array[5] - pre_array[5];
-    st_array[0] = bytein / (inter * 1.0);
-    st_array[1] = byteout / (inter * 1.0);
+    st_array[0] = bytein / (inter * 1.0) * 8;
+    st_array[1] = byteout / (inter * 1.0) * 8;
     st_array[2] = pktin / (inter * 1.0);
     st_array[3] = pktout / (inter * 1.0);
     st_array[4] = pkterrin / (inter * 2.0);
