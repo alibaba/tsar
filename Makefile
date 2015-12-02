@@ -22,6 +22,9 @@ install: all
 	#copy man file
 	cp conf/tsar.8 /usr/local/man/man8/
 
+tar:
+	tar cvzf tsar-install.tar.gz /usr/local/tsar/modules /etc/tsar  /usr/local/man/man8/   /usr/bin/tsar    /etc/logrotate.d/tsar  /etc/cron.d/tsar
+
 tsardevel:
 	mkdir -p /usr/local/tsar/devel
 	cp devel/mod_test.c /usr/local/tsar/devel/mod_test.c
