@@ -180,6 +180,8 @@ main_init(int argc, char **argv)
         conf.print_interval = 60;
         conf.print_tail = 0;
         conf.print_nline_interval = conf.print_interval;
+    } else if (conf.running_mode == RUN_CRON) {
+        conf.print_interval = 60;
     }
 
     if (!strlen(conf.output_print_mod)) {
