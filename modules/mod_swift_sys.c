@@ -28,7 +28,7 @@ static struct mod_info swift_proc_mod_info[] = {
     {"sstart", DETAIL_BIT,  0,  STATS_NULL}, /* swift start time */
     {"pstart", DETAIL_BIT,  0,  STATS_NULL}, /* swift's parent start time */
     {"  core", DETAIL_BIT,  0,  STATS_NULL}, /* swfit's coredump times */
-    {"d-core", DETAIL_BIT,  0,  STATS_NULL}, /* swfit's diff coredump times */
+    {"d_core", DETAIL_BIT,  0,  STATS_NULL}, /* swfit's diff coredump times */
 };
 
 /* swift process's info, see swift_proc_info */
