@@ -127,7 +127,7 @@ send:
 }
 
 void
-output_multi_tcp(int have_collectd)
+output_multi_tcp(int have_collect)
 {
     int        fd, flags, res;
     fd_set     fdr, fdw;
@@ -138,11 +138,9 @@ output_multi_tcp(int have_collectd)
     static char   data[LEN_10M] = {0};
     int         i;
     /* get st_array */
-    /*
     if (get_st_array_from_file(have_collect)) {
         return;
     }
-    */
     /* only output from output_db_mod */
     reload_modules(conf.output_tcp_mod);
 
