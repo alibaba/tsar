@@ -28,6 +28,7 @@ static struct mod_info swift_proc_mod_info[] = {
     {"sstart", DETAIL_BIT,  0,  STATS_NULL}, /* swift start time */
     {"pstart", DETAIL_BIT,  0,  STATS_NULL}, /* swift's parent start time */
     {"  core", DETAIL_BIT,  0,  STATS_NULL}, /* swfit's coredump times */
+    {"d_core", DETAIL_BIT,  0,  STATS_NULL}, /* swfit's diff coredump times */
 };
 
 /* swift process's info, see swift_proc_info */
@@ -299,12 +300,13 @@ static void set_proc_stat(struct module *mod, double st_array[],
     for (i = 0; i < 5; ++i) {
         st_array[i] = cur_array[i];
     }
+    st_array[5] = cur_array[4] - pre_array[4];
 }
 
 void mod_register(struct module *mod)
 {
     register_mod_fields(mod, "--swift_sys", usage,
-        swift_proc_mod_info, 5, read_proc_stat, set_proc_stat);
+        swift_proc_mod_info, 6, read_proc_stat, set_proc_stat);
 }
 
 

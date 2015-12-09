@@ -314,6 +314,8 @@ read_swift_health()
         return 1;
     }
 
+    close(conn);
+
     return 0;
 }
 
