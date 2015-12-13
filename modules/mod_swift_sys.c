@@ -300,7 +300,7 @@ static void set_proc_stat(struct module *mod, double st_array[],
     for (i = 0; i < 5; ++i) {
         st_array[i] = cur_array[i];
     }
-    st_array[5] = cur_array[4] - pre_array[4];
+    st_array[5] = cur_array[4] > pre_array[4] ? cur_array[4] - pre_array[4] : 0;
 }
 
 void mod_register(struct module *mod)
