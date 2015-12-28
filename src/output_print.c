@@ -295,6 +295,7 @@ running_print_live()
         /* print current time */
         print_current_time();
         print_record();
+        fflush(stdout);
 
         print_num++;
         /* sleep every interval */
