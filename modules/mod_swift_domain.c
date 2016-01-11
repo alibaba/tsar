@@ -170,11 +170,10 @@ static void read_swift_domain_value(char *buf,
 static int parse_swift_code_info(char *buf, size_t buflen)
 {
     char           *line, *p, *pos, token[1024];
-    int             len, id;
+    int             id;
     domain_id_pair *pair, key;
 
     pos = buf;
-    len = strlen(buf);
 
     while (pos < buf + buflen) {
         if ((p = strchr(pos, '\n')) == NULL) {

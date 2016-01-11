@@ -278,7 +278,6 @@ writebuf:
 static void
 read_nginx_stats(struct module *mod, char *parameter)
 {
-    int     write_flag = 0, addr_len, domain;
     int     pos = 0;
     int     new_pos = 0;
     char    buf[LEN_1M];

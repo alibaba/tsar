@@ -129,10 +129,6 @@ send:
 void
 output_multi_tcp(int have_collect)
 {
-    int        fd, flags, res;
-    fd_set     fdr, fdw;
-    struct     timeval timeout;
-    struct     sockaddr_in db_addr;
     int           out_pipe[2];
     int           len;
     static char   data[LEN_10M] = {0};
