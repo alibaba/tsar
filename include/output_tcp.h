@@ -27,6 +27,6 @@
 #include <arpa/inet.h>
 
 
-void output_tcp(int have_collect);
+void output_multi_tcp(int have_collect);
 struct sockaddr_in * str2sa(char *);
 #endif

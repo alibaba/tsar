@@ -98,7 +98,7 @@ init_nginx_host_info(struct hostinfo *p)
 void
 read_nginx_live_stats(struct module *mod, char *parameter)
 {
-    int                 i,addr_len, domain, m, sockfd, send, pos = 0;
+    int                 addr_len, domain, m, sockfd, send, pos = 0;
     char                buf[LEN_1M], request[LEN_4096], line[LEN_4096];
     unsigned long long online = 0, online_history = 0, up_flow = 0;
     unsigned long long down_flow = 0, fmtime = 0, drop_frame = 0;
