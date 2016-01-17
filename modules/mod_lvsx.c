@@ -228,9 +228,8 @@ read_lvsx_record(struct module *mod)
                         all_stat.vs_ackcount += stat.vs_ackcount;
                 }else if (!strncmp(line+2, "->", 2)){
                         int weight = 0;
-                        int k  = 0;
 
-                        k = strcspn(line, " ");
+                        strcspn(line, " ");
                         ret = sscanf(line + 5, "%*s %*u %*u %*u %*u %*u %*s %d %*d %*d", &weight);
                         weight > 0 ? stat.rson_count++ : stat.rsoff_count++;
                         weight > 0 ? all_stat.rson_count++ : all_stat.rsoff_count++;
