@@ -18,6 +18,7 @@ struct stats_nginx {
     unsigned long long nssl;        /* ssl requests */
     unsigned long long nsslhst;     /* ssl handshake time*/
     unsigned long long nsslhsc;     /* ssl handshake count*/
+    unsigned long long nsslf;       /* ssl failed request */
 };
 
 struct hostinfo {
@@ -43,6 +44,7 @@ static struct mod_info nginx_info[] = {
     {"spdyps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
     {"sslhst", SUMMARY_BIT, 0,  STATS_NULL},
     {"sslhsc", HIDE_BIT,    0,  STATS_NULL},
+    {"  sslf", SUMMARY_BIT, 0,  STATS_SUB_INTER},
 };
 
 
@@ -93,6 +95,12 @@ set_nginx_record(struct module *mod, double st_array[],
             st_array[11] = 0;
         }
     }
+
+    if (cur_array[13] >= pre_array[13]) {
+        st_array[13] = (cur_array[13] - pre_array[13]) * 1.0 / inter;
+    } else {
+        st_array[13] = 0;
+    } 
 }
 
 
@@ -216,8 +224,8 @@ read_nginx_stats(struct module *mod, char *parameter)
                     &st_nginx.nreading, &st_nginx.nwriting, &st_nginx.nwaiting);
             write_flag = 1;
         } else if (!strncmp(line, "SSL:", sizeof("SSL:") - 1)) {
-            sscanf(line, "SSL: %llu SPDY: %llu",
-                    &st_nginx.nssl, &st_nginx.nspdy);
+            sscanf(line, "SSL: %llu SPDY: %llu SSL_failed: %llu",
+                    &st_nginx.nssl, &st_nginx.nspdy, &st_nginx.nsslf);
             write_flag = 1;
         } else if (!strncmp(line, "SSL_Requests:", sizeof("SSL_Requests:") - 1)) {
             sscanf(line, "SSL_Requests: %llu SSL_Handshake: %llu SSL_Handshake_Time: %llu",
@@ -241,7 +249,7 @@ writebuf:
     }
 
     if (write_flag) {
-        pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
+        pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
                 st_nginx.naccept,
                 st_nginx.nhandled,
                 st_nginx.nrequest,
@@ -254,7 +262,8 @@ writebuf:
                 st_nginx.nssl,
                 st_nginx.nspdy,
                 st_nginx.nsslhst,
-                st_nginx.nsslhsc
+                st_nginx.nsslhsc,
+                st_nginx.nsslf
                  );
         buf[pos] = '\0';
         set_mod_record(mod, buf);
@@ -264,5 +273,5 @@ writebuf:
 void
 mod_register(struct module *mod)
 {
-    register_mod_fields(mod, "--nginx", nginx_usage, nginx_info, 13, read_nginx_stats, set_nginx_record);
+    register_mod_fields(mod, "--nginx", nginx_usage, nginx_info, 14, read_nginx_stats, set_nginx_record);
 }
