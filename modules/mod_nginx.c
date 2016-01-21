@@ -224,8 +224,12 @@ read_nginx_stats(struct module *mod, char *parameter)
                     &st_nginx.nreading, &st_nginx.nwriting, &st_nginx.nwaiting);
             write_flag = 1;
         } else if (!strncmp(line, "SSL:", sizeof("SSL:") - 1)) {
-            sscanf(line, "SSL: %llu SPDY: %llu SSL_failed: %llu",
-                    &st_nginx.nssl, &st_nginx.nspdy, &st_nginx.nsslf);
+            sscanf(line, "SSL: %llu SPDY: %llu",
+                    &st_nginx.nssl, &st_nginx.nspdy);
+            write_flag = 1;
+        } else if (!strncmp(line, "SSL_failed:", sizeof("SSL_failed:") - 1)) {
+            sscanf(line, "SSL_failed: %llu",
+                    &st_nginx.nsslf);
             write_flag = 1;
         } else if (!strncmp(line, "SSL_Requests:", sizeof("SSL_Requests:") - 1)) {
             sscanf(line, "SSL_Requests: %llu SSL_Handshake: %llu SSL_Handshake_Time: %llu",
