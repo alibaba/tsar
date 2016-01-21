@@ -3,8 +3,8 @@
 #include "tsar.h"
 
 static char *search_usage = "    --search            KGB search statistics";
-static const char * SEARCH_FILE_1 = "/tmp/_tsar_amonitor_1.out";
-static const char * SEARCH_FILE_2 = "/tmp/_tsar_amonitor_2.out";
+static const char * SEARCH_FILE_1 = "/tmp/_tsar_amonitor_search_1.out";
+static const char * SEARCH_FILE_2 = "/tmp/_tsar_amonitor_search_2.out";
 
 static struct mod_info search_info[] = {
     {"    rt", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
@@ -135,6 +135,10 @@ read_search_record(struct module *mod)
     }
     fclose(fp);
     fp = NULL;
+    sprintf(cmd, "rm -rf %s", SEARCH_FILE_1);
+    system(cmd);
+    sprintf(cmd, "rm -rf %s", SEARCH_FILE_2);
+    system(cmd);
     snprintf(buf, LEN_1M, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",  (long long)search_stat.rt*100/search_stat.rt_count,  (long long)search_stat.qps*100/search_stat.qps_count, (long long)search_stat.fail*100/search_stat.fail_count, (long long)search_stat.empty*100/search_stat.empty_count,(long long) search_stat.rank_rt*100/search_stat.rank_rt_count, (long long)search_stat.rank_qps*100/search_stat.rank_qps_count, (long long)search_stat.rank_to*100/search_stat.rank_to_count, (long long) search_stat.rank_fail*100/search_stat.rank_fail_count);
 
     set_mod_record(mod, buf);
