@@ -18,7 +18,7 @@ ifeq ($(UNAME_S),Darwin)
             mod_swift_purge.so mod_swift_tcmalloc.so mod_swift_sys.so \
             mod_swift_esi.so mod_swift_balancer.so mod_swift_blc_fwd.so mod_swift_conn.so\
             mod_tmd.so mod_percpu.so mod_rpi.so mod_tcprt.so mod_shell.so mod_nginx_domain.so \
-	    mod_tmd4.so mod_nginx_domain_traffic.so mod_nginx_ups.so mod_nginx_sys.so mod_network.so mod_lvsx.so mod_keyserver.so \
+	    mod_tmd4.so mod_nginx_domain_traffic.so mod_nginx_ups.so mod_nginx_sys_mport.so mod_nginx_sys.so mod_network.so mod_lvsx.so mod_keyserver.so \
 	    mod_pharos.so mod_pharos_load.so mod_pharos_status.so mod_pharos_rcode.so mod_pharos_qtype.so \
 		mod_nginx_live.so mod_nginx_multiport.so
 else
@@ -33,7 +33,7 @@ else
             mod_swift_purge.so mod_swift_tcmalloc.so mod_swift_sys.so \
             mod_swift_esi.so mod_swift_balancer.so mod_swift_blc_fwd.so mod_swift_conn.so\
             mod_tmd.so mod_percpu.so mod_rpi.so mod_tcprt.so mod_shell.so mod_nginx_domain.so \
-	    mod_tmd4.so mod_nginx_domain_traffic.so mod_nginx_ups.so mod_nginx_sys.so mod_network.so mod_lvsx.so mod_keyserver.so \
+	    mod_tmd4.so mod_nginx_domain_traffic.so mod_nginx_ups.so mod_nginx_sys_mport.so mod_nginx_sys.so mod_network.so mod_lvsx.so mod_keyserver.so \
 	    mod_pharos.so mod_pharos_load.so mod_pharos_status.so mod_pharos_rcode.so mod_pharos_qtype.so \
 		mod_nginx_live.so mod_nginx_multiport.so
 endif
