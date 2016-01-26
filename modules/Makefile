@@ -1,7 +1,7 @@
 CFLAGS = -Wall -fPIC --shared -g -O2 -Wno-strict-aliasing
 CC = gcc
 INCLUDE_DIR = ../include
-LINK = $(CC) -I$(INCLUDE_DIR) $(CFLAGS)
+LINK = $(CC) -I$(INCLUDE_DIR) -I /home/xiaokaikai.xk/work/LuaJIT-2.0.4/src $(CFLAGS)
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
@@ -20,7 +20,7 @@ ifeq ($(UNAME_S),Darwin)
             mod_tmd.so mod_percpu.so mod_rpi.so mod_tcprt.so mod_shell.so mod_nginx_domain.so \
 	    mod_tmd4.so mod_nginx_domain_traffic.so mod_nginx_ups.so mod_nginx_sys_mport.so mod_nginx_sys.so mod_network.so mod_lvsx.so mod_keyserver.so \
 	    mod_pharos.so mod_pharos_load.so mod_pharos_status.so mod_pharos_rcode.so mod_pharos_qtype.so \
-		mod_nginx_live.so mod_nginx_multiport.so
+		mod_nginx_live.so mod_nginx_multiport.so mod_lua.so
 else
     OBJS =  mod_search.so mod_swap.so mod_partition.so mod_cpu.so mod_mem.so mod_lvs.so mod_haproxy.so \
             mod_traffic.so mod_pernic.so mod_squid.so mod_load.so mod_tcp.so mod_udp.so mod_tcpx.so mod_proc.so\
@@ -35,13 +35,13 @@ else
             mod_tmd.so mod_percpu.so mod_rpi.so mod_tcprt.so mod_shell.so mod_nginx_domain.so \
 	    mod_tmd4.so mod_nginx_domain_traffic.so mod_nginx_ups.so mod_nginx_sys_mport.so mod_nginx_sys.so mod_network.so mod_lvsx.so mod_keyserver.so \
 	    mod_pharos.so mod_pharos_load.so mod_pharos_status.so mod_pharos_rcode.so mod_pharos_qtype.so \
-		mod_nginx_live.so mod_nginx_multiport.so
+		mod_nginx_live.so mod_nginx_multiport.so mod_lua.so
 endif
 
 all: $(OBJS)
 
 $(OBJS): %.so: %.c
-	$(LINK) $< -o $@
+	$(LINK) $< -lluajit-5.1 -o $@
 clean:
 	rm -f *.so;
 	rm -rf *.dSYM;

@@ -279,7 +279,6 @@ static void
 read_nginx_stats(struct module *mod, char *parameter)
 {
     int     pos = 0;
-    int     new_pos = 0;
     char    buf[LEN_1M];
     char    *token;
     char    mod_parameter[LEN_256];
@@ -297,7 +296,7 @@ read_nginx_stats(struct module *mod, char *parameter)
         }
         while ((token = strtok(NULL, W_SPACE)) != NULL);
     }
-    if(new_pos != -1) {
+    if(pos != -1) {
         set_mod_record(mod,buf);
     }
 }
