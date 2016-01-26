@@ -241,7 +241,7 @@ read_merger_record(struct module *mod) {
         merger_stat.dn_succ_count != 0) {
         snprintf(buf,
                  LEN_1M,
-                 "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
+                 "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
                  (long long) merger_stat.rt * 100 / merger_stat.rt_count,
                  (long long) merger_stat.qps * 100 / merger_stat.qps_count,
                  (long long) merger_stat.fail * 100 / merger_stat.fail_count,
