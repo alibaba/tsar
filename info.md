@@ -28,14 +28,14 @@ Hard Irq time, 0
 SoftIRQ time, 195975
 Steal time, 609768
 
-`CPU总时间=user+system+nice+idle+iowait+irq+softirq+Stl`  
-各个状态的占用=状态的cpu时间％CPU总时间＊100%  
-比较特殊的是CPU总使用率的计算(util),目前的算法是:  
+`CPU总时间=user+system+nice+idle+iowait+irq+softirq+Stl`
+各个状态的占用=状态的cpu时间％CPU总时间＊100%
+比较特殊的是CPU总使用率的计算(util),目前的算法是:
 `util = 1 - idle - iowait - steal`
 
 ###mem
 ####字段含义
-* free:   空闲的物理内存的大小  
+* free:   空闲的物理内存的大小
 * used:   已经使用的内存大小
 * buff:   buff使用的内存大小,buffer is something that has yet to be "written" to disk.
 * cach:   操作系统会把经常访问的东西放在cache中加快执行速度,A cache is something that has been "read" from the disk and stored for later use
@@ -43,37 +43,37 @@ Steal time, 609768
 * util:   内存使用率
 
 ####采集方法
-内存的计数器在/proc/meminfo,里面有一些关键项  
+内存的计数器在/proc/meminfo,里面有一些关键项
 
         MemTotal:      7680000 kB
         MemFree:        815652 kB
         Buffers:       1004824 kB
         Cached:        4922556 kB
 
-含义就不解释了,主要介绍一下内存使用率的计算算法:  
+含义就不解释了,主要介绍一下内存使用率的计算算法:
 `util = (total - free - buff - cache) / total * 100%`
 
 ###load
 ####字段含义
 * load1: 一分钟的系统平均负载
-* load5: 五分钟的系统平均负载  
-* load15:十五分钟的系统平均负载  
+* load5: 五分钟的系统平均负载
+* load15:十五分钟的系统平均负载
 * runq:  在采样时刻,运行队列的任务的数目,与/proc/stat的procs_running表示相同意思
 * plit:  在采样时刻,系统中活跃的任务的个数（不包括运行已经结束的任务）
 
 ####采集方法
-/proc/loadavg文件中保存的有负载相关的数据  
-`0.00 0.01 0.00 1/271 23741`  
-分别是1分钟负载,五分钟负载,十五分钟负载,运行进程／总进程 最大的pid  
-只需要采集前五个数据既可得到所有信息  
+/proc/loadavg文件中保存的有负载相关的数据
+`0.00 0.01 0.00 1/271 23741`
+分别是1分钟负载,五分钟负载,十五分钟负载,运行进程／总进程 最大的pid
+只需要采集前五个数据既可得到所有信息
 注意:只有当系统负载除cpu核数>1的时候,系统负载较高
 
 ###traffic
 ####字段含义
 * bytin:   入口流量byte/s
 * bytout:  出口流量byte/s
-* pktin:   入口pkt/s 
-* pktout:  出口pkt/s 
+* pktin:   入口pkt/s
+* pktout:  出口pkt/s
 
 ####采集方法
 流量的计数器信息来自:/proc/net/dev
@@ -81,29 +81,29 @@ Steal time, 609768
         face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
         lo:1291647853895 811582000    0    0    0     0          0         0 1291647853895 811582000    0    0    0     0       0          0
         eth0:853633725380 1122575617    0    0    0     0          0         0 1254282827126 808083790    0    0    0     0       0          0
-        
-字段的含义第一行已经标示出来,每一行代表一个网卡,tsar主要采集的是出口和入口的bytes／packets  
+
+字段的含义第一行已经标示出来,每一行代表一个网卡,tsar主要采集的是出口和入口的bytes／packets
 注意tsar只对以eth和em开头的网卡数据进行了采集,像lo这种网卡直接就忽略掉了,流量的单位是byte
 
 ###tcp
 ####字段含义
 * active:主动打开的tcp连接数目
 * pasive:被动打开的tcp连接数目
-* iseg:  收到的tcp报文数目 
+* iseg:  收到的tcp报文数目
 * outseg:发出的tcp报文数目
 * EstRes:Number of resets that have occurred at ESTABLISHED
-* AtmpFa:Number of failed connection attempts 
+* AtmpFa:Number of failed connection attempts
 * CurrEs:当前状态为ESTABLISHED的tcp连接数
 * retran:系统的重传率
 
 ####采集方法
-tcp的相关计数器文件是:/proc/net/snmp  
+tcp的相关计数器文件是:/proc/net/snmp
 
         Tcp: RtoAlgorithm RtoMin RtoMax MaxConn ActiveOpens PassiveOpens AttemptFails EstabResets CurrEstab InSegs OutSegs RetransSegs InErrs OutRsts
         Tcp: 1 200 120000 -1 31702170 14416937 935062 772446 16 1846056224 1426620266 448823 0 5387732
 
-我们主要关注其中的ActiveOpens/PassiveOpens/AttemptFails/EstabResets/CurrEstab/InSegs/OutSegs/RetransSegs  
-主要关注一下重传率的计算方式:  
+我们主要关注其中的ActiveOpens/PassiveOpens/AttemptFails/EstabResets/CurrEstab/InSegs/OutSegs/RetransSegs
+主要关注一下重传率的计算方式:
 `retran = (RetransSegs－last RetransSegs) ／ (OutSegs－last OutSegs) * 100%`
 
 ###udp
@@ -135,12 +135,12 @@ UDP的数据来源文件和TCP一样,也是在/proc/net/snmp
 * util:  Percentage of CPU time during which I/O requests were issued to the device (bandwidth utilization for the device).Device saturation occurs when this value is close to 100%.
 
 ####采集方法
-IO的计数器文件是:/proc/diskstats,比如:  
+IO的计数器文件是:/proc/diskstats,比如:
 
         202    0 xvda 12645385 1235409 416827071 59607552 193111576 258112651 3679534806 657719704 0 37341324 717325100
         202    1 xvda1 421 2203 3081 9888 155 63 421 1404 0 2608 11292
 
-每一行字段的含义是:  
+每一行字段的含义是:
 * major:     主设备号
 * minor:      次设备号,设备号是用来区分磁盘的类型和厂家信息
 * name:       设备名称
@@ -186,7 +186,7 @@ IO的计数器文件是:/proc/diskstats,比如:
 * util:  分区使用率
 
 ####采集方法
-首先通过/etc/mtab获取到分区信息,然后通过statfs访问该分区的信息,查询文件系统相关信息,包含:  
+首先通过/etc/mtab获取到分区信息,然后通过statfs访问该分区的信息,查询文件系统相关信息,包含:
 
         struct statfs {
         long f_type; /* 文件系统类型 */
@@ -200,7 +200,7 @@ IO的计数器文件是:/proc/diskstats,比如:
         fsid_t f_fsid; /* 文件系统标识 */
         long f_namelen; /* 文件名的最大长度 */
         };
-        
+
 然后就可以计算出tsar需要的信息,分区的字节数＝块数＊块大小＝f_blocks * f_bsize
 
 ###pcsw
@@ -209,7 +209,7 @@ IO的计数器文件是:/proc/diskstats,比如:
 * proc:   新建的进程数
 
 ####采集方法
-计数器在/proc/stat:  
+计数器在/proc/stat:
 
         ctxt 19873315174
         processes 296444211
@@ -218,16 +218,16 @@ IO的计数器文件是:/proc/diskstats,比如:
 
 ###tcpx
 ####字段含义
-recvq sendq est twait fwait1 fwait2 lisq lising lisove cnest ndrop edrop rdrop pdrop kdrop  
-分别代表  
+recvq sendq est twait fwait1 fwait2 lisq lising lisove cnest ndrop edrop rdrop pdrop kdrop
+分别代表
 tcprecvq tcpsendq tcpest tcptimewait tcpfinwait1 tcpfinwait2 tcplistenq tcplistenincq tcplistenover tcpnconnest tcpnconndrop tcpembdrop tcprexmitdrop tcppersistdrop tcpkadrop
 ####采集方法
 计数器来自:/proc/net/netstat /proc/net/snmp
-里面用到的数据有:  
+里面用到的数据有:
 
         TcpExt: SyncookiesSent SyncookiesRecv SyncookiesFailed EmbryonicRsts PruneCalled RcvPruned OfoPruned OutOfWindowIcmps LockDroppedIcmps ArpFilter TW TWRecycled TWKilled PAWSPassive PAWSActive PAWSEstab DelayedACKs DelayedACKLocked DelayedACKLost ListenOverflows ListenDrops TCPPrequeued TCPDirectCopyFromBacklog TCPDirectCopyFromPrequeue TCPPrequeueDropped TCPHPHits TCPHPHitsToUser TCPPureAcks TCPHPAcks TCPRenoRecovery TCPSackRecovery TCPSACKReneging TCPFACKReorder TCPSACKReorder TCPRenoReorder TCPTSReorder TCPFullUndo TCPPartialUndo TCPDSACKUndo TCPLossUndo TCPLoss TCPLostRetransmit TCPRenoFailures TCPSackFailures TCPLossFailures TCPFastRetrans TCPForwardRetrans TCPSlowStartRetrans TCPTimeouts TCPRenoRecoveryFail TCPSackRecoveryFail TCPSchedulerFailed TCPRcvCollapsed TCPDSACKOldSent TCPDSACKOfoSent TCPDSACKRecv TCPDSACKOfoRecv TCPAbortOnSyn TCPAbortOnData TCPAbortOnClose TCPAbortOnMemory TCPAbortOnTimeout TCPAbortOnLinger TCPAbortFailed TCPMemoryPressures
         TcpExt: 0 0 0 80 539 0 0 0 0 0 3733709 51268 0 0 0 80 5583301 5966 104803 146887 146887 6500405 39465075 2562794034 0 689613557 2730596 540646233 234702206 0 44187 2066 94 240 0 114 293 1781 7221 60514 185158 2 2 3403 400 107505 5860 24813 174014 0 2966 7 168787 106151 40 32851 2 0 2180 9862 0 15999 0 0 0
-        
+
 具体字段找到并且获取即可
 
 ###percpu ncpu
@@ -254,10 +254,10 @@ tcprecvq tcpsendq tcpest tcptimewait tcpfinwait1 tcpfinwait2 tcplistenq tcpliste
 * write:进程的io写字节
 
 ####采集方法
-计数器文件  
-> /proc/pid/stat:获取进程的cpu信息  
-> /proc/pid/status:获取进程的mem信息  
-> /proc/pid/io:获取进程的读写IO信息  
+计数器文件
+> /proc/pid/stat:获取进程的cpu信息
+> /proc/pid/status:获取进程的mem信息
+> /proc/pid/io:获取进程的读写IO信息
 
 注意,需要将采集的进程名称配置在/etc/tsar/tsar.conf总的mod_proc on procname,这样就会找到procname的pid,并进行数据采集
 
@@ -278,7 +278,7 @@ tcprecvq tcpsendq tcpest tcptimewait tcpfinwait1 tcpfinwait2 tcplistenq tcpliste
 
 
 ####采集方法
-通过nginx的采集模块配置,访问特定地址,具体参见:https://github.com/taobao/tsar-mod_nginx  
+通过nginx的采集模块配置,访问特定地址,具体参见:https://github.com/taobao/tsar-mod_nginx
 
         location = /nginx_status {
             stub_status on;
@@ -286,17 +286,17 @@ tcprecvq tcpsendq tcpest tcptimewait tcpfinwait1 tcpfinwait2 tcplistenq tcpliste
 
 请确保如下方式能得到数据：
 curl 127.0.0.1:80/nginx_status  -H 'Host: status.taobao.com'
-请求到的数据是:  
+请求到的数据是:
 
         Active connections: 1
         server accepts handled requests request_time
          24 24 7 0
         Reading: 0 Writing: 1 Waiting: 0
         SSL: 0 SPDY: 0
-（注：对于上述返回数据中的server accepts handled requests request_time，当前是通过“ 24 24 7 0”数据行首的空格作为前导  
+（注：对于上述返回数据中的server accepts handled requests request_time，当前是通过“ 24 24 7 0”数据行首的空格作为前导
 现tsar在本模块中同时支持“Server accepts: 24 handled: 24 requests: 7 request_time 0”格式返回该数据行。今后将升级tengine改用此方式。）
 
-需要确保nginx配置该location,并且能够访问`curl http://localhost/nginx_status`得到上面的数据  
+需要确保nginx配置该location,并且能够访问`curl http://localhost/nginx_status`得到上面的数据
 如果nginx的端口不是80,则需要在配置文件中指定端口,配置文件是/etc/tsar/tsar.conf,修改mod_nginx on为mod_nginx on 8080 。nginx 模块支持多个端口采集，以解决在不同端口启动了nginx的情况，端口号之间以空格隔开即可。
 不同端口的nginx数据以不同item的形式展现，在对各item进行合并的时候（-m），除rt以及sslhst依然为平均值之外，其他的所有值都为所有端口的值的总和
 
@@ -306,10 +306,10 @@ curl 127.0.0.1:80/nginx_status  -H 'Host: status.taobao.com'
         req_status server;
         location /traffic_status {
                 req_status_show;
-        } 
+        }
 
-通过访问`curl http://localhost/traffic_status`能够得到如下字段的数据  
-`localhost,0,0,2,2,2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0`  
+通过访问`curl http://localhost/traffic_status`能够得到如下字段的数据
+`localhost,0,0,2,2,2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0`
 
 请求到的数据每个字段的含义是:
 * kv 计算得到的req_status_zone指令定义变量的值,此时为domain字段
@@ -341,11 +341,11 @@ curl 127.0.0.1:80/nginx_status  -H 'Host: status.taobao.com'
 * 508 508请求的总数
 * detail_other 非以上13种status code的请求总数
 
-如果domain数量太多,或者端口不是80,需要进行专门的配置,配置文件内容如下:  
-port=8080 #指定nginx的端口  
-top=10 #指定最多采集的域名个数，按照请求总个数排列  
-domain=a.com b.com #指定特定需要采集的域名列表,分隔符为空格,逗号,或者制表符  
-在/etc/tsar/tsar.conf中指定配置文件的路径:mod_nginx_domain on /tmp/my.conf  
+如果domain数量太多,或者端口不是80,需要进行专门的配置,配置文件内容如下:
+port=8080 #指定nginx的端口
+top=10 #指定最多采集的域名个数，按照请求总个数排列
+domain=a.com b.com #指定特定需要采集的域名列表,分隔符为空格,逗号,或者制表符
+在/etc/tsar/tsar.conf中指定配置文件的路径:mod_nginx_domain on /tmp/my.conf
 
 ####nginx_domain_traffic
 nginx配置是:
@@ -360,7 +360,7 @@ nginx配置是:
 
         location /traffic_status {
                 req_status_show;
-        } 
+        }
 
 输出实例:
 
@@ -390,7 +390,7 @@ nginx配置是:
 
         location /traffic_status {
                 req_status_show;
-        } 
+        }
 
 输出实例:
 
@@ -427,9 +427,9 @@ nginx配置是:
 
 ####采集方法
 请确保如下方式能得到数据：
-curl -x 127.0.0.1:7001 http://status.taobao.com/rtmp_reqstat 
-请求到的数据是:  
-rtmp://pagefault/alicdn/diaoliang123,fm_time:574 drop_frame:0 online:1 online_history:2 down_flow:166096189 up_flow:166096188 internal:0 edge:2 
+curl -x 127.0.0.1:7001 http://status.taobao.com/rtmp_reqstat
+请求到的数据是:
+rtmp://pagefault/alicdn/diaoliang123,fm_time:574 drop_frame:0 online:1 online_history:2 down_flow:166096189 up_flow:166096188 internal:0 edge:2
 
 ###squid
 ####字段含义
@@ -467,7 +467,7 @@ haproxy经过了patch,能够在多进程模式下进行统计信息的汇总,然
 * conns: 总的连接数
 * pktin: 收到的包数
 * pktout:发出的包数
-* bytin: 收到的字节数 
+* bytin: 收到的字节数
 * bytout:发出的字节数
 
 ####采集方法
@@ -485,3 +485,12 @@ haproxy经过了patch,能够在多进程模式下进行统计信息的汇总,然
 待补充
 ###tmd
 私有应用,略
+
+###lua
+####采集方法
+在/etc/tsar/tsar.conf中：
+mod_lua on {lua_file_name}
+启用lua模块，将从绝对路径调用{lua_file_name}这个lua脚本文件
+mod_lua 依赖luajit-5.1
+目前为仅有一个tsar模块支持lua，通过修改lua脚本文件来实现不同的数据采集。目前支持11个字段供lua操作
+具体实现样例见lua_modules/nginx_mem.lua，该脚本实现采集本机上所有nginx进程分配的内存总数
