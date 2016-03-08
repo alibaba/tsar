@@ -10,26 +10,26 @@
 #define TRUE  1
 #define FALSE 0
 struct stats_live_tcprt{
-	unsigned int 	 connections;       //建立连接总数
-	unsigned int     i_sum_out_bytes;   //传输时的发送字节数
-	unsigned int     i_sum_drop_packets;//传输时的丢包数
-	unsigned int     i_avg_rtt;  		//平均传输时的RTT
-	unsigned int     e_sum_out_bytes;   //连接结束时的发送字节数
-	unsigned int     e_sum_drop_packets;//连接结束时的丢包数
-	unsigned int     e_avg_rtt;			//平均连接结束时的RTT
-	unsigned int     i_records;			//所有的传输次数
-	unsigned int     e_records;			//所有的连接结束次数
+	unsigned int 	 connections;		 //建立连接总数
+	unsigned int     i_sum_out_bytes;        //传输时的发送字节数
+	unsigned int     i_sum_drop_packets;     //传输时的丢包数
+	unsigned int     i_avg_rtt;  		 //平均传输时的RTT
+	unsigned int     e_sum_out_bytes;        //连接结束时的发送字节数
+	unsigned int     e_sum_drop_packets;     //连接结束时的丢包数
+	unsigned int     e_avg_rtt;		 //平均连接结束时的RTT
+	unsigned int     i_records;		 //所有的传输次数
+	unsigned int     e_records;		 //所有的连接结束次数
 };
 static char* live_tcprt_usage ="    --live-tcprt	live-tcprt stats average data(outbytes、rt、drop etc...)";
 
 static struct mod_info live_tcprt_info[] = {
-	    {"  Conn", DETAIL_BIT,  0,  STATS_NULL}, /*建立连接总数*/
-		{"Ioutbt", DETAIL_BIT,  0,  STATS_NULL}, /*传输时的发送字节数*/
-		{"Idppak", DETAIL_BIT,  0,  STATS_NULL}, /*传输时的丢包数*/
-		{"  Irtt", DETAIL_BIT,  0,  STATS_NULL}, /*平均传输时的RTT*/
-		{"Eoutbt", DETAIL_BIT,  0,  STATS_NULL}, /*连接结束时的发送字节数*/
-		{"Edppak", DETAIL_BIT,  0,  STATS_NULL}, /*连接结束时的丢包数*/
-		{"  Ertt", DETAIL_BIT,  0,  STATS_NULL}, /*平均连接结束时的RTT*/
+	{"  Conn", DETAIL_BIT,  0,  STATS_NULL},  /*建立连接总数*/
+	{"Ioutbt", DETAIL_BIT,  0,  STATS_NULL},  /*传输时的发送字节数*/
+	{"Idppak", DETAIL_BIT,  0,  STATS_NULL},  /*传输时的丢包数*/
+	{"  Irtt", DETAIL_BIT,  0,  STATS_NULL},  /*平均传输时的RTT*/
+	{"Eoutbt", DETAIL_BIT,  0,  STATS_NULL},  /*连接结束时的发送字节数*/
+	{"Edppak", DETAIL_BIT,  0,  STATS_NULL},  /*连接结束时的丢包数*/
+	{"  Ertt", DETAIL_BIT,  0,  STATS_NULL},  /*平均连接结束时的RTT*/
 };
 
 void prepare_data(char* shell_string){
@@ -62,11 +62,11 @@ static void
 read_live_tcprt_stats(struct module* mod){
 	
 	char   buf[LEN_4096];
-	int             pos=0;
-	FILE*         fd=NULL;
-	char    line[LEN_256];
-	struct  stats_live_tcprt sl_tcprt;
-	int row             =1;
+	int    pos=0;
+	FILE*  fd=NULL;
+	char   line[LEN_256];
+	struct stats_live_tcprt sl_tcprt;
+	int    row=1;
 	unsigned int counter=0;
 	unsigned int para5=0, para6=0, para7=0;
 
@@ -76,10 +76,10 @@ read_live_tcprt_stats(struct module* mod){
 	
 	// /sys/kernel/debug/tcp-watch-log*
 	prepare_data("cat /sys/kernel/debug/tcp-watch-log* | sort -nrk 1 | awk 'BEGIN{tmps=\"S\";tmpi=\"I\";tmpe=\"E\";\
-			             		       sums=0;sumi=0;sume=0;sp5=0;sp6=0;sp7=0;ip5=0;ip6=0;ip7=0;ep5=0;ep6=0;ep7=0;}\
-						                      {if(tmps==$1){sums+=1;}if(tmpi==$1){sumi+=1;ip5+=$5;ip6+=$6;ip7+=$7;}\
-											                        if(tmpe==$1){sume+=1;ep5+=$5;ep6+=$6;ep7+=$7;}}\
-								      END{print sums,sp5,sp6,sp7; print sumi,ip5,ip6,ip7; print sume,ep5,ep6,ep7}'");
+		    sums=0;sumi=0;sume=0;sp5=0;sp6=0;sp7=0;ip5=0;ip6=0;ip7=0;ep5=0;ep6=0;ep7=0;}\
+		    {if(tmps==$1){sums+=1;}if(tmpi==$1){sumi+=1;ip5+=$5;ip6+=$6;ip7+=$7;}\
+		    if(tmpe==$1){sume+=1;ep5+=$5;ep6+=$6;ep7+=$7;}}\
+		    END{print sums,sp5,sp6,sp7; print sumi,ip5,ip6,ip7; print sume,ep5,ep6,ep7}'");
 
 	fd =fopen(DATA_PATH,"r");
 	if(!fd){
