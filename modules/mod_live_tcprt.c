@@ -10,14 +10,14 @@
 #define FALSE 0
 struct stats_live_tcprt{
     unsigned int     connections;         //建立连接总数
-    unsigned int     i_sum_out_bytes;        //传输时的发送字节数
-    unsigned int     i_sum_drop_packets;     //传输时的丢包数
+    unsigned int     i_sum_out_bytes;     //传输时的发送字节数
+    unsigned int     i_sum_drop_packets;  //传输时的丢包数
     unsigned int     i_avg_rtt;           //平均传输时的RTT
-    unsigned int     e_sum_out_bytes;        //连接结束时的发送字节数
-    unsigned int     e_sum_drop_packets;     //连接结束时的丢包数
-    unsigned int     e_avg_rtt;         //平均连接结束时的RTT
-    unsigned int     i_records;         //所有的传输次数
-    unsigned int     e_records;         //所有的连接结束次数
+    unsigned int     e_sum_out_bytes;     //连接结束时的发送字节数
+    unsigned int     e_sum_drop_packets;  //连接结束时的丢包数
+    unsigned int     e_avg_rtt;           //平均连接结束时的RTT
+    unsigned int     i_records;           //所有的传输次数
+    unsigned int     e_records;           //所有的连接结束次数
 };
 static char* live_tcprt_usage ="    --live-tcprt        live-tcprt stats average data(outbytes、rt、drop etc...)";
 
