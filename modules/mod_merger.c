@@ -80,6 +80,9 @@ read_merger_record(struct module *mod) {
     int idx = 0;
     double f;
 
+    ret = system("ps -ef | grep amonitor_agent | grep -v grep > /dev/null");
+    if (ret == -1 || WEXITSTATUS(ret) != 0)
+        return;
     snprintf(cmd,
              LEN_1024,
              "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -r node | /bin/grep merger/ | /bin/grep -v merger/default | /usr/bin/head -n 1 > %s",
