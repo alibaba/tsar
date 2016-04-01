@@ -47,6 +47,9 @@ read_search_record(struct module *mod)
     char *p = NULL;
     int idx = 0;
     double f;
+    ret = system("ps -ef | grep amonitor_agent | grep -v grep > /dev/null");
+    if (ret == -1 || WEXITSTATUS(ret) != 0)
+        return;
 
     snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -r node | /bin/grep /master/ | /usr/bin/head -n 1 > %s", SEARCH_FILE_1);
     ret = system(cmd);
