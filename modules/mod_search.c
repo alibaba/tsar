@@ -143,7 +143,7 @@ read_search_record(struct module *mod)
     sprintf(cmd, "rm -rf %s", SEARCH_FILE_2);
     system(cmd);
 
-    if(search_stat.rt_count == 0 || search_stat.qps_count == 0 || search_stat.fail_count = 0 || search_stat.empty_count == 0 ||
+    if(search_stat.rt_count == 0 || search_stat.qps_count == 0 || search_stat.fail_count == 0 || search_stat.empty_count == 0 ||
         search_stat.rank_rt_count == 0 || search_stat.rank_qps_count == 0 || search_stat.rank_to_count == 0 ||
         search_stat.rank_fail_count == 0)
         return;
