@@ -142,6 +142,11 @@ read_search_record(struct module *mod)
     system(cmd);
     sprintf(cmd, "rm -rf %s", SEARCH_FILE_2);
     system(cmd);
+
+    if(search_stat.rt_count == 0 || search_stat.qps_count == 0 || search_stat.fail_count == 0 || search_stat.empty_count == 0 ||
+        search_stat.rank_rt_count == 0 || search_stat.rank_qps_count == 0 || search_stat.rank_to_count == 0 ||
+        search_stat.rank_fail_count == 0)
+        return;
     snprintf(buf, LEN_1M, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",  (long long)search_stat.rt*100/search_stat.rt_count,  (long long)search_stat.qps*100/search_stat.qps_count, (long long)search_stat.fail*100/search_stat.fail_count, (long long)search_stat.empty*100/search_stat.empty_count,(long long) search_stat.rank_rt*100/search_stat.rank_rt_count, (long long)search_stat.rank_qps*100/search_stat.rank_qps_count, (long long)search_stat.rank_to*100/search_stat.rank_to_count, (long long) search_stat.rank_fail*100/search_stat.rank_fail_count);
 
     set_mod_record(mod, buf);

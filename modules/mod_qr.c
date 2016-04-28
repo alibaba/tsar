@@ -16,18 +16,18 @@ static const char *QR_FILE_1 = "/tmp/_tsar_amonitor_qr_1.out";
 static const char *QR_FILE_2 = "/tmp/_tsar_amonitor_qr_2.out";
 
 static struct mod_info qr_info[] = {
-        {"    qr_in", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
-        {"  qr_tmot", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
-        {"    qr_rt", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
-        {"  qr_fail", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
-        {"  tair_in", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
-        {" tair_hit", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
-        {"  tair_rt", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
-        {"tair_dslz", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
-        {"  norm_in", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
-        {"  norm_rt", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
-        {"  norm_fl", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
-        {"  rw_word", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
+        {"    in", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
+        {"  tmot", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
+        {"    rt", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
+        {"  fail", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
+        {"tairin", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
+        {"tairht", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
+        {"tairrt", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
+        {"tairlz", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
+        {"normin", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
+        {"normrt", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
+        {"normfl", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
+        {"rwword", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
 };
 
 struct stats_qr {
