@@ -28,6 +28,7 @@ struct mod_info {
     int     summary_bit;    /* bit set indefi summary */
     int     merge_mode;
     int     stats_opt;
+    int     print_llu;   /* 0: print as float ; 1: print as %6llu*/
 };
 
 struct module {
