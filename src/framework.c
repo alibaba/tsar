@@ -24,12 +24,37 @@ void
 register_mod_fields(struct module *mod, const char *opt, const char *usage,
     struct mod_info *info, int n_col, void *data_collect, void *set_st_record)
 {
+    int i;
     sprintf(mod->opt_line, "%s", opt);
     sprintf(mod->usage, "%s", usage);
     mod->info = info;
     mod->n_col = n_col;
     mod->data_collect = data_collect;
     mod->set_st_record = set_st_record;
+
+    for (i = 0; i < n_col; i++ ) {
+        switch (info[i].summary_bit) {
+            case HIDE_BIT_LLU:
+                info[i].summary_bit = HIDE_BIT;
+                info[i].print_llu = 1;
+                break;
+            case DETAIL_BIT_LLU:
+                info[i].summary_bit = DETAIL_BIT;
+                info[i].print_llu = 1;
+                break;
+            case SUMMARY_BIT_LLU:
+                info[i].summary_bit = SUMMARY_BIT;
+                info[i].print_llu = 1;
+                break;
+            case SPEC_BIT_LLU:
+                info[i].summary_bit = SPEC_BIT;
+                info[i].print_llu = 1;
+                break;
+            default:
+                info[i].print_llu = 0;
+        }
+    }
+
 }
 
 
