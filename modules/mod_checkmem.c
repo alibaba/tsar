@@ -21,7 +21,7 @@ typedef struct {
 #define PSCMD "ps -ef | grep %s | grep -v grep | awk '{print $2}'"
 #define STATS_MEM_SIZE (sizeof(struct stats_mem))
 
-static char *checkmem_usage = "    --checkmem               check process rss mem info (nginx nginx_live & swift)";
+static char *checkmem_usage = "    --checkmem          check process rss mem info (nginx nginx_live & swift)";
 
 static void
 read_mem_stat_info(proc_mem_t *stat_mem)
