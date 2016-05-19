@@ -50,24 +50,25 @@ read_mem_stat_info(proc_mem_t *stat_mem)
         return;
     }
 
-    if(fgets(spid, 1000, fp) ==NULL) {
-        pclose(fp);
-        return;
-    }
-    pclose(fp);
-    /* split pidof into array pid */
-    char *p;
-    p = strtok(spid, delch);
-    while (p) {
-        pid[nb] = atoi(p);
-        if (pid[nb++] <= 0) {
-            return;
-        }
-        if (nb >= 100) {
-            return;
-        }
-        p = strtok(NULL, " ");
-    }
+    do {
+        if(fgets(spid, 1000, fp) ==NULL) {
+            pclose(fp);
+            break;
+         }
+        /* split pidof into array pid */
+        char *p;
+        p = strtok(spid, " ");
+        while (p) {
+            pid[nb] = atoi(p);
+            if (pid[nb++] <= 0) {
+                return;
+            }
+            if (nb >= 100) {
+                return;
+            }
+            p = strtok(NULL, " ");
+       }
+    } while(1);
     /* get all pid's info */
     stat_mem->mem = 0;
     for (i = 0; i < nb; i++) {
@@ -81,10 +82,11 @@ read_mem_stat_info(proc_mem_t *stat_mem)
             if (!strncmp(line, "VmRSS:", 6)) {
                 sscanf(line + 6, "%llu", &data);
                 stat_mem->aver_mem += data * 1024;
-                if (data > stat_mem->mem) {
+                if (data * 1024 > stat_mem->mem) {
                     stat_mem->mem = data * 1024;
                     stat_mem->pid = pid[i];
                 }
+                break;
             }
         }
         fclose(fp);
