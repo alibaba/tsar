@@ -43,7 +43,7 @@ read_traffic_stats(struct module *mod)
     memset(&total_st, 0, sizeof(cur_st));
 
     while (fgets(line, LEN_4096, fp) != NULL) {
-        if (strstr(line, "eth") || strstr(line, "em") || strstr(line, "venet")) {
+        if (strstr(line, ":") && !strstr(line, "lo:")) {
             memset(&cur_st, 0, sizeof(cur_st));
             p = strchr(line, ':');
             sscanf(p + 1, "%llu %llu %llu %llu %*u %*u %*u %*u "
