@@ -18,6 +18,9 @@ struct stats_nginx {
     unsigned long long nssl;        /* ssl requests */
     unsigned long long nsslhst;     /* ssl handshake time*/
     unsigned long long nsslhsc;     /* ssl handshake count*/
+    unsigned long long nsslf;       /* ssl failed request */
+    unsigned long long nsslv3f;     /* sslv3 failed request */
+    unsigned long long nhttp2;      /* http2 requests */
 };
 
 struct hostinfo {
@@ -32,7 +35,7 @@ static char *nginx_usage = "    --nginx_multiport   nginx statistics for multi n
 static struct mod_info nginx_info[] = {
 /*as merge options are realated to the order of
  * putting data into tsar framework (in function read_nginx_stats)
- * so, all values are merged by adding data from diffrent ports together 
+ * so, all values are merged by adding data from diffrent ports together
  * but rt and sslhst are average values (sum(diff)/sum(diff)== average)*/
 /*                          merge_opt work on ---->         merge_opt work here */
     {"accept", DETAIL_BIT,  MERGE_SUM,  STATS_SUB},         /*0 st_nginx.naccept*/
@@ -48,6 +51,9 @@ static struct mod_info nginx_info[] = {
     {"spdyps", SUMMARY_BIT, MERGE_SUM,  STATS_SUB_INTER},   /*10st_nginx.nspdy*/
     {"sslhst", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},        /*11st_nginx.nsslhst*/
     {"sslhsc", HIDE_BIT,    MERGE_SUM,  STATS_NULL},        /*12st_nginx.nsslhsc*/
+    {"  sslf", SUMMARY_BIT, MERGE_SUM,  STATS_SUB_INTER},
+    {"sslv3f", SUMMARY_BIT, MERGE_SUM,  STATS_SUB_INTER},
+    {" h2qps", SUMMARY_BIT, MERGE_SUM,  STATS_SUB_INTER},
 };
 
 
@@ -87,15 +93,23 @@ set_nginx_record(struct module *mod, double st_array[],
             st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
         } else {
             st_array[i] = 0;
-        } 
+        }
     }
- 
+
     if (cur_array[11] >= pre_array[11]) {
         if (cur_array[12] > pre_array[12]) {
             /*sslhst= ( nsslhstB-nsslhstA)/(nsslhscB - nsslhscA)*/
             st_array[11] = (cur_array[11] - pre_array[11]) * 1.0 / (cur_array[12] - pre_array[12]);
         } else {
             st_array[11] = 0;
+        }
+    }
+
+    for (i = 13; i < 16;  i++){
+        if (cur_array[i] >= pre_array[i]) {
+            st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
+        } else {
+            st_array[i] = 0;
         }
     }
 }
@@ -190,7 +204,7 @@ read_one_nginx_stats(char *parameter, char * buf, int pos)
         if (!strncmp(line, "Active connections:", sizeof("Active connections:") - 1)) {
             sscanf(line + sizeof("Active connections:"), "%llu", &st_nginx.nactive);
             write_flag = 1;
-        } else if (!strncmp(line, 
+        } else if (!strncmp(line,
                             "server accepts handled requests request_time",
                             sizeof("server accepts handled requests request_time") - 1)
                   ) {
@@ -200,9 +214,9 @@ read_one_nginx_stats(char *parameter, char * buf, int pos)
                     sscanf(line + 1, "%llu %llu %llu %llu",
                              &st_nginx.naccept, &st_nginx.nhandled, &st_nginx.nrequest, &st_nginx.nrstime);
                     write_flag = 1;
-                }    
-            }  
-        } else if (!strncmp(line, 
+                }
+            }
+        } else if (!strncmp(line,
                             "server accepts handled requests",
                             sizeof("server accepts handled requests") - 1)
                   ) {
@@ -212,8 +226,8 @@ read_one_nginx_stats(char *parameter, char * buf, int pos)
                     sscanf(line + 1, "%llu %llu %llu",
                              &st_nginx.naccept, &st_nginx.nhandled, &st_nginx.nrequest);
                     write_flag = 1;
-                }    
-            }  
+                }
+            }
         } else if (!strncmp(line, "Server accepts:", sizeof("Server accepts:") - 1)) {
             sscanf(line , "Server accepts: %llu handled: %llu requests: %llu request_time: %llu",
                     &st_nginx.naccept, &st_nginx.nhandled, &st_nginx.nrequest, &st_nginx.nrstime);
@@ -226,6 +240,18 @@ read_one_nginx_stats(char *parameter, char * buf, int pos)
         } else if (!strncmp(line, "SSL:", sizeof("SSL:") - 1)) {
             sscanf(line, "SSL: %llu SPDY: %llu",
                     &st_nginx.nssl, &st_nginx.nspdy);
+            write_flag = 1;
+        } else if (!strncmp(line, "HTTP2:", sizeof("HTTP2:") - 1)) {
+            sscanf(line, "HTTP2: %llu",
+                    &st_nginx.nhttp2);
+            write_flag = 1;
+        } else if (!strncmp(line, "SSL_failed:", sizeof("SSL_failed:") - 1)) {
+            sscanf(line, "SSL_failed: %llu",
+                    &st_nginx.nsslf);
+            write_flag = 1;
+        } else if (!strncmp(line, "SSLv3_failed:", sizeof("SSLv3_failed:") - 1)) {
+            sscanf(line, "SSLv3_failed: %llu",
+                    &st_nginx.nsslv3f);
             write_flag = 1;
         } else if (!strncmp(line, "SSL_Requests:", sizeof("SSL_Requests:") - 1)) {
             sscanf(line, "SSL_Requests: %llu SSL_Handshake: %llu SSL_Handshake_Time: %llu",
@@ -249,7 +275,7 @@ writebuf:
     }
 
     if (write_flag) {
-        pos += snprintf(buf + pos, LEN_1M - pos, "%d=%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT,
+        pos += snprintf(buf + pos, LEN_1M - pos, "%d=%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld" ITEM_SPLIT,
                 hinfo.port,
                 st_nginx.naccept,
                 st_nginx.nhandled,
@@ -263,7 +289,10 @@ writebuf:
                 st_nginx.nssl,
                 st_nginx.nspdy,
                 st_nginx.nsslhst,
-                st_nginx.nsslhsc
+                st_nginx.nsslhsc,
+                st_nginx.nsslf,
+                st_nginx.nsslv3f,
+                st_nginx.nhttp2
                 );
         if (strlen(buf) == LEN_1M - 1) {
             return -1;
@@ -293,7 +322,7 @@ read_nginx_stats(struct module *mod, char *parameter)
             pos = read_one_nginx_stats(token,buf,pos);
             if(pos == -1){
                 break;
-            } 
+            }
         }
         while ((token = strtok(NULL, W_SPACE)) != NULL);
     }
@@ -305,5 +334,5 @@ read_nginx_stats(struct module *mod, char *parameter)
 void
 mod_register(struct module *mod)
 {
-    register_mod_fields(mod, "--nginx_multiport", nginx_usage, nginx_info, 13, read_nginx_stats, set_nginx_record);
+    register_mod_fields(mod, "--nginx_multiport", nginx_usage, nginx_info, 16, read_nginx_stats, set_nginx_record);
 }
