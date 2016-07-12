@@ -146,9 +146,10 @@ read_one_nginx_stats(char *parameter, char * buf, int pos)
     char                request[LEN_4096], line[LEN_4096];
     FILE               *stream = NULL;
 
+    struct timeval      timeout;
+    struct hostinfo     hinfo;
     struct sockaddr_in  servaddr;
     struct sockaddr_un  servaddr_un;
-    struct hostinfo     hinfo;
 
     init_nginx_host_info(&hinfo);
     if (parameter && (atoi(parameter) != 0)) {
@@ -191,6 +192,11 @@ read_one_nginx_stats(char *parameter, char * buf, int pos)
     if ((m = connect(sockfd, (struct sockaddr *) addr, addr_len)) == -1 ) {
         goto writebuf;
     }
+
+    timeout.tv_sec = 10;
+    timeout.tv_usec = 0;
+    setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(struct timeval));
+    setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval));
 
     if ((send = write(sockfd, request, strlen(request))) == -1) {
         goto writebuf;
