@@ -102,6 +102,8 @@ read_nginx_code_stats(struct module *mod, char *parameter)
     char                    *p;
     void                    *addr;
     FILE                    *stream = NULL;
+
+    struct timeval           timeout;
     struct hostinfo          hinfo;
     struct sockaddr_in       servaddr;
     struct sockaddr_un       servaddr_un;
@@ -148,6 +150,11 @@ read_nginx_code_stats(struct module *mod, char *parameter)
         close(sockfd);
         return;
     }
+
+    timeout.tv_sec = 10;
+    timeout.tv_usec = 0;
+    setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(struct timeval));
+    setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval));
 
     if ((send = write(sockfd, request, strlen(request))) == -1) {
         close(sockfd);
