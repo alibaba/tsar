@@ -77,7 +77,7 @@ read_search_record(struct module *mod)
     if (ret == -1 || WEXITSTATUS(ret) != 0)
         return;
 
-    snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n updated-adt_adgroup -m 'rt;qps' -r metric -b -62 >> %s", node, SEARCH_FILE_2);
+    snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n updated-adt_adgroup -m 'rt;qps' -r metric -b -62 >> %s", SEARCH_FILE_2);
     ret = system(cmd);
     if (ret == -1 || WEXITSTATUS(ret) != 0)
         return;
@@ -172,11 +172,17 @@ read_search_record(struct module *mod)
     sprintf(cmd, "rm -rf %s", SEARCH_FILE_2);
     system(cmd);
 
-    if(search_stat.rt_count == 0 || search_stat.qps_count == 0 || search_stat.fail_count == 0 || search_stat.empty_count == 0 ||
-        search_stat.rank_rt_count == 0 || search_stat.rank_qps_count == 0 || search_stat.rank_to_count == 0 ||
-        search_stat.rank_fail_count == 0)
-        return;
-    snprintf(buf, LEN_1M, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",  (long long)search_stat.rt*100/search_stat.rt_count,  (long long)search_stat.qps*100/search_stat.qps_count, (long long)search_stat.fail*100/search_stat.fail_count, (long long)search_stat.empty*100/search_stat.empty_count,(long long) search_stat.rank_rt*100/search_stat.rank_rt_count, (long long)search_stat.rank_qps*100/search_stat.rank_qps_count, (long long)search_stat.rank_to*100/search_stat.rank_to_count, (long long) search_stat.rank_fail*100/search_stat.rank_fail_count);
+    long long rt = (search_stat.rt_count > 0) ? (long long)search_stat.rt*100/search_stat.rt_count : 0;
+    long long qps = (search_stat.qps_count > 0) ? (long long)search_stat.qps*100/search_stat.qps_count : 0;
+    long long fail = (search_stat.fail_count > 0) ? (long long)search_stat.fail*100/search_stat.fail_count : 0;
+    long long empty = (search_stat.empty_count > 0) ? (long long)search_stat.empty*100/search_stat.empty_count : 0;
+    long long rank_rt = (search_stat.rank_rt_count > 0) ? (long long)search_stat.rank_rt*100/search_stat.rank_rt_count : 0;
+    long long rank_qps = (search_stat.rank_qps_count > 0) ? (long long)search_stat.rank_qps*100/search_stat.rank_qps_count : 0;
+    long long rank_to = (search_stat.rank_to_count > 0) ? (long long)search_stat.rank_to*100/search_stat.rank_to_count : 0;
+    long long rank_fail = (search_stat.rank_fail_count > 0) ? (long long)search_stat.rank_fail*100/search_stat.rank_fail_count : 0;
+    long long uprt = (search_stat.uprt_count > 0) ? (long long)search_stat.uprt*100/search_stat.uprt_count : 0;
+    long long upqps = (search_stat.upqps_count > 0) ? (long long)search_stat.upqps*100/search_stat.upqps_count : 0;
+    snprintf(buf, LEN_1M, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld", rt, qps, fail, empty,rank_rt, rank_qps, rank_to, rank_fail, uprt, upqps);
 
     set_mod_record(mod, buf);
 }
