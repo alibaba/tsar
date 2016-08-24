@@ -84,7 +84,6 @@ read_search_record(struct module *mod)
     if (ret == -1 || WEXITSTATUS(ret) != 0)
         return;
     fp = fopen(SEARCH_FILE_2, "r");
-    fp = fopen(SEARCH_FILE_2, "r");
     if(fp == NULL)
         return;
     memset(&search_stat, 0, sizeof(search_stat));
@@ -192,12 +191,12 @@ set_search_record(struct module *mod, double st_array[],
         U_64 pre_array[], U_64 cur_array[], int inter)
 {
     int i = 0;
-    for(; i < 8; ++i)
+    for(; i <  sizeof(search_info)/sizeof(search_info[0]); ++i)
         st_array[i] = cur_array[i] * 1.0/100;
 }
 
 void
 mod_register(struct module *mod)
 {
-    register_mod_fields(mod, "--search", search_usage, search_info, 8, read_search_record, set_search_record);
+    register_mod_fields(mod, "--search", search_usage, search_info, sizeof(search_info)/sizeof(search_info[0]), read_search_record, set_search_record);
 }
