@@ -16,6 +16,8 @@ static struct mod_info search_info[] = {
     {" rkqps", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
     {"  rkto", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
     {"rkfail", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
+    {" upqps", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
+    {"  uprt", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
 };
 
 struct stats_search {
@@ -35,6 +37,10 @@ struct stats_search {
     int rank_to_count;
     double rank_fail;
     int rank_fail_count;
+    double uprt;
+    int uprt_count;
+    double upqps;
+    int upqps_count;
 };
 
 static struct stats_search search_stat;
@@ -66,10 +72,16 @@ read_search_record(struct module *mod)
         return;
     p = strrchr(node, '/');
     *p = 0;
-    sprintf(cmd, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n %s -m 'rt;qps;fail;empty;rank_rt;rank_qps;rank_to;rank_fail' -r metric -b -62 > %s", node, SEARCH_FILE_2);
+    snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n %s -m 'rt;qps;fail;empty;rank_rt;rank_qps;rank_to;rank_fail' -r metric -b -62 > %s", node, SEARCH_FILE_2);
     ret = system(cmd);
     if (ret == -1 || WEXITSTATUS(ret) != 0)
         return;
+
+    snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n updated-adt_adgroup -m 'rt;qps' -r metric -b -62 >> %s", node, SEARCH_FILE_2);
+    ret = system(cmd);
+    if (ret == -1 || WEXITSTATUS(ret) != 0)
+        return;
+    fp = fopen(SEARCH_FILE_2, "r");
     fp = fopen(SEARCH_FILE_2, "r");
     if(fp == NULL)
         return;
@@ -77,7 +89,13 @@ read_search_record(struct module *mod)
     while (fgets(line, LEN_1024, fp) != NULL) {
         p = strrchr(line, '/');
         if(p != NULL) {
-            if(!strncmp(p+1, "rt", 2))
+            if((strstr(line, "updated-adt_adgroup") != NULL)
+                && (!strncmp(p+1, "rt", 2)))
+                idx = 8;
+            else if((strstr(line, "updated-adt_adgroup") != NULL)
+                && (!strncmp(p+1, "qps", 3)))
+                idx = 9;
+            else if(!strncmp(p+1, "rt", 2))
                 idx = 0;
             else if(!strncmp(p+1, "qps", 3))
                 idx = 1;
@@ -134,6 +152,16 @@ read_search_record(struct module *mod)
                 sscanf(line + 24, "%lf", &f);
                 search_stat.rank_fail += f;
                 search_stat.rank_fail_count++;
+            }
+            else if(idx == 8) {
+                sscanf(line + 24, "%lf", &f);
+                search_stat.uprt += f;
+                search_stat.uprt_count++;
+            }
+            else if(idx == 9) {
+                sscanf(line + 24, "%lf", &f);
+                search_stat.upqps += f;
+                search_stat.upqps_count++;
             }
         }
     }
