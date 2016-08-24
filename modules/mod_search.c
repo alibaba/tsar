@@ -58,31 +58,36 @@ read_search_record(struct module *mod)
     if (ret == -1 || WEXITSTATUS(ret) != 0)
         return;
 
-    snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -r node | /bin/grep /master/ | /usr/bin/head -n 1 > %s", SEARCH_FILE_1);
-    ret = system(cmd);
-    if (ret == -1 || WEXITSTATUS(ret) != 0)
-        return;
-    fp = fopen(SEARCH_FILE_1, "r");
-    if(fp == NULL)
-        return;
-    p = fgets(node, LEN_1024, fp);
-    fclose(fp);
-    fp = NULL;
-    if(p == NULL)
-        return;
-    p = strrchr(node, '/');
-    *p = 0;
-    sprintf(cmd, "rm -rf %s", SEARCH_FILE_1);
-    system(cmd);
-    snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n %s -m 'rt;qps;fail;empty;rank_rt;rank_qps;rank_to;rank_fail' -r metric -b -62 > %s", node, SEARCH_FILE_2);
-    ret = system(cmd);
-    if (ret == -1 || WEXITSTATUS(ret) != 0)
-        return;
+    do {
+        snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -r node | /bin/grep /master/ | /usr/bin/head -n 1 > %s", SEARCH_FILE_1);
+        ret = system(cmd);
+        if (ret == -1 || WEXITSTATUS(ret) != 0)
+            break;
+        fp = fopen(SEARCH_FILE_1, "r");
+        if(fp == NULL)
+            break;
+        p = fgets(node, LEN_1024, fp);
+        fclose(fp);
+        fp = NULL;
+        if(p == NULL)
+            break;
+        p = strrchr(node, '/');
+        *p = 0;
+        snprintf(cmd, sizeof(cmd), "rm -rf %s", SEARCH_FILE_1);
+        system(cmd);
+        snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n %s -m 'rt;qps;fail;empty;rank_rt;rank_qps;rank_to;rank_fail' -r metric -b -62 > %s", node, SEARCH_FILE_2);
+        ret = system(cmd);
+        if (ret == -1 || WEXITSTATUS(ret) != 0)
+            break;
+    } while(0);
 
-    snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n updated-adt_adgroup -m 'rt;qps' -r metric -b -62 >> %s", SEARCH_FILE_2);
-    ret = system(cmd);
-    if (ret == -1 || WEXITSTATUS(ret) != 0)
-        return;
+    do {
+        snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n updated-adt_adgroup -m 'rt;qps' -r metric -b -62 >> %s", SEARCH_FILE_2);
+        ret = system(cmd);
+        if (ret == -1 || WEXITSTATUS(ret) != 0)
+            break;
+    } while(0);
+
     fp = fopen(SEARCH_FILE_2, "r");
     if(fp == NULL)
         return;
