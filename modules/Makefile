@@ -35,7 +35,7 @@ else
             mod_tmd.so mod_percpu.so mod_rpi.so mod_tcprt.so mod_shell.so mod_nginx_domain.so \
 	    mod_tmd4.so mod_nginx_domain_traffic.so mod_nginx_ups.so mod_nginx_sys_mport.so mod_nginx_sys.so mod_network.so mod_lvsx.so mod_keyserver.so \
 	    mod_pharos.so mod_pharos_load.so mod_pharos_status.so mod_pharos_rcode.so mod_pharos_qtype.so \
-		mod_nginx_live.so mod_nginx_multiport.so mod_live_tcprt.so mod_checkmem.so
+		mod_nginx_live.so mod_nginx_multiport.so mod_live_tcprt.so mod_checkmem.so mod_traffic_multinic.so
 endif
 
 all: $(OBJS)
