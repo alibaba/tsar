@@ -16,8 +16,8 @@ static struct mod_info search_info[] = {
     {" rkqps", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
     {"  rkto", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
     {"rkfail", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
-    {" upqps", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
     {"  uprt", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
+    {" upqps", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
 };
 
 struct stats_search {
@@ -72,6 +72,8 @@ read_search_record(struct module *mod)
         return;
     p = strrchr(node, '/');
     *p = 0;
+    sprintf(cmd, "rm -rf %s", SEARCH_FILE_1);
+    system(cmd);
     snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n %s -m 'rt;qps;fail;empty;rank_rt;rank_qps;rank_to;rank_fail' -r metric -b -62 > %s", node, SEARCH_FILE_2);
     ret = system(cmd);
     if (ret == -1 || WEXITSTATUS(ret) != 0)
@@ -167,8 +169,6 @@ read_search_record(struct module *mod)
     }
     fclose(fp);
     fp = NULL;
-    sprintf(cmd, "rm -rf %s", SEARCH_FILE_1);
-    system(cmd);
     sprintf(cmd, "rm -rf %s", SEARCH_FILE_2);
     system(cmd);
 
