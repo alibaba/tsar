@@ -276,7 +276,7 @@ set_merger_record(struct module *mod, double st_array[],
 void
 mod_register(struct module *mod) {
     register_mod_fields(mod,
-                        "--merger",
+                        "--urb",
                         merger_usage,
                         merger_info,
                         16,
