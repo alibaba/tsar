@@ -32,11 +32,6 @@ static struct mod_info merger_info[] = {
         {"  dnrt", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
         {" dnqps", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
         {"dnsucc", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
-        {"urbsrl", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
-        {" et2rt", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
-        {" st3rt", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
-        {"et2suc", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
-        {"st3suc", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
 };
 
 struct stats_merger {
@@ -72,16 +67,6 @@ struct stats_merger {
     int dn_qps_count;
     double dn_succ;
     int dn_succ_count;
-    double urb_serial;
-    int urb_serial_count;
-    double write_et2_uc_rt;
-    int write_et2_uc_rt_count;
-    double write_st3_uc_rt;
-    int write_st3_uc_rt_count;
-    double write_et2_uc_succ;
-    int write_et2_uc_succ_count;
-    double write_st3_uc_succ;
-    int write_st3_uc_succ_count;
 };
 
 static struct stats_merger merger_stat;
@@ -116,7 +101,7 @@ read_merger_record(struct module *mod) {
     p = strrchr(node, '/');
     *p = 0;
     sprintf(cmd,
-            "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n %s -m 'response_time;query;failure_result;empty_result;qr_succ_response_time;qr_query;qr_succ_query;uc_response_time;uc_query;uc_succ_query;kw_succ_response_time;kw_query;kw_succ_query;dn_succ_response_time;dn_query;dn_succ_query;urb_serial;write_et2_uc_time;write_st3_uc_time;write_et2_uc_succ;write_st3_uc_succ' -r metric -b -62 > %s",
+            "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n %s -m 'response_time;query;failure_result;empty_result;qr_succ_response_time;qr_query;qr_succ_query;uc_response_time;uc_query;uc_succ_query;kw_succ_response_time;kw_query;kw_succ_query;dn_succ_response_time;dn_query;dn_succ_query' -r metric -b -62 > %s",
             node,
             MERGER_FILE_2);
     ret = system(cmd);
@@ -161,16 +146,6 @@ read_merger_record(struct module *mod) {
                 idx = 14;
             else if (!strncmp(p + 1, "dn_succ_query", 13))
                 idx = 15;
-            else if (!strncmp(p + 1, "urb_serial", 10))
-                idx = 16;
-            else if (!strncmp(p + 1, "write_et2_uc_time", 17))
-                idx = 17;
-            else if (!strncmp(p + 1, "write_st3_uc_time", 17))
-                idx = 18;
-            else if (!strncmp(p + 1, "write_et2_uc_succ", 17))
-                idx = 19;
-            else if (!strncmp(p + 1, "write_st3_uc_succ", 17))
-                idx = 20;
         }
         else {
             if (idx == 0) {
@@ -253,31 +228,6 @@ read_merger_record(struct module *mod) {
                 merger_stat.dn_succ += f;
                 merger_stat.dn_succ_count++;
             }
-            else if (idx == 16) {
-                sscanf(line + 24, "%lf", &f);
-                merger_stat.urb_serial += f;
-                merger_stat.urb_serial_count++;
-            }
-            else if (idx == 17) {
-                sscanf(line + 24, "%lf", &f);
-                merger_stat.write_et2_uc_rt += f;
-                merger_stat.write_et2_uc_rt_count++;
-            }
-            else if (idx == 18) {
-                sscanf(line + 24, "%lf", &f);
-                merger_stat.write_st3_uc_rt += f;
-                merger_stat.write_st3_uc_rt_count++;
-            }
-            else if (idx == 19) {
-                sscanf(line + 24, "%lf", &f);
-                merger_stat.write_et2_uc_succ += f;
-                merger_stat.write_et2_uc_succ_count++;
-            }
-            else if (idx ==20) {
-                sscanf(line + 24, "%lf", &f);
-                merger_stat.write_st3_uc_succ += f;
-                merger_stat.write_st3_uc_succ_count++;
-            }
         }
     }
     fclose(fp);
@@ -291,11 +241,10 @@ read_merger_record(struct module *mod) {
         merger_stat.qr_succ_count != 0 && merger_stat.uc_rt_count != 0 && merger_stat.uc_qps_count != 0 &&
         merger_stat.uc_succ_count != 0 && merger_stat.sn_rt_count != 0 && merger_stat.sn_qps_count != 0 &&
         merger_stat.sn_succ_count != 0 && merger_stat.dn_rt_count != 0 && merger_stat.dn_qps_count != 0 &&
-        merger_stat.dn_succ_count != 0 && merger_stat.urb_serial_count != 0 && merger_stat.write_et2_uc_rt_count != 0 &&
-        merger_stat.write_st3_uc_rt_count != 0 && merger_stat.write_et2_uc_succ_count != 0 && merger_stat.write_st3_uc_succ_count != 0) {
+        merger_stat.dn_succ_count != 0) {
         snprintf(buf,
                  LEN_1M,
-                 "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
+                 "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
                  (long long) merger_stat.rt * 100 / merger_stat.rt_count,
                  (long long) merger_stat.qps * 100 / merger_stat.qps_count,
                  (long long) merger_stat.fail * 100 / merger_stat.fail_count,
@@ -311,12 +260,7 @@ read_merger_record(struct module *mod) {
                  (long long) merger_stat.sn_succ * 100 / merger_stat.sn_succ_count,
                  (long long) merger_stat.dn_rt * 100 / merger_stat.dn_rt_count,
                  (long long) merger_stat.dn_qps * 100 / merger_stat.dn_qps_count,
-                 (long long) merger_stat.dn_succ * 100 / merger_stat.dn_succ_count,
-                 (long long) merger_stat.urb_serial * 100 / merger_stat.urb_serial_count,
-                 (long long) merger_stat.write_et2_uc_rt * 100 / merger_stat.write_et2_uc_rt_count,
-                 (long long) merger_stat.write_st3_uc_rt * 100 / merger_stat.write_st3_uc_rt_count,
-                 (long long) merger_stat.write_et2_uc_succ * 100 / merger_stat.write_et2_uc_succ_count,
-                 (long long) merger_stat.write_st3_uc_succ * 100 / merger_stat.write_st3_uc_succ_count);
+                 (long long) merger_stat.dn_succ * 100 / merger_stat.dn_succ_count);
         set_mod_record(mod, buf);
     }
 }
@@ -325,7 +269,7 @@ static void
 set_merger_record(struct module *mod, double st_array[],
                   U_64 pre_array[], U_64 cur_array[], int inter) {
     int i = 0;
-    for (; i < 21; ++i)
+    for (; i < 16; ++i)
         st_array[i] = cur_array[i] * 1.0 / 100;
 }
 
@@ -335,7 +279,7 @@ mod_register(struct module *mod) {
                         "--merger",
                         merger_usage,
                         merger_info,
-                        21,
+                        16,
                         read_merger_record,
                         set_merger_record);
 }
