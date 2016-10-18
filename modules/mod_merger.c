@@ -292,9 +292,9 @@ read_merger_record(struct module *mod) {
                  (long long) merger_stat.dn_rt * 100 / merger_stat.dn_rt_count,
                  (long long) merger_stat.dn_qps * 100 / merger_stat.dn_qps_count,
                  (long long) merger_stat.dn_succ * 100 / merger_stat.dn_succ_count,
-                 (long long) merger_stat.sn_rt * 100 / merger_stat.twins_sn_rt_count,
-                 (long long) merger_stat.sn_qps * 100 / merger_stat.twins_sn_qps_count,
-                 (long long) merger_stat.sn_succ * 100 / merger_stat.twins_sn_succ_count);
+                 (long long) merger_stat.twins_sn_rt * 100 / merger_stat.twins_sn_rt_count,
+                 (long long) merger_stat.twins_sn_qps * 100 / merger_stat.twins_sn_qps_count,
+                 (long long) merger_stat.twins_sn_succ * 100 / merger_stat.twins_sn_succ_count);
         set_mod_record(mod, buf);
     }
 }
