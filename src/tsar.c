@@ -23,6 +23,7 @@
 struct statistic statis;
 struct configure conf;
 struct module   mods[MAX_MOD_NUM];
+lua_State *L = NULL;
 
 
 void
@@ -257,6 +258,12 @@ main(int argc, char **argv)
 {
 
     parse_config_file(DEFAULT_CONF_FILE_PATH);
+
+    L = load_luavm();
+    if (L == NULL) {
+        do_debug(LOG_ERR, "load lua vm err");
+        return 1;
+    }
 
     load_modules();
 

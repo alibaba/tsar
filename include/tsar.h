@@ -33,6 +33,10 @@
 #include <getopt.h>
 #include <ctype.h>
 #include <sys/stat.h>
+#include <luajit-2.0/lua.h>
+#include <luajit-2.0/lauxlib.h>
+#include <luajit-2.0/lualib.h>
+
 
 #include "framework.h"
 #include "debug.h"
@@ -44,6 +48,7 @@
 #include "output_tcp.h"
 #include "output_nagios.h"
 #include "common.h"
+#include "tsar_lua_util.h"
 
 
 struct statistic {
@@ -55,6 +60,7 @@ struct statistic {
 extern struct configure conf;
 extern struct module    mods[MAX_MOD_NUM];
 extern struct statistic statis;
+extern lua_State *L;
 
 
 #endif
