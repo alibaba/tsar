@@ -165,7 +165,6 @@ main_init(int argc, char **argv)
                 if (argv[oind] && strstr(argv[oind], "--")) {
                     strcat(conf.output_print_mod, argv[oind]);
                     strcat(conf.output_print_mod, DATA_SPLIT);
-
                 } else {
                     usage();
                 }

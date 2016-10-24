@@ -21,6 +21,9 @@
 #define TSAR_FRAMEWORK_H
 
 
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 #include "define.h"
 
 struct mod_info {
@@ -66,6 +69,9 @@ struct module {
 
     /* mod manage */
     void (*mod_register) (struct module *);
+
+
+    lua_State *vm;
 };
 
 

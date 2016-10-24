@@ -76,6 +76,7 @@
 #define APACHERT "/tmp/apachert.mmap"
 #define TCP "/proc/net/tcp"
 #define NETSTAT "/proc/net/netstat"
+#define MOD_LUA_PREFIX "mod_lua"
 
 
 enum {
