@@ -176,7 +176,7 @@ static int
 parse_line(char *buff)
 {
     char   *token;
-    int     i; 
+    int     i;
 
     if ((token = strtok(buff, W_SPACE)) == NULL) {
         /* ignore empty lines */
@@ -261,7 +261,7 @@ static void
 process_input_line(char *config_input_line, int len, const char *file_name)
 {
     char *token;
-    
+
     if ((token = strchr(config_input_line, '\n'))) {
     	*token = '\0';
     }
@@ -275,10 +275,10 @@ process_input_line(char *config_input_line, int len, const char *file_name)
     }
     /* FIXME can't support wrap line */
     if (!parse_line(config_input_line)) {
-        do_debug(LOG_INFO, "parse_config_file: unknown keyword in '%s' at file %s\n", 
+        do_debug(LOG_INFO, "parse_config_file: unknown keyword in '%s' at file %s\n",
                  config_input_line, file_name);
     }
-    
+
 final:
     memset(config_input_line, '\0', LEN_1024);
 }
@@ -369,7 +369,7 @@ get_threshold()
     if (conf.mod_num >= MAX_MOD_NUM) {
         do_debug(LOG_FATAL, "Too many mod threshold\n");
     }
-    sscanf(token, "%[^;];%[.N0-9];%[.N0-9];%[.N0-9];%[.N0-9];", 
+    sscanf(token, "%[^;];%[.N0-9];%[.N0-9];%[.N0-9];%[.N0-9];",
            conf.check_name[conf.mod_num], tmp[0], tmp[1], tmp[2], tmp[3]);
 
     if (!strcmp(tmp[0], "N")) {

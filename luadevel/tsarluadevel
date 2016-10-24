@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# check argc
+usage()
+{
+  echo "Usage:"
+  echo "tsarluadevel modname"
+  exit 0
+}
+install()
+{
+ echo "build:make"
+ echo "install:make install"
+ echo "uninstall:make uninstall"
+ echo "test:tsar --list or tsar --lua_$modname --live -i 1"
+}
+if [ $# -ne 1 ]
+then
+ usage
+fi
+
+modname=$1
+install_path='/usr/local/tsar/luadevel'
+
+for file in mod_lua_test.lua mod_lua_test.conf Makefile.test
+do
+ if [ ! -e "$install_path/$file" ] ;then
+  echo "$install_path/$file not exist!"
+  echo "make sure you have run 'make tsardevel' when install tsar."
+  exit 1
+ fi
+done
+
+
+# mk new mod_test
+mkdir -p $modname
+sed -e "s/test/lua_$modname/g" < $install_path/mod_lua_test.lua > ./$modname/mod_lua_$modname.lua
+sed -e "s/test/lua_$modname/g" < $install_path/mod_lua_test.conf > ./$modname/mod_lua_$modname.conf
+sed -e "s/test/lua_$modname/g" < $install_path/Makefile.test > ./$modname/Makefile
+if [ $? -eq 0 ]
+then
+ install
+fi

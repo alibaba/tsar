@@ -1,0 +1,8 @@
+install:
+	mkdir -p /etc/tsar/conf.d/
+	cp ./mod_test.lua /usr/local/tsar/modules/
+	cp ./mod_test.conf /etc/tsar/conf.d/test.conf
+
+uninstall:
+	rm /usr/local/tsar/modules/mod_test.lua
+	rm /etc/tsar/conf.d/test.conf
