@@ -20,19 +20,28 @@
 #include "tsar.h"
 
 
+void
+close_luavm(lua_State *L)
+{
+    lua_close(L);
+}
+
+
 lua_State *
 load_luavm()
 {
-    L = luaL_newstate();
-    if (L == NULL) {
+    lua_State *vm;
+
+    vm = luaL_newstate();
+    if (vm == NULL) {
         return NULL;
     }
 
-    luaL_openlibs(L);
+    luaL_openlibs(vm);
 
-    inject_tsar_api(L);
+    inject_tsar_api(vm);
 
-    return L;
+    return vm;
 }
 
 
@@ -105,8 +114,6 @@ void
 lua_module_set_st_record_wrapper(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {
-    lua_State *L = mod->vm;
-
     int        i;
 
     lua_getglobal(L, mod->name);
@@ -205,8 +212,6 @@ lua_module_set_st_record_wrapper(struct module *mod, double st_array[],
 void
 lua_module_data_collect_wrapper(struct module *mod, char *parameter)
 {
-    lua_State *L = mod->vm;
-
     lua_getglobal(L, mod->name);
     if (!lua_istable(L, -1)) {
         do_debug(LOG_ERR, "lua_module_data_collect_wrapper %s isn's table\n", mod->name);

@@ -25,6 +25,7 @@
 
 void inject_tsar_consts(lua_State *L);
 void inject_tsar_api(lua_State *L);
+void close_luavm(lua_State *L);
 lua_State *load_luavm();
 void lua_set_mod(lua_State *L, struct module *mod);
 void load_lua_module(lua_State *L, struct module *mod);

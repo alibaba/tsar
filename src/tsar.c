@@ -203,6 +203,7 @@ main_init(int argc, char **argv)
 void
 shut_down()
 {
+    close_luavm(L);
     free_modules();
 
     memset(&conf, 0, sizeof(struct configure));
