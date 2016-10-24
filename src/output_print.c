@@ -409,7 +409,7 @@ find_offset_from_start(FILE *fp, int number)
             if (p_sec_token) {
                 *p_sec_token = '\0';
                 t_get = atol(line);
-                if (abs(t_get - t_token) <= 60) {
+                if (labs(t_get - t_token) <= 60) {
                     conf.print_file_number = number;
                     return 0;
                 }
