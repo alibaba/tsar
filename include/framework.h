@@ -66,9 +66,6 @@ struct module {
 
     /* mod manage */
     void (*mod_register) (struct module *);
-
-    /* it points global lua vm instance */
-    lua_State *vm;
 };
 
 

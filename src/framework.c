@@ -62,12 +62,13 @@ load_modules()
         mod = &mods[i];
         memset(mod_path, '\0', LEN_128);
 
+        if (strlen(mod->name) == 0) {
+            continue;
+        }
+
         if (strncmp(MOD_LUA_PREFIX, mod->name, strlen(MOD_LUA_PREFIX)) == 0) {
             do_debug(LOG_DEBUG, "load_modules: ready to load %s\n", mod->name);
-            if (!mod->vm) {
-                mod->vm = L;
-                load_lua_module(L, mod);
-            }
+            load_lua_module(L, mod);
             continue;
         }
 
