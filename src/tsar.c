@@ -61,10 +61,7 @@ usage()
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = &mods[i];
-        if (mod->usage) {
-            fprintf(stderr, "%s", mod->usage);
-            fprintf(stderr, "\n");
-        }
+        fprintf(stderr, "%s\n", mod->usage);
     }
 
     exit(0);
