@@ -1,4 +1,4 @@
-DIRS = modules src
+DIRS = src modules
 
 all:
 	for i in $(DIRS); do make -C $$i; done
