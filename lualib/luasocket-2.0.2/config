@@ -1,0 +1,60 @@
+#------
+# LuaSocket makefile configuration
+#
+
+#------
+# Output file names
+#
+EXT=so
+SOCKET_V=2.0.2
+MIME_V=1.0.2
+SOCKET_SO=socket.$(EXT).$(SOCKET_V) 
+MIME_SO=mime.$(EXT).$(MIME_V)
+UNIX_SO=unix.$(EXT)
+
+#------
+# Lua includes and libraries
+#
+#LUAINC=-I/usr/local/include/lua50
+#LUAINC=-I/usr/local/include/lua5.1
+#LUAINC=-Ilua-5.1.1/src
+
+#------
+# Compat-5.1 directory
+#
+#COMPAT=compat-5.1r5
+
+#------
+# Top of your Lua installation
+# Relative paths will be inside the src tree
+#
+#INSTALL_TOP_SHARE=/usr/local/share/lua/5.0
+#INSTALL_TOP_LIB=/usr/local/lib/lua/5.0
+INSTALL_TOP_SHARE=/usr/local/share/lua/5.1
+INSTALL_TOP_LIB=/usr/local/lib/lua/5.1
+
+INSTALL_DATA=cp
+INSTALL_EXEC=cp
+
+#------
+# Compiler and linker settings
+# for Mac OS X
+#
+#CC=gcc
+#DEF= -DLUASOCKET_DEBUG -DUNIX_HAS_SUN_LEN
+#CFLAGS= $(LUAINC) -I$(COMPAT) $(DEF) -pedantic -Wall -O2 -fno-common
+#LDFLAGS=-bundle -undefined dynamic_lookup
+#LD=export MACOSX_DEPLOYMENT_TARGET="10.3"; gcc
+
+#------
+# Compiler and linker settings
+# for Linux
+CC=gcc
+DEF=-DLUASOCKET_DEBUG 
+CFLAGS= $(LUAINC) $(DEF) -pedantic -Wall -O2 -fpic
+LDFLAGS=-O -shared -fpic
+LD=gcc 
+
+#------
+# End of makefile configuration
+#

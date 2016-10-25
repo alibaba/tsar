@@ -1,0 +1,14 @@
+What's New
+
+This is just a bug-fix/update release.
+
+    * Improved: http.request() now supports deprecated HTTP/0.9
+      servers (Florian Berger)
+    * Fixed: could return "timedout" instead of "timeout" (Leo Leo)
+    * Fixed: crash when reading '*a' on closed socket (Paul Ducklin);
+    * Fixed: return values are consistent when reading from closed sockets;
+    * Fixed: case sensitivity in headers of multipart messages in 
+      smtp.message() (Graham Henstridge);
+    * Fixed a couple instances of error() being called instead of base.error().       These would cause an error when an error was reported. :)  (Ketmar Dark);
+    * Fixed: test script now uses pairs() iterator instead of the old 
+      Lua syntax (Robert Dodier).
