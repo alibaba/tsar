@@ -22,7 +22,25 @@ install: all
 	#copy man file
 	cp conf/tsar.8 /usr/local/man/man8/
 	#install lualib
-	make -C lualib install	
+	make -C lualib install
+
+uninstall:
+	#rm tsar
+	rm -rf /usr/local/tsar
+	rm -rf /etc/tsar/cron.d
+	rm -f /etc/logrotate.d/tsar
+	rm -f /etc/cron.d/tsar
+	rm -f /usr/local/man/man8/tsar.8
+	#rm tsar
+	rm -f /usr/bin/tsar
+	#rm tsardevel
+	rm -f /usr/bin/tsardevel
+	#rm tsarluadevel
+	rm -f /usr/bin/tsarluadevel
+	#backup configure file
+	if [ -f /etc/tsar/tsar.conf ]; then mv /etc/tsar/tsar.conf /etc/tsar/tsar.conf.rpmsave; fi
+	#backup the log data file
+	if [ -f /var/log/tsar.data ]; then mv /var/log/tsar.data /var/log/tsar.data.bak; fi
 
 tsardevel:
 	mkdir -p /usr/local/tsar/devel
