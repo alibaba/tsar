@@ -20,33 +20,7 @@
 #include "tsar.h"
 
 
-void
-close_luavm(lua_State *L)
-{
-    lua_close(L);
-}
-
-
-lua_State *
-load_luavm()
-{
-    lua_State *vm;
-
-    vm = luaL_newstate();
-    if (vm == NULL) {
-        return NULL;
-    }
-
-    luaL_openlibs(vm);
-
-    inject_lua_package_path(vm);
-    inject_tsar_api(vm);
-
-    return vm;
-}
-
-
-void
+static void
 lua_set_mod(lua_State *L, struct module *mod)
 {
     lua_newtable(L);
@@ -64,7 +38,7 @@ lua_set_mod(lua_State *L, struct module *mod)
 }
 
 
-void
+static void
 inject_lua_package_path(lua_State *L)
 {
     const char *old_path;
@@ -102,7 +76,7 @@ inject_lua_package_path(lua_State *L)
 }
 
 
-void
+static void
 inject_tsar_consts(lua_State *L)
 {
     lua_pushinteger(L, HIDE_BIT);
@@ -137,7 +111,7 @@ inject_tsar_consts(lua_State *L)
 }
 
 
-void
+static void
 inject_tsar_api(lua_State *L)
 {
     /* tsar */
@@ -146,140 +120,6 @@ inject_tsar_api(lua_State *L)
     inject_tsar_consts(L);
 
     lua_setglobal(L, "tsar");
-}
-
-
-void
-lua_module_set_st_record_wrapper(struct module *mod, double st_array[],
-    U_64 pre_array[], U_64 cur_array[], int inter)
-{
-    int        i;
-
-    lua_getglobal(L, mod->name);
-    if (!lua_istable(L, -1)) {
-        do_debug(LOG_ERR, "lua_module_set_st_record_wrapper %s isn's table\n", mod->name);
-        return;
-    }
-
-    lua_getfield(L, -1, "set");
-    if (lua_isnil(L, -1)) {
-        do_debug(LOG_DEBUG, "lua_module_set_st_record_wrapper %s.set() doesnt set\n", mod->name);
-        for (i = 0; i < mod->n_col; i++) {
-            st_array[i] = cur_array[i] - pre_array[i];
-        }
-        return;
-    } else if (!lua_isfunction(L, -1)) {
-        do_debug(LOG_ERR, "lua_module_set_st_record_wrapper %s.set() isnt function\n", mod->name);
-        return;
-    }
-
-    lua_set_mod(L, mod);
-
-    lua_newtable(L);
-    for (i = 0; i < mod->n_col; i++) {
-        lua_pushnumber(L, st_array[i]);
-        lua_rawseti(L, -2, i+1);
-    }
-
-    lua_newtable(L);
-    for (i = 0; i < mod->n_col; i++) {
-        lua_pushnumber(L, pre_array[i]);
-        lua_rawseti(L, -2, i+1);
-    }
-
-    lua_newtable(L);
-    for (i = 0; i < mod->n_col; i++) {
-        lua_pushnumber(L, cur_array[i]);
-        lua_rawseti(L, -2, i+1);
-    }
-
-    lua_pushnumber(L, inter);
-
-    if (lua_pcall(L, 5, 3, 0) != 0) {
-        do_debug(LOG_ERR, "lua_module_set_st_record_wrapper call set() err %s\n", lua_tostring(L, -1));
-        return;
-    }
-
-    if (!lua_istable(L, -1)) {
-        do_debug(LOG_ERR, "lua_module_set_st_record_wrapper set() return 3rd nontable\n");
-        return;
-    }
-
-    if (!lua_istable(L, -2)) {
-        do_debug(LOG_ERR, "lua_module_set_st_record_wrapper set() return 2nd nontable\n");
-        return;
-    }
-
-    if (!lua_istable(L, -3)) {
-        do_debug(LOG_ERR, "lua_module_set_st_record_wrapper set() return 1st nontable\n");
-        return;
-    }
-
-    for (i = 0; i < mod->n_col; i++) {
-        lua_rawgeti(L, -1, i + 1);
-        if (!lua_isnumber(L, -1)) {
-            continue;
-        }
-        cur_array[i] = lua_tonumber(L, -1);
-        lua_pop(L, 1);
-    }
-
-    lua_pop(L, 1);
-    for (i = 0; i < mod->n_col; i++) {
-        lua_rawgeti(L, -1, i + 1);
-        if (!lua_isnumber(L, -1)) {
-            continue;
-        }
-        pre_array[i] = lua_tonumber(L, -1);
-        lua_pop(L, 1);
-    }
-
-    lua_pop(L, 1);
-    for (i = 0; i < mod->n_col; i++) {
-        lua_rawgeti(L, -1, i + 1);
-        if (!lua_isnumber(L, -1)) {
-            continue;
-        }
-        st_array[i] = lua_tonumber(L, -1);
-        lua_pop(L, 1);
-    }
-
-    lua_pop(L, lua_gettop(L));
-}
-
-
-void
-lua_module_data_collect_wrapper(struct module *mod, char *parameter)
-{
-    lua_getglobal(L, mod->name);
-    if (!lua_istable(L, -1)) {
-        do_debug(LOG_ERR, "lua_module_data_collect_wrapper %s isn's table\n", mod->name);
-        return;
-    }
-
-    lua_getfield(L, -1, "read");
-    if (lua_isnil(L, -1)) {
-        do_debug(LOG_DEBUG, "lua_module_data_collect_wrapper %s.read() doesnt set\n", mod->name);
-        return;
-    } else if (lua_isfunction(L, -1) == 0) {
-        do_debug(LOG_ERR, "lua_module_data_collect_wrapper %s.read() isnt function\n", mod->name);
-        return;
-    }
-
-    lua_set_mod(L, mod);
-    lua_pushstring(L, parameter);
-
-    if (lua_pcall(L, 2, 1, 0) != 0) {
-        do_debug(LOG_ERR, "lua_module_data_collect_wrapper call %s.read() err %s\n", mod->name, lua_tostring(L, -1));
-        return;
-    }
-
-    if (!lua_isstring(L, -1)) {
-        do_debug(LOG_ERR, "lua_module_data_collect_wrapper %s.read() function return value isnt string\n", mod->name);
-        return;
-    }
-
-    set_mod_record(mod, lua_tostring(L, -1));
 }
 
 
@@ -407,9 +247,170 @@ load_lua_module_register(lua_State *L, struct module *mod)
     return 0;
 }
 
-void
-load_lua_module(lua_State *L, struct module *mod) {
 
+void
+close_luavm(lua_State *L)
+{
+    lua_close(L);
+}
+
+
+lua_State *
+load_luavm()
+{
+    lua_State *vm;
+
+    vm = luaL_newstate();
+    if (vm == NULL) {
+        return NULL;
+    }
+
+    luaL_openlibs(vm);
+
+    inject_lua_package_path(vm);
+    inject_tsar_api(vm);
+
+    return vm;
+}
+
+
+static void
+lua_module_set_st_record_wrapper(struct module *mod, double st_array[],
+    U_64 pre_array[], U_64 cur_array[], int inter)
+{
+    int        i;
+
+    lua_getglobal(L, mod->name);
+    if (!lua_istable(L, -1)) {
+        do_debug(LOG_ERR, "lua_module_set_st_record_wrapper %s isn's table\n", mod->name);
+        return;
+    }
+
+    lua_getfield(L, -1, "set");
+    if (lua_isnil(L, -1)) {
+        do_debug(LOG_DEBUG, "lua_module_set_st_record_wrapper %s.set() doesnt set\n", mod->name);
+        for (i = 0; i < mod->n_col; i++) {
+            st_array[i] = cur_array[i] - pre_array[i];
+        }
+        return;
+    } else if (!lua_isfunction(L, -1)) {
+        do_debug(LOG_ERR, "lua_module_set_st_record_wrapper %s.set() isnt function\n", mod->name);
+        return;
+    }
+
+    lua_set_mod(L, mod);
+
+    lua_newtable(L);
+    for (i = 0; i < mod->n_col; i++) {
+        lua_pushnumber(L, st_array[i]);
+        lua_rawseti(L, -2, i+1);
+    }
+
+    lua_newtable(L);
+    for (i = 0; i < mod->n_col; i++) {
+        lua_pushnumber(L, pre_array[i]);
+        lua_rawseti(L, -2, i+1);
+    }
+
+    lua_newtable(L);
+    for (i = 0; i < mod->n_col; i++) {
+        lua_pushnumber(L, cur_array[i]);
+        lua_rawseti(L, -2, i+1);
+    }
+
+    lua_pushnumber(L, inter);
+
+    if (lua_pcall(L, 5, 3, 0) != 0) {
+        do_debug(LOG_ERR, "lua_module_set_st_record_wrapper call set() err %s\n", lua_tostring(L, -1));
+        return;
+    }
+
+    if (!lua_istable(L, -1)) {
+        do_debug(LOG_ERR, "lua_module_set_st_record_wrapper set() return 3rd nontable\n");
+        return;
+    }
+
+    if (!lua_istable(L, -2)) {
+        do_debug(LOG_ERR, "lua_module_set_st_record_wrapper set() return 2nd nontable\n");
+        return;
+    }
+
+    if (!lua_istable(L, -3)) {
+        do_debug(LOG_ERR, "lua_module_set_st_record_wrapper set() return 1st nontable\n");
+        return;
+    }
+
+    for (i = 0; i < mod->n_col; i++) {
+        lua_rawgeti(L, -1, i + 1);
+        if (!lua_isnumber(L, -1)) {
+            continue;
+        }
+        cur_array[i] = lua_tonumber(L, -1);
+        lua_pop(L, 1);
+    }
+
+    lua_pop(L, 1);
+    for (i = 0; i < mod->n_col; i++) {
+        lua_rawgeti(L, -1, i + 1);
+        if (!lua_isnumber(L, -1)) {
+            continue;
+        }
+        pre_array[i] = lua_tonumber(L, -1);
+        lua_pop(L, 1);
+    }
+
+    lua_pop(L, 1);
+    for (i = 0; i < mod->n_col; i++) {
+        lua_rawgeti(L, -1, i + 1);
+        if (!lua_isnumber(L, -1)) {
+            continue;
+        }
+        st_array[i] = lua_tonumber(L, -1);
+        lua_pop(L, 1);
+    }
+
+    lua_pop(L, lua_gettop(L));
+}
+
+
+static void
+lua_module_data_collect_wrapper(struct module *mod, char *parameter)
+{
+    lua_getglobal(L, mod->name);
+    if (!lua_istable(L, -1)) {
+        do_debug(LOG_ERR, "lua_module_data_collect_wrapper %s isn's table\n", mod->name);
+        return;
+    }
+
+    lua_getfield(L, -1, "read");
+    if (lua_isnil(L, -1)) {
+        do_debug(LOG_DEBUG, "lua_module_data_collect_wrapper %s.read() doesnt set\n", mod->name);
+        return;
+    } else if (lua_isfunction(L, -1) == 0) {
+        do_debug(LOG_ERR, "lua_module_data_collect_wrapper %s.read() isnt function\n", mod->name);
+        return;
+    }
+
+    lua_set_mod(L, mod);
+    lua_pushstring(L, parameter);
+
+    if (lua_pcall(L, 2, 1, 0) != 0) {
+        do_debug(LOG_ERR, "lua_module_data_collect_wrapper call %s.read() err %s\n", mod->name, lua_tostring(L, -1));
+        return;
+    }
+
+    if (!lua_isstring(L, -1)) {
+        do_debug(LOG_ERR, "lua_module_data_collect_wrapper %s.read() function return value isnt string\n", mod->name);
+        return;
+    }
+
+    set_mod_record(mod, lua_tostring(L, -1));
+}
+
+
+void
+load_lua_module(lua_State *L, struct module *mod)
+{
     char       buff[LEN_128] = {0};
     char       mod_path[LEN_128] = {0};
 
