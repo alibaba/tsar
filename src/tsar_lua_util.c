@@ -39,6 +39,7 @@ load_luavm()
 
     luaL_openlibs(vm);
 
+    inject_lua_package_path(vm);
     inject_tsar_api(vm);
 
     return vm;
@@ -60,6 +61,44 @@ lua_set_mod(lua_State *L, struct module *mod)
     lua_pushstring(L, "n_col");
     lua_pushinteger(L, mod->n_col);
     lua_settable(L, -3);
+}
+
+
+void
+inject_lua_package_path(lua_State *L)
+{
+    const char *old_path;
+    char new_path[LEN_512];
+
+    if (strlen(conf.lua_path)) {
+        lua_getglobal(L, "package");
+        /* get original package.path */
+        lua_getfield(L, -1, "path");
+        old_path = lua_tostring(L, -1);
+        do_debug(LOG_DEBUG, "old lua package path: %s\n", old_path);
+        lua_pop(L, 1);
+
+        sprintf(new_path, "%s;%s", conf.lua_path, old_path);
+        do_debug(LOG_DEBUG, "new lua package path: %s\n", new_path);
+        lua_pushstring(L, new_path);
+        lua_setfield(L, -2, "path");
+    }
+
+    if (strlen(conf.lua_cpath)) {
+        lua_getglobal(L, "package");
+        /* get original package.path */
+        lua_getfield(L, -1, "cpath");
+        old_path = lua_tostring(L, -1);
+        do_debug(LOG_DEBUG, "old lua package cpath: %s\n", old_path);
+        lua_pop(L, 1);
+
+        sprintf(new_path, "%s;%s", conf.lua_cpath, old_path);
+        do_debug(LOG_DEBUG, "new lua package cpath: %s\n", new_path);
+        lua_pushstring(L, new_path);
+        lua_setfield(L, -2, "cpath");
+    }
+
+    lua_pop(L, 2);
 }
 
 

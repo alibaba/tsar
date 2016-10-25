@@ -77,6 +77,10 @@ struct configure {
 
     /* output file */
     char    output_file_path[LEN_128];
+
+    /* lua package path */
+    char lua_path[LEN_512];
+    char lua_cpath[LEN_512];
 };
 
 

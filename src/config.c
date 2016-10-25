@@ -251,6 +251,12 @@ parse_line(char *buff)
     } else if (!strcmp(token, "threshold")) {
         get_threshold();
 
+    } else if (!strcmp(token, "lua_package_path")) {
+        parse_string(conf.lua_path);
+
+    } else if (!strcmp(token, "lua_package_cpath")) {
+        parse_string(conf.lua_cpath);
+
     } else {
         return 0;
     }

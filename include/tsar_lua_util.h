@@ -23,6 +23,7 @@
 
 #include "define.h"
 
+void inject_lua_package_path(lua_State *L);
 void inject_tsar_consts(lua_State *L);
 void inject_tsar_api(lua_State *L);
 void close_luavm(lua_State *L);
