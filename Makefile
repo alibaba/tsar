@@ -50,13 +50,15 @@ tsardevel:
 	cp devel/Makefile.test /usr/local/tsar/devel/Makefile.test
 	cp devel/tsardevel /usr/bin/tsardevel
 
-
-	ctags -R
-	cscope -Rbq
-
 tsarluadevel:
 	mkdir -p /usr/local/tsar/luadevel
 	cp luadevel/mod_lua_test.lua /usr/local/tsar/luadevel/mod_lua_test.lua
 	cp luadevel/mod_lua_test.conf /usr/local/tsar/luadevel/mod_lua_test.conf
 	cp luadevel/Makefile.test /usr/local/tsar/luadevel/Makefile.test
 	cp luadevel/tsarluadevel /usr/bin/tsarluadevel
+
+tags:
+	ctags -R
+	cscope -Rbq
+
+.PHONY: all clean install unintall tsardevel tsarluadevel tags
