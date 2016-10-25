@@ -2,6 +2,10 @@ local _M = {
     _VERSION = "0.1.0"
 }
 
+local cjson = require("cjson")
+local socket = require("socket")
+local http = require("socket.http")
+local ltn12 = require("ltn12")
 local DETAIL_BIT = tsar.DETAIL_BIT
 local SUMMARY_BIT = tsar.SUMMARY_BIT
 local HIDE_BIT = tsar.HIDE_BIT
