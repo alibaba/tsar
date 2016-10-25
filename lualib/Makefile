@@ -3,6 +3,7 @@ LUASOCKET = luasocket-2.0.2
 DIRS = $(LUACJSON) $(LUASOCKET)
 
 all:
+	for i in $(DIRS); do tar --no-same-owner -zxf $$i.tar.gz; done
 	for i in $(DIRS); do make -C $$i; done
 
 install:
