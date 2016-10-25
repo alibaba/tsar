@@ -446,5 +446,3 @@ load_lua_module(lua_State *L, struct module *mod) {
 
     return;
 }
-
-
