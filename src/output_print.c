@@ -35,7 +35,7 @@ adjust_print_opt_line(char *n_opt_line, const char *opt_line, int hdr_len)
         memset(pad, '-', pad_len);
         strcat(n_opt_line, pad);
         strcat(n_opt_line, opt_line);
-        memset(&pad, '-', hdr_len - pad_len - strlen(opt_line));
+        memset(pad, '-', hdr_len - pad_len - strlen(opt_line));
         strcat(n_opt_line, pad);
 
     } else {
@@ -54,7 +54,7 @@ print_header()
     char   header[LEN_1M] = {0};
     char   opt_line[LEN_1M] = {0};
     char   hdr_line[LEN_1M] = {0};
-    char   opt[LEN_128] = {0};
+    char   opt[LEN_256] = {0};
     char   n_opt[LEN_256] = {0};
     char   mod_hdr[LEN_256] = {0};
     char  *token, *s_token, *n_record;
