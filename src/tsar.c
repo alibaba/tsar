@@ -197,7 +197,7 @@ main_init(int argc, char **argv)
     }
 
     strcpy(conf.config_file, DEFAULT_CONF_FILE_PATH);
-    if (access(conf.config_file, F_OK)) {
+    if (access(conf.config_file, F_OK) != 0) {
         do_debug(LOG_FATAL, "main_init: can't find tsar.conf");
     }
 }
