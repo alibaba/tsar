@@ -56,7 +56,7 @@ send_sql_txt(int fd, int have_collect)
 
     /* print summary data */
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
 

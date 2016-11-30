@@ -22,7 +22,7 @@
 
 struct statistic statis;
 struct configure conf;
-struct module   mods[MAX_MOD_NUM];
+struct module   *mods[MAX_MOD_NUM];
 
 
 void
@@ -59,7 +59,7 @@ usage()
            );
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (mod->usage) {
             fprintf(stderr, "%s", mod->usage);
             fprintf(stderr, "\n");
@@ -208,9 +208,11 @@ shut_down()
 {
     free_modules();
 
+/*
     memset(&conf, 0, sizeof(struct configure));
-    memset(&mods, 0, sizeof(struct module) * MAX_MOD_NUM);
+    memset(mods, 0, sizeof(mods));
     memset(&statis, 0, sizeof(struct statistic));
+*/
 }
 
 
@@ -223,7 +225,7 @@ running_list()
     printf("tsar enable follow modules:\n");
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         printf("    %s\n", mod->name + 4);
     }
 }

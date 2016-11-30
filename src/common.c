@@ -222,7 +222,7 @@ get_st_array_from_file(int have_collect)
 
     sprintf(line, "%ld", statis.cur_time);
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (mod->enable && strlen(mod->record)) {
             memset(&detail, 0, sizeof(detail));
             /* save collect data to output_file */

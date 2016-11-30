@@ -40,7 +40,7 @@ output_file()
     strcat(line, s_time);
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (mod->enable && strlen(mod->record)) {
             /* save collect data to output_file */
             n = snprintf(detail, LEN_1M, "%s%s%s%s", SECTION_SPLIT, mod->opt_line, STRING_SPLIT, mod->record);
