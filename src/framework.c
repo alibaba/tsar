@@ -83,7 +83,7 @@ load_modules()
     sprintf(buff, "/usr/local/tsar/modules");
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->lib) {
             memset(mod_path, '\0', LEN_128);
             snprintf(mod_path, LEN_128, "%s/%s.so", buff, mod->name);
@@ -127,7 +127,7 @@ reload_modules(const char *s_mod)
     strncpy(buf, s_mod, strlen(s_mod) + 1);
 
     for (i = 0; i < statis.total_mod_num; i++)
-        mods[i].enable = 0;
+        mods[i]->enable = 0;
 
     token = strtok(buf, DATA_SPLIT);
     while (token != NULL) {
@@ -141,13 +141,13 @@ reload_modules(const char *s_mod)
         }
 
         for (i = 0; i < statis.total_mod_num; i++) {
-            if (strcmp(name, mods[i].name) == 0
-                    || strcmp(name, mods[i].opt_line) == 0) {
+            if (strcmp(name, mods[i]->name) == 0
+                    || strcmp(name, mods[i]->opt_line) == 0) {
                 reload = 1;
-                mods[i].enable = 1;
+                mods[i]->enable = 1;
 
                 if (param != NULL) {
-                    strncpy(mods[i].parameter, param, strlen(param) + 1);
+                    strncpy(mods[i]->parameter, param, strlen(param) + 1);
                 }
 
                 break;
@@ -171,7 +171,7 @@ reload_check_modules()
     struct module *mod;
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!strcmp(mod->name, "mod_apache")
              || !strcmp(mod->name, "mod_cpu")
              || !strcmp(mod->name, "mod_mem")
@@ -204,7 +204,7 @@ init_module_fields()
     struct module *mod = NULL;
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
         }
@@ -342,7 +342,7 @@ collect_record()
     struct module *mod = NULL;
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
         }
@@ -368,7 +368,7 @@ collect_record_stat()
     struct module *mod = NULL;
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
         }
@@ -446,7 +446,7 @@ free_modules()
     struct module *mod;
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (mod->lib) {
             dlclose(mod->lib);
         }
@@ -468,6 +468,7 @@ free_modules()
             mod->mean_array = NULL;
             mod->min_array = NULL;
         }
+	free(mod);
     }
 }
 
@@ -485,7 +486,7 @@ read_line_to_module_record(char *line)
 
     line[strlen(line) - 1] = '\0';
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (mod->enable) {
             sprintf(mod_opt, "%s%s%s", SECTION_SPLIT, mod->opt_line, STRING_SPLIT);
             memset(mod->record, 0, sizeof(mod->record));
@@ -521,7 +522,7 @@ disable_col_zero()
     struct mod_info *info;
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
         }

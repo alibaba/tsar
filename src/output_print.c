@@ -70,7 +70,7 @@ print_header()
     }
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
         }
@@ -233,7 +233,7 @@ print_record()
 
     /* print summary data */
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
         }
@@ -563,7 +563,7 @@ print_tail(int tail_type)
 
     /* print summary data */
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
         }
@@ -814,10 +814,41 @@ trim(char* src, int max_len)
     return index;
 }
 
+int
+seek_tail_lines(FILE *fp, int n, int len[])
+{
+    int total_num = 0;
+
+    /* find two \n from end*/
+    if (fseek(fp, -1, SEEK_END) != 0) {
+        do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
+    }
+    while (1) {
+        if (fgetc(fp) == '\n') {
+            ++total_num;
+            len[n - total_num] = 0;
+        } else {
+            ++len[n - total_num];
+	}
+        if (total_num > n) {
+            break;
+        }
+        if (fseek(fp, -2, SEEK_CUR) != 0) {
+            /* goto file head */
+            if (fseek(fp, 0, SEEK_SET) != 0) {
+                do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
+            }
+            break;
+        }
+    }
+
+    return total_num;
+}
+
 void
 running_check(int check_type)
 {
-    int               total_num=0, i, j, k;
+    int               total_num, len[2] = {0}, i, j, k;
     FILE             *fp;
     char              filename[LEN_128] = {0};
     char              tmp[10][LEN_4096];
@@ -826,8 +857,8 @@ running_check(int check_type)
     struct            stat statbuf;
     time_t            nowtime;
     double           *st_array;
-    static char       line[2][LEN_10M];
-    static char       check[LEN_10M] = {0};
+    char             *line[2];
+    static char       check[LEN_4096 * 11] = {0};
 
     /* get hostname */
     if (0 != gethostname(host_name, sizeof(host_name))) {
@@ -840,8 +871,6 @@ running_check(int check_type)
             break;
         }
     }
-    memset(tmp, 0, 10 * LEN_4096);
-    sprintf(check, "%s\ttsar\t", host_name);
     sprintf(filename, "%s", conf.output_file_path);
     fp = fopen(filename, "r");
     if (!fp) {
@@ -853,75 +882,35 @@ running_check(int check_type)
     if (nowtime - statbuf.st_mtime > 300) {
         do_debug(LOG_FATAL, "/var/log/tsar.data is far away from now, now time is %d, last time is %d", nowtime, statbuf.st_mtime);
     }
-    /* get file len */
-    memset(&line[0], 0, LEN_10M);
-    total_num =0;
-    /* find two \n from end*/
-    if (fseek(fp, -1, SEEK_END) != 0) {
-        do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
-    }
-    while (1) {
-        if (fgetc(fp) == '\n') {
-            ++total_num;
-        }
-        if (total_num == 3) {
-            break;
-        }
-        if (fseek(fp, -2, SEEK_CUR) != 0) {
-            /* just 1 or 2 line, goto file header */
-            if (fseek(fp, 0, SEEK_SET) != 0) {
-                do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
-            }
-            break;
-        }
-    }
     /*FIX ME*/
+    total_num = seek_tail_lines(fp, 2, len);
     if (total_num == 0) {
         if (fclose(fp) < 0) {
             do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
         }
-        memset(filename, 0, sizeof(filename));
         sprintf(filename, "%s.1", conf.output_file_path);
         fp = fopen(filename, "r");
         if (!fp) {
             do_debug(LOG_FATAL, "unable to open the log file %s.\n", filename);
         }
-        total_num = 0;
-        memset(&line[0], 0, 2 * LEN_10M);
         /* count tsar.data.1 lines */
-        if (fseek(fp, -1, SEEK_END) != 0) {
-            do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
-        }
-        while (1) {
-            if (fgetc(fp) == '\n') {
-                ++total_num;
-            }
-            if (total_num == 3) {
-                break;
-            }
-            if (fseek(fp, -2, SEEK_CUR) != 0) {
-                if (fseek(fp, 0, SEEK_SET) != 0) {
-                    do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
-                }
-                break;
-            }
-        }
+	total_num = seek_tail_lines(fp, 2, len);
         if (total_num < 2) {
             do_debug(LOG_FATAL, "not enough lines at log file %s.\n", filename);
         }
 
-        memset(&line[0], 0, LEN_10M);
-        if (!fgets(line[0], LEN_10M, fp)) {
+        line[0] = malloc(len[0] + 2);
+        if (!fgets(line[0], len[0] + 2, fp)) {
             do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
         }
-        memset(&line[1], 0, LEN_10M);
-        if (!fgets(line[1], LEN_10M, fp)) {
+        line[1] = malloc(len[1] + 2);
+        if (!fgets(line[1], len[1] + 2, fp)) {
             do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
         }
 
     } else if (total_num == 1) {
-        memset(&line[1], 0, LEN_10M);
-        if (!fgets(line[1], LEN_10M, fp)) {
+        line[1] = malloc(len[1] + 2);
+        if (!fgets(line[1], len[1] + 2, fp)) {
             do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
         }
         if (fclose(fp) < 0) {
@@ -932,42 +921,24 @@ running_check(int check_type)
         if (!fp) {
             do_debug(LOG_FATAL, "unable to open the log file %s\n", filename);
         }
-        total_num = 0;
         /* go to the start of the last line at tsar.data.1 */
-        if (fseek(fp, -1, SEEK_END) != 0) {
-            do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
-        }
-        while (1) {
-            if (fgetc(fp) == '\n') {
-                ++total_num;
-            }
-            /* find the sencond \n from the end, read fp point to the last line */
-            if (total_num == 2) {
-                break;
-            }
-            if (fseek(fp, -2, SEEK_CUR) != 0) {
-                if (fseek(fp, 0, SEEK_SET) != 0) {
-                    do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
-                }
-                break;
-            }
-        }
+        total_num = seek_tail_lines(fp, 1, len);
 
         if (total_num < 1) {
             do_debug(LOG_FATAL, "not enough lines at log file %s\n", filename);
         }
-        memset(&line[0], 0, LEN_10M);
-        if (!fgets(line[0], LEN_10M, fp)) {
+        line[0] = malloc(len[0] + 2);
+        if (!fgets(line[0], len[0] + 2, fp)) {
             do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
         }
 
     } else {
-        memset(&line[0], 0, LEN_10M);
-        if (!fgets(line[0], LEN_10M, fp)) {
+        line[0] = malloc(len[0] + 2);
+        if (!fgets(line[0], len[0] + 2, fp)) {
             do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
         }
-        memset(&line[1], 0, LEN_10M);
-        if (!fgets(line[1], LEN_10M, fp)) {
+        line[1] = malloc(len[1] + 2);
+        if (!fgets(line[1], len[1] + 2, fp)) {
             do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
         }
     }
@@ -983,16 +954,18 @@ running_check(int check_type)
 
     /* read one line to init module parameter */
     read_line_to_module_record(line[0]);
+    free(line[0]);
     collect_record_stat();
 
     read_line_to_module_record(line[1]);
+    free(line[1]);
     collect_record_stat();
     /*display check detail*/
     /* ---------------------------RUN_CHECK_NEW--------------------------------------- */
     if (check_type == RUN_CHECK_NEW) {
         printf("%s\ttsar\t", host_name);
         for (i = 0; i < statis.total_mod_num; i++) {
-            mod = &mods[i];
+            mod = mods[i];
             if (!mod->enable) {
                 continue;
             }
@@ -1073,8 +1046,10 @@ running_check(int check_type)
      */
     /* ------------------------------RUN_CHECK------------------------------------------- */
     if (check_type == RUN_CHECK) {
+        //memset(tmp, 0, 10 * LEN_4096);
+        sprintf(check, "%s\ttsar\t", host_name);
         for (i = 0; i < statis.total_mod_num; i++) {
-            mod = &mods[i];
+            mod = mods[i];
             if (!mod->enable){
                 continue;
             }

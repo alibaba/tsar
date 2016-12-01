@@ -66,7 +66,7 @@ output_nagios()
 
     /* print summary data */
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
 
