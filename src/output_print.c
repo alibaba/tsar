@@ -79,14 +79,14 @@ print_header()
         memset(mod_hdr, 0, sizeof(mod_hdr));
         get_mod_hdr(mod_hdr, mod);
 
-        if (strstr(mod->record, ITEM_SPLIT) && MERGE_NOT == conf.print_merge) {
+        if (strpbrk(mod->record, ITEM_SPLIT) && MERGE_NOT == conf.print_merge) {
             n_record = strdup(mod->record);
             /* set print opt line */
             token = strtok(n_record, ITEM_SPLIT);
             int count = 0;
             mod->p_item = -1;
             while (token) {
-                s_token = strstr(token, ITEM_SPSTART);
+                s_token = strpbrk(token, ITEM_SPSTART);
                 if (s_token) {
                     memset(opt, 0, sizeof(opt));
                     memset(n_opt, 0, sizeof(n_opt));
@@ -408,7 +408,7 @@ find_offset_from_start(FILE *fp, int number)
             do_debug(LOG_FATAL, "fgets error: maybe %s has not enough data", conf.output_file_path);
         }
         if (0 != line[0] && offset > line_len) {
-            p_sec_token = strstr(line, SECTION_SPLIT);
+            p_sec_token = strpbrk(line, SECTION_SPLIT);
             if (p_sec_token) {
                 *p_sec_token = '\0';
                 t_get = atol(line);
@@ -473,7 +473,7 @@ set_record_time(const char *line)
     static long  pre_time, c_time = 0;
 
     /* get record time */
-    token = strstr(line, SECTION_SPLIT);
+    token = strpbrk(line, SECTION_SPLIT);
     memcpy(s_time, line, token - line);
 
     /* swap time */
@@ -502,7 +502,7 @@ check_time(const char *line)
     static long pre_time;
 
     /* get record time */
-    token = strstr(line, SECTION_SPLIT);
+    token = strpbrk(line, SECTION_SPLIT);
     if ((token - line) < 32) {
 	    memcpy(s_time, line, token - line);
     }
@@ -984,7 +984,7 @@ running_check(int check_type)
             for (j = 0; j < mod->n_item; j++) {
                 memset(opt, 0, sizeof(opt));
                 if (token) {
-                    s_token = strstr(token, ITEM_SPSTART);
+                    s_token = strpbrk(token, ITEM_SPSTART);
                     if (s_token) {
                         strncat(opt, token, s_token - token);
                         strcat(opt, ":");
@@ -1104,7 +1104,7 @@ running_check(int check_type)
                 char   *token = strtok(n_record, ITEM_SPLIT);
                 char   *s_token;
                 for (j = 0; j < mod->n_item; j++) {
-                    s_token = strstr(token, ITEM_SPSTART);
+                    s_token = strpbrk(token, ITEM_SPSTART);
                     if (s_token) {
                         memset(opt, 0, sizeof(opt));
                         strncat(opt, token, s_token - token);
@@ -1153,7 +1153,7 @@ running_check(int check_type)
                 char   *token = strtok(n_record, ITEM_SPLIT);
                 char   *s_token;
                 for (j = 0; j < mod->n_item; j++) {
-                    s_token = strstr(token, ITEM_SPSTART);
+                    s_token = strpbrk(token, ITEM_SPSTART);
                     if (s_token) {
                         memset(opt, 0, sizeof(opt));
                         strncat(opt, token, s_token - token);
