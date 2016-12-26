@@ -386,23 +386,22 @@ collect_record_stat()
             }
 
             mod->n_item = n_item;
-            /* multiply item because of have ITEM_SPLIT */
-            if (strstr(mod->record, ITEM_SPLIT)) {
+            /* multiple item because of having ITEM_SPLIT */
+            if (strpbrk(mod->record, ITEM_SPLIT)) {
                 /* merge items */
                 if (MERGE_ITEM == conf.print_merge) {
                     mod->n_item = 1;
                     ret = merge_mult_item_to_array(mod->cur_array, mod);
 
                 } else {
-                    char item[LEN_1M] = {0};
+                    char *item;
                     int num = 0;
                     int pos = 0;
 
-                    while (strtok_next_item(item, mod->record, &pos)) {
-                        if (!(ret=convert_record_to_array(&mod->cur_array[num * mod->n_col], mod->n_col, item))) {
+                    while ((item = strtok_next_item(mod->record, &pos)) != NULL) {
+                        if ((ret=convert_record_to_array(&mod->cur_array[num * mod->n_col], mod->n_col, item)) < mod->n_col) {
                             break;
                         }
-                        memset(item, 0, sizeof(item));
                         num++;
                     }
                 }
@@ -496,8 +495,8 @@ read_line_to_module_record(char *line)
                 continue;
             }
 
-            s_token += sizeof(SECTION_SPLIT) + strlen(mod->opt_line) + sizeof(STRING_SPLIT) - 2;
-            e_token = strstr(s_token, SECTION_SPLIT);
+            s_token += strlen(mod->opt_line) + 2;
+            e_token = strpbrk(s_token, SECTION_SPLIT);
 
             if (e_token) {
                 memcpy(mod->record, s_token, e_token - s_token);
