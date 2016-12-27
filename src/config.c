@@ -66,7 +66,7 @@ parse_mod(const char *mod_name)
     /*if exist more parameters, add them */
     while((token = strtok(NULL, W_SPACE)) != NULL){
         j = strlen(token);
-        if ((j + i) >= LEN_256) {
+        if (i + j + 1 >= LEN_256) {
             break;
         }
         mod->parameter[i++] = ' ';
