@@ -54,20 +54,22 @@ read_mem_stat_info(proc_mem_t *stat_mem)
         if(fgets(spid, 1000, fp) ==NULL) {
             pclose(fp);
             break;
-         }
+        }
         /* split pidof into array pid */
         char *p;
         p = strtok(spid, " ");
         while (p) {
             pid[nb] = atoi(p);
             if (pid[nb++] <= 0) {
+                pclose(fp);
                 return;
             }
             if (nb >= 100) {
+                pclose(fp);
                 return;
             }
             p = strtok(NULL, " ");
-       }
+        }
     } while(1);
     /* get all pid's info */
     stat_mem->mem = 0;
@@ -103,31 +105,33 @@ static void initializes(proc_mem_t *stats_mem, int *nitems)
     FILE *fp;
     if (access(NGINX_PROCESS_PATH, R_OK) == 0) {
         strncpy(stats_mem[(*nitems)].name, "nginx", sizeof("nginx"));
-        if ((fp = fopen(NGINX_PROCESS_PATH, "r"))) {
-            fgets(stats_mem[(*nitems)++].master_pid, 256, fp);
+        if ((fp = fopen(NGINX_PROCESS_PATH, "r")) != NULL) {
+            fgets(stats_mem[(*nitems)++].master_pid, 100, fp);
+            fclose(fp);
         }
     } else {
-       sprintf(pscmd, PSCMD, "/home/admin/tengine/bin/t-coresystem-tengine-cdn");
-       fp = popen(pscmd, "r");
-       if (fp != NULL) {
-           if(fgets(stats_mem[(*nitems)].master_pid, 100, fp)) {
-               strncpy(stats_mem[(*nitems)++].name, "nginx", sizeof("nginx"));
-           }
-       }
+        sprintf(pscmd, PSCMD, "/home/admin/tengine/bin/t-coresystem-tengine-cdn");
+        if ((fp = popen(pscmd, "r")) != NULL) {
+            if(fgets(stats_mem[(*nitems)].master_pid, 100, fp)) {
+                strncpy(stats_mem[(*nitems)++].name, "nginx", sizeof("nginx"));
+            }
+            fclose(fp);
+        }
     }
 
     if (access(LIVE_PROCESS_PATH, R_OK) == 0) {
         strncpy(stats_mem[(*nitems)].name, "live", sizeof("live"));
-        if ((fp = fopen(LIVE_PROCESS_PATH, "r"))) {
-            fgets(stats_mem[(*nitems)++].master_pid, 256, fp);
+        if ((fp = fopen(LIVE_PROCESS_PATH, "r")) != NULL) {
+            fgets(stats_mem[(*nitems)++].master_pid, 100, fp);
+            fclose(fp);
         }
     } else {
         sprintf(pscmd, PSCMD, "/home/admin/live/bin/t-coresystem-tengine-live");
-        fp = popen(pscmd, "r");
-        if (fp != NULL) {
-           if(fgets(stats_mem[(*nitems)].master_pid, 100, fp)) {
-               strncpy(stats_mem[(*nitems)++].name, "live", sizeof("live"));
-           }
+        if ((fp = popen(pscmd, "r")) != NULL) {
+            if(fgets(stats_mem[(*nitems)].master_pid, 100, fp)) {
+                strncpy(stats_mem[(*nitems)++].name, "live", sizeof("live"));
+            }
+            fclose(fp);
         }
     }
 
@@ -150,7 +154,7 @@ read_mem_stats(struct module *mod, char *paramter)
     }
     /* store data to tsar */
     for (i = 0; i < nitems; i++) {
-        pos += snprintf(buf + pos, LEN_1M - pos, "%s=%llu,%llu,%llu,%d" ITEM_SPLIT,
+        pos += snprintf(buf + pos, LEN_4096 - pos, "%s=%llu,%llu,%llu,%d" ITEM_SPLIT,
                         stats_mem[i].name,
                         stats_mem[i].pid,
                         stats_mem[i].aver_mem,
