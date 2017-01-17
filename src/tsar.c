@@ -186,7 +186,6 @@ main_init(int argc, char **argv)
     } else if (conf.running_mode == RUN_CHECK_NEW) {
         conf.print_interval = 60;
         conf.print_tail = 0;
-        conf.print_nline_interval = conf.print_interval;
     }
 
     if (!strlen(conf.output_print_mod)) {

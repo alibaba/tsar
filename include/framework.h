@@ -81,7 +81,7 @@ void reload_check_modules();
 void load_modules();
 void free_modules();
 void collect_record();
-void read_line_to_module_record(char *line);
+time_t read_line_to_module_record(char *line);
 int  collect_record_stat();
 void disable_col_zero();
 

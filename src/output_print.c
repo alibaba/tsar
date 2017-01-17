@@ -504,7 +504,7 @@ check_time(const char *line)
     /* get record time */
     token = strpbrk(line, SECTION_SPLIT);
     if ((token - line) < 32) {
-	    memcpy(s_time, line, token - line);
+        memcpy(s_time, line, token - line);
     }
     now_time = atol(s_time);
 
@@ -829,7 +829,7 @@ seek_tail_lines(FILE *fp, int n, int len[])
             len[n - total_num] = 0;
         } else {
             ++len[n - total_num];
-	}
+        }
         if (total_num > n) {
             break;
         }
@@ -855,7 +855,7 @@ running_check(int check_type)
     char              host_name[LEN_64] = {0};
     struct            module *mod = NULL;
     struct            stat statbuf;
-    time_t            nowtime;
+    time_t            nowtime, ts[2] = {0};
     double           *st_array;
     char             *line[2];
     static char       check[LEN_4096 * 11] = {0};
@@ -894,7 +894,7 @@ running_check(int check_type)
             do_debug(LOG_FATAL, "unable to open the log file %s.\n", filename);
         }
         /* count tsar.data.1 lines */
-	total_num = seek_tail_lines(fp, 2, len);
+        total_num = seek_tail_lines(fp, 2, len);
         if (total_num < 2) {
             do_debug(LOG_FATAL, "not enough lines at log file %s.\n", filename);
         }
@@ -953,13 +953,17 @@ running_check(int check_type)
     init_module_fields();
 
     /* read one line to init module parameter */
-    read_line_to_module_record(line[0]);
+    ts[0] = read_line_to_module_record(line[0]);
     free(line[0]);
     collect_record_stat();
 
-    read_line_to_module_record(line[1]);
+    ts[1] = read_line_to_module_record(line[1]);
     free(line[1]);
+    if (ts[0] && ts[1]) {
+        conf.print_interval = ts[1] - ts[0];
+    }
     collect_record_stat();
+
     /*display check detail*/
     /* ---------------------------RUN_CHECK_NEW--------------------------------------- */
     if (check_type == RUN_CHECK_NEW) {
@@ -1184,8 +1188,8 @@ running_check(int check_type)
                     }
                 }
             }
-	    if (!strcmp(mod->name, "mod_swap")) {
-	        for (j = 0; j < mod->n_item; j++) {
+            if (!strcmp(mod->name, "mod_swap")) {
+                for (j = 0; j < mod->n_item; j++) {
                     st_array = &mod->st_array[j * mod->n_col];
                     if (!st_array || !mod->st_flag) {
                         sprintf(tmp[9], " swap/total=- swap/util=-");
@@ -1194,7 +1198,7 @@ running_check(int check_type)
                         sprintf(tmp[9], " swap/total=%0.2f swap/util=%0.2f%%", st_array[2] / 1024 / 1024, st_array[3]);
                     }
                 }
-	    }
+            }
         }
         for (j = 0; j < 10; j++) {
             strcat(check, tmp[j]);

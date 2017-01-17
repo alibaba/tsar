@@ -473,9 +473,9 @@ free_modules()
 
 
 /*
- * read line from file to mod->record
+ * read line from file to mod->record and return timestamp
  */
-void
+time_t
 read_line_to_module_record(char *line)
 {
     int    i;
@@ -506,6 +506,7 @@ read_line_to_module_record(char *line)
             }
         }
     }
+    return atol(line);
 }
 
 
