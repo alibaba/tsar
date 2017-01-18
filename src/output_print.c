@@ -961,6 +961,10 @@ running_check(int check_type)
     free(line[1]);
     if (ts[0] && ts[1]) {
         conf.print_interval = ts[1] - ts[0];
+        if (conf.print_interval == 0) {
+            do_debug(LOG_FATAL, "running tsar -c too frequently");
+            return;
+        }
     }
     collect_record_stat();
 
