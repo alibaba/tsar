@@ -12,8 +12,6 @@
 #include "tsar.h"
 
 static char* ors_usage = "    --ors           KGB ors statistics";
-static const char* ORS_FILE_1 = "/tmp/_tsar_amonitor_ors_1.out";
-static const char* ORS_FILE_2 = "/tmp/_tsar_amonitor_ors_2.out";
 
 static struct mod_info ors_info[] = {
     // total
@@ -110,52 +108,45 @@ struct stats_ors {
 
 static struct stats_ors ors_stat;
 
+/***
+ * main function
+ *
+ * @param mod
+ */
 static void read_ors_record(struct module* mod) {
-  int ret = 0;
   char node[LEN_1024], cmd[LEN_1024], line[LEN_1024], buf[LEN_1M];
   FILE* fp = NULL;
   char* p = NULL;
   int idx = 0;
   double f;
 
-  ret = system("ps -ef | grep amonitor_agent | grep -v grep > /dev/null");
-  if (ret == -1 || WEXITSTATUS(ret) != 0) {
-    return;
-  }
+  memset(node, '\0', sizeof(node));
+  memset(cmd, '\0', sizeof(cmd));
+  memset(line, '\0', sizeof(line));
+  memset(buf, '\0', sizeof(buf));
 
   snprintf(cmd,
            LEN_1024,
-           "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -r node | /bin/grep ors/ | /bin/grep -v ors/default | /usr/bin/head -n 1 > %s",
-           ORS_FILE_1);
-  ret = system(cmd);
-  if (ret == -1 || WEXITSTATUS(ret) != 0) {
-    return;
-  }
-
-  fp = fopen(ORS_FILE_1, "r");
+           "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -r node | /bin/grep ors/ | /bin/grep -v pc_ors/ | /bin/grep -v ors/default | /usr/bin/head -n 1");
+  fp = popen(cmd, "r");
   if (fp == NULL) {
     return;
   }
 
   p = fgets(node, LEN_1024, fp);
-  fclose(fp);
+  pclose(fp);
   fp = NULL;
+
   if (p == NULL) {
     return;
   }
-
   p = strrchr(node, '/');
   *p = 0;
-  sprintf(cmd,
-          "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n %s -m 'response_time;query;instance;success_query;rss_response_time;rss_query;rss_success_query;sn_response_time;sn_query;sn_instance;sn_success_query;qscore_response_time;qscore_query;qscore_instance;qscore_success_query;hurricane_response_time;hurricane_query;hurricane_instance;hurricane_success_query;sib_response_time;sib_query;sib_instance;sib_success_query' -r metric -b -62 > %s",
-          node,
-          ORS_FILE_2);
-  ret = system(cmd);
-  if (ret == -1 || WEXITSTATUS(ret) != 0) {
-    return;
-  }
 
-  fp = fopen(ORS_FILE_2, "r");
+  sprintf(cmd,
+          "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n %s -m 'response_time;query;instance;success_query;rss_response_time;rss_query;rss_success_query;sn_response_time;sn_query;sn_instance;sn_success_query;qscore_response_time;qscore_query;qscore_instance;qscore_success_query;hurricane_response_time;hurricane_query;hurricane_instance;hurricane_success_query;sib_response_time;sib_query;sib_instance;sib_success_query' -r metric -b -62",
+          node);
+  fp = popen(cmd, "r");
   if (fp == NULL) {
     return;
   }
@@ -320,16 +311,13 @@ static void read_ors_record(struct module* mod) {
 
     }
   }
-  fclose(fp);
+
+  pclose(fp);
   fp = NULL;
-  sprintf(cmd, "rm -rf %s", ORS_FILE_1);
-  system(cmd);
-  sprintf(cmd, "rm -rf %s", ORS_FILE_2);
-  system(cmd);
 
   if (ors_stat.rt_count != 0
       && ors_stat.qps_count != 0
-      && ors_stat.ips_count !=0
+      && ors_stat.ips_count != 0
       && ors_stat.succ_count != 0
 
       && ors_stat.rss_rt_count != 0
@@ -376,12 +364,17 @@ static void read_ors_record(struct module* mod) {
              (long long) ors_stat.qscore_rt * 100 / ors_stat.qscore_rt_count,
              (long long) ors_stat.qscore_qps * 100 / ors_stat.qscore_qps_count,
              (long long) ors_stat.qscore_ips * 100 / ors_stat.qscore_ips_count,
-             (long long) ors_stat.qscore_succ * 100 / ors_stat.qscore_succ_count,
+             (long long) ors_stat.qscore_succ * 100
+                 / ors_stat.qscore_succ_count,
 
-             (long long) ors_stat.hurricane_rt * 100 / ors_stat.hurricane_rt_count,
-             (long long) ors_stat.hurricane_qps * 100 / ors_stat.hurricane_qps_count,
-             (long long) ors_stat.hurricane_ips * 100 / ors_stat.hurricane_ips_count,
-             (long long) ors_stat.hurricane_succ * 100 / ors_stat.hurricane_succ_count,
+             (long long) ors_stat.hurricane_rt * 100
+                 / ors_stat.hurricane_rt_count,
+             (long long) ors_stat.hurricane_qps * 100
+                 / ors_stat.hurricane_qps_count,
+             (long long) ors_stat.hurricane_ips * 100
+                 / ors_stat.hurricane_ips_count,
+             (long long) ors_stat.hurricane_succ * 100
+                 / ors_stat.hurricane_succ_count,
 
              (long long) ors_stat.sib_rt * 100 / ors_stat.sib_rt_count,
              (long long) ors_stat.sib_qps * 100 / ors_stat.sib_qps_count,
@@ -412,3 +405,4 @@ void mod_register(struct module* mod) {
                       read_ors_record,
                       set_ors_record);
 }
+
