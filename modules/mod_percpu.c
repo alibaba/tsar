@@ -1,7 +1,6 @@
 #include "tsar.h"
 
 #define STAT_PATH "/proc/stat"
-#define MAX_CPUS 32
 
 static char *percpu_usage = "    --percpu            Per cpu share (user, system, interrupt, nice, & idle)";
 
@@ -66,15 +65,12 @@ read_percpu_stats(struct module *mod)
                     st_percpu.cpu_idle,
                     st_percpu.cpu_nice,
                     st_percpu.cpu_steal,
-		    st_percpu.cpu_guest);
-	    if (strlen(buf) == LEN_1M - 1) {
-		    fclose(fp);
-		    return;
-	    }
-            cpus++;
-            if (cpus > MAX_CPUS) {
-                break;
+                    st_percpu.cpu_guest);
+            if (strlen(buf) == LEN_1M - 1) {
+                fclose(fp);
+                return;
             }
+            cpus++;
         }
     }
     set_mod_record(mod, buf);
