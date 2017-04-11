@@ -12,8 +12,8 @@
 #include "tsar.h"
 
 static char *merger_usage = "    --urb      KGB merger urb statistics";
-static const char *MERGER_FILE_1 = "/tmp/_tsar_amonitor_urb_1.out";
-static const char *MERGER_FILE_2 = "/tmp/_tsar_amonitor_urb_2.out";
+static const char *MERGER_FILE_1 = "/tmp/_tsar_amonitor_urb_1_%d.out";
+static const char *MERGER_FILE_2 = "/tmp/_tsar_amonitor_urb_2_%d.out";
 
 static struct mod_info merger_info[] = {
         {"    rt", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
@@ -63,10 +63,14 @@ static void
 read_merger_record(struct module *mod) {
     int ret = 0;
     char node[LEN_1024], cmd[LEN_1024], line[LEN_1024], buf[LEN_1M];
+    char FILE_1[LEN_1024], FILE_2[LEN_1024];
     FILE *fp = NULL;
     char *p = NULL;
     int idx = 0;
     double f;
+
+    snprintf(FILE_1, LEN_1024, MERGER_FILE_1, getpid());
+    snprintf(FILE_2, LEN_1024, MERGER_FILE_2, getpid());
 
     ret = system("ps -ef | grep amonitor_agent | grep -v grep > /dev/null");
     if (ret == -1 || WEXITSTATUS(ret) != 0)
@@ -74,11 +78,11 @@ read_merger_record(struct module *mod) {
     snprintf(cmd,
              LEN_1024,
              "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -r node | /bin/grep merger/ | /bin/grep -v merger/default | /usr/bin/head -n 1 > %s",
-             MERGER_FILE_1);
+             FILE_1);
     ret = system(cmd);
     if (ret == -1 || WEXITSTATUS(ret) != 0)
         return;
-    fp = fopen(MERGER_FILE_1, "r");
+    fp = fopen(FILE_1, "r");
     if (fp == NULL)
         return;
     p = fgets(node, LEN_1024, fp);
@@ -91,11 +95,11 @@ read_merger_record(struct module *mod) {
     sprintf(cmd,
             "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n %s -m 'response_time;query;failure_result;empty_result;uc_response_time;uc_query;uc_succ_query;urb_serial;write_et2_uc_time;write_st3_uc_time;write_et2_uc_succ;write_st3_uc_succ' -r metric -b -62 > %s",
             node,
-            MERGER_FILE_2);
+            FILE_2);
     ret = system(cmd);
     if (ret == -1 || WEXITSTATUS(ret) != 0)
         return;
-    fp = fopen(MERGER_FILE_2, "r");
+    fp = fopen(FILE_2, "r");
     if (fp == NULL)
         return;
     memset(&merger_stat, 0, sizeof(merger_stat));
@@ -192,9 +196,9 @@ read_merger_record(struct module *mod) {
     }
     fclose(fp);
     fp = NULL;
-    sprintf(cmd, "rm -rf %s", MERGER_FILE_1);
+    sprintf(cmd, "rm -rf %s", FILE_1);
     system(cmd);
-    sprintf(cmd, "rm -rf %s", MERGER_FILE_2);
+    sprintf(cmd, "rm -rf %s", FILE_2);
     system(cmd);
     if (merger_stat.rt_count != 0 && merger_stat.qps_count != 0 && merger_stat.fail_count != 0 &&
         merger_stat.empty_count != 0 && merger_stat.uc_rt_count != 0 && merger_stat.uc_qps_count != 0 &&
