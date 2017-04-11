@@ -4,8 +4,8 @@
 #include "tsar.h"
 
 static char *search_usage = "    --search            KGB search statistics";
-static const char * SEARCH_FILE_1 = "/tmp/_tsar_amonitor_search_1.out";
-static const char * SEARCH_FILE_2 = "/tmp/_tsar_amonitor_search_2.out";
+static const char * SEARCH_FILE_1 = "/tmp/_tsar_amonitor_search_1_%d.out";
+static const char * SEARCH_FILE_2 = "/tmp/_tsar_amonitor_search_2_%d.out";
 
 static struct mod_info search_info[] = {
     {"    rt", SUMMARY_BIT, MERGE_SUM,  STATS_NULL},
@@ -50,20 +50,25 @@ read_search_record(struct module *mod)
 {
     int ret = 0;
     char node[LEN_1024], cmd[LEN_1024], line[LEN_1024], buf[LEN_1M];
+    char FILE_1[LEN_1024], FILE_2[LEN_1024];
     FILE *fp = NULL;
     char *p = NULL;
     int idx = 0;
     double f;
+
+    snprintf(FILE_1, LEN_1024, SEARCH_FILE_1, getpid());
+    snprintf(FILE_2, LEN_1024, SEARCH_FILE_2, getpid());
+
     ret = system("ps -ef | grep amonitor_agent | grep -v grep > /dev/null");
     if (ret == -1 || WEXITSTATUS(ret) != 0)
         return;
 
     do {
-        snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -r node | /bin/grep /master/ | /usr/bin/head -n 1 > %s", SEARCH_FILE_1);
+        snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -r node | /bin/grep /master/ | /usr/bin/head -n 1 > %s", FILE_1);
         ret = system(cmd);
         if (ret == -1 || WEXITSTATUS(ret) != 0)
             break;
-        fp = fopen(SEARCH_FILE_1, "r");
+        fp = fopen(FILE_1, "r");
         if(fp == NULL)
             break;
         p = fgets(node, LEN_1024, fp);
@@ -73,22 +78,22 @@ read_search_record(struct module *mod)
             break;
         p = strrchr(node, '/');
         *p = 0;
-        snprintf(cmd, sizeof(cmd), "rm -rf %s", SEARCH_FILE_1);
+        snprintf(cmd, sizeof(cmd), "rm -rf %s", FILE_1);
         system(cmd);
-        snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n %s -m 'rt;qps;fail;empty;rank_rt;rank_qps;rank_to;rank_fail' -r metric -b -62 > %s", node, SEARCH_FILE_2);
+        snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n %s -m 'rt;qps;fail;empty;rank_rt;rank_qps;rank_to;rank_fail' -r metric -b -62 > %s", node, FILE_2);
         ret = system(cmd);
         if (ret == -1 || WEXITSTATUS(ret) != 0)
             break;
     } while(0);
 
     do {
-        snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n updated-adt_adgroup -m 'rt;qps' -r metric -b -62 >> %s", SEARCH_FILE_2);
+        snprintf(cmd, LEN_1024, "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n updated-adt_adgroup -m 'rt;qps' -r metric -b -62 >> %s", FILE_2);
         ret = system(cmd);
         if (ret == -1 || WEXITSTATUS(ret) != 0)
             break;
     } while(0);
 
-    fp = fopen(SEARCH_FILE_2, "r");
+    fp = fopen(FILE_2, "r");
     if(fp == NULL)
         return;
     memset(&search_stat, 0, sizeof(search_stat));
@@ -173,7 +178,7 @@ read_search_record(struct module *mod)
     }
     fclose(fp);
     fp = NULL;
-    sprintf(cmd, "rm -rf %s", SEARCH_FILE_2);
+    sprintf(cmd, "rm -rf %s", FILE_2);
     system(cmd);
 
     long long rt = (search_stat.rt_count > 0) ? (long long)search_stat.rt*100/search_stat.rt_count : 0;
