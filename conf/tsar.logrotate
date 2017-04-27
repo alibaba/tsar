@@ -7,7 +7,9 @@ nocompress
 nodateext
 notifempty
 prerotate
+/usr/bin/chattr -a /var/log/tsar.data
 endscript
 postrotate
+/usr/bin/chattr +a /var/log/tsar.data
 endscript
 }
