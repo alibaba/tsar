@@ -35,6 +35,9 @@ static struct mod_info merger_info[] = {
         {" tsnrt", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
         {"tsnqps", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
         {"tsnsuc", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
+        {" dnnrt", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
+        {"dnnqps", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
+        {"dnnsuc", SUMMARY_BIT, MERGE_SUM, STATS_NULL},
 };
 
 struct stats_merger {
@@ -76,6 +79,12 @@ struct stats_merger {
     int twins_sn_qps_count;
     double twins_sn_succ;
     int twins_sn_succ_count;
+    double dnn_rt;
+    int dnn_rt_count;
+    double dnn_qps;
+    int dnn_qps_count;
+    double dnn_succ;
+    int dnn_succ_count;
 };
 
 static struct stats_merger merger_stat;
@@ -113,7 +122,7 @@ read_merger_record(struct module *mod) {
     p = strrchr(node, '/');
     *p = 0;
     snprintf(cmd, LEN_1024,
-            "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n %s -m 'response_time;query;failure_result;empty_result;qr_succ_response_time;qr_query;qr_succ_query;uc_response_time;uc_query;uc_succ_query;kw_succ_response_time;kw_query;kw_succ_query;dn_succ_response_time;dn_query;dn_succ_query;kw_twins_succ_response_time;kw_twins_query;kw_twins_succ_query' -r metric -b -62 > %s",
+            "/usr/local/bin/amonitor q -a localhost:10086 -s kgb -n %s -m 'response_time;query;failure_result;empty_result;qr_succ_response_time;qr_query;qr_succ_query;uc_response_time;uc_query;uc_succ_query;kw_succ_response_time;kw_query;kw_succ_query;dn_succ_response_time;dn_query;dn_succ_query;kw_twins_succ_response_time;kw_twins_query;kw_twins_succ_query;dnn_succ_response_time;dnn_query;dnn_succ_query' -r metric -b -62 > %s",
             node,
             FILE_2);
     ret = system(cmd);
@@ -164,6 +173,12 @@ read_merger_record(struct module *mod) {
                 idx = 17;
             else if (!strncmp(p + 1, "kw_twins_succ_query", 19))
                 idx = 18;
+            else if (!strncmp(p + 1, "dnn_succ_response_time", 21))
+                idx = 19;
+            else if (!strncmp(p + 1, "dnn_query", 8))
+                idx = 20;
+            else if (!strncmp(p + 1, "dnn_succ_query", 13))
+                idx = 21;
         }
         else {
             if (idx == 0) {
@@ -261,6 +276,21 @@ read_merger_record(struct module *mod) {
                 merger_stat.twins_sn_succ += f;
                 merger_stat.twins_sn_succ_count++;
             }
+            else if (idx == 19) {
+                sscanf(line + 24, "%lf", &f);
+                merger_stat.dnn_rt += f;
+                merger_stat.dnn_rt_count++;
+            }
+            else if (idx == 20) {
+                sscanf(line + 24, "%lf", &f);
+                merger_stat.dnn_qps += f;
+                merger_stat.dnn_qps_count++;
+            }
+            else if (idx == 21) {
+                sscanf(line + 24, "%lf", &f);
+                merger_stat.dnn_succ += f;
+                merger_stat.dnn_succ_count++;
+            }
         }
     }
     fclose(fp);
@@ -275,10 +305,11 @@ read_merger_record(struct module *mod) {
         merger_stat.uc_succ_count != 0 && merger_stat.sn_rt_count != 0 && merger_stat.sn_qps_count != 0 &&
         merger_stat.sn_succ_count != 0 && merger_stat.dn_rt_count != 0 && merger_stat.dn_qps_count != 0 &&
         merger_stat.dn_succ_count != 0 && merger_stat.twins_sn_rt_count != 0 && merger_stat.twins_sn_qps_count != 0 &&
-        merger_stat.twins_sn_succ_count != 0) {
+        merger_stat.twins_sn_succ_count != 0 && merger_stat.dnn_rt_count != 0 && merger_stat.dnn_qps_count != 0 &&
+        merger_stat.dnn_succ_count != 0) {
         snprintf(buf,
                  LEN_1M,
-                 "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
+                 "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
                  (long long) merger_stat.rt * 100 / merger_stat.rt_count,
                  (long long) merger_stat.qps * 100 / merger_stat.qps_count,
                  (long long) merger_stat.fail * 100 / merger_stat.fail_count,
@@ -297,7 +328,10 @@ read_merger_record(struct module *mod) {
                  (long long) merger_stat.dn_succ * 100 / merger_stat.dn_succ_count,
                  (long long) merger_stat.twins_sn_rt * 100 / merger_stat.twins_sn_rt_count,
                  (long long) merger_stat.twins_sn_qps * 100 / merger_stat.twins_sn_qps_count,
-                 (long long) merger_stat.twins_sn_succ * 100 / merger_stat.twins_sn_succ_count);
+                 (long long) merger_stat.twins_sn_succ * 100 / merger_stat.twins_sn_succ_count,
+                 (long long) merger_stat.dnn_rt * 100 / merger_stat.dnn_rt_count,
+                 (long long) merger_stat.dnn_qps * 100 / merger_stat.dnn_qps_count,
+                 (long long) merger_stat.dnn_succ * 100 / merger_stat.dnn_succ_count);
         set_mod_record(mod, buf);
     }
 }
@@ -306,7 +340,7 @@ static void
 set_merger_record(struct module *mod, double st_array[],
                   U_64 pre_array[], U_64 cur_array[], int inter) {
     int i = 0;
-    for (; i < 19; ++i)
+    for (; i < 22; ++i)
         st_array[i] = cur_array[i] * 1.0 / 100;
 }
 
@@ -316,7 +350,7 @@ mod_register(struct module *mod) {
                         "--merger",
                         merger_usage,
                         merger_info,
-                        19,
+                        22,
                         read_merger_record,
                         set_merger_record);
 }
