@@ -104,7 +104,7 @@ enum {
     HIDE_BIT,
     DETAIL_BIT,
     SUMMARY_BIT,
-    SPEC_BIT
+    SPEC_BIT,
     HIDE_BIT_LLU, /*with _LLU , the data will be printed as %6llu,*/
     DETAIL_BIT_LLU, /*with _LLU , the data will be printed as %6llu,*/
     SUMMARY_BIT_LLU, /*with _LLU , the data will be printed as %6llu,*/
