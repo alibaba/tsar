@@ -58,7 +58,7 @@ load_modules()
     sprintf(buff, "/usr/local/tsar/modules");
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->lib) {
             memset(mod_path, '\0', LEN_128);
             snprintf(mod_path, LEN_128, "%s/%s.so", buff, mod->name);
@@ -102,7 +102,7 @@ reload_modules(const char *s_mod)
     strncpy(buf, s_mod, strlen(s_mod) + 1);
 
     for (i = 0; i < statis.total_mod_num; i++)
-        mods[i].enable = 0;
+        mods[i]->enable = 0;
 
     token = strtok(buf, DATA_SPLIT);
     while (token != NULL) {
@@ -116,13 +116,13 @@ reload_modules(const char *s_mod)
         }
 
         for (i = 0; i < statis.total_mod_num; i++) {
-            if (strcmp(name, mods[i].name) == 0
-                    || strcmp(name, mods[i].opt_line) == 0) {
+            if (strcmp(name, mods[i]->name) == 0
+                    || strcmp(name, mods[i]->opt_line) == 0) {
                 reload = 1;
-                mods[i].enable = 1;
+                mods[i]->enable = 1;
 
                 if (param != NULL) {
-                    strncpy(mods[i].parameter, param, strlen(param) + 1);
+                    strncpy(mods[i]->parameter, param, strlen(param) + 1);
                 }
 
                 break;
@@ -146,7 +146,7 @@ reload_check_modules()
     struct module *mod;
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!strcmp(mod->name, "mod_apache")
              || !strcmp(mod->name, "mod_cpu")
              || !strcmp(mod->name, "mod_mem")
@@ -179,7 +179,7 @@ init_module_fields()
     struct module *mod = NULL;
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
         }
@@ -317,7 +317,7 @@ collect_record()
     struct module *mod = NULL;
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
         }
@@ -343,7 +343,7 @@ collect_record_stat()
     struct module *mod = NULL;
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
         }
@@ -361,23 +361,22 @@ collect_record_stat()
             }
 
             mod->n_item = n_item;
-            /* multiply item because of have ITEM_SPLIT */
-            if (strstr(mod->record, ITEM_SPLIT)) {
+            /* multiple item because of having ITEM_SPLIT */
+            if (strpbrk(mod->record, ITEM_SPLIT)) {
                 /* merge items */
                 if (MERGE_ITEM == conf.print_merge) {
                     mod->n_item = 1;
                     ret = merge_mult_item_to_array(mod->cur_array, mod);
 
                 } else {
-                    char item[LEN_1M] = {0};
+                    char *item;
                     int num = 0;
                     int pos = 0;
 
-                    while (strtok_next_item(item, mod->record, &pos)) {
-                        if (!(ret=convert_record_to_array(&mod->cur_array[num * mod->n_col], mod->n_col, item))) {
+                    while ((item = strtok_next_item(mod->record, &pos)) != NULL) {
+                        if ((ret=convert_record_to_array(&mod->cur_array[num * mod->n_col], mod->n_col, item)) < mod->n_col) {
                             break;
                         }
-                        memset(item, 0, sizeof(item));
                         num++;
                     }
                 }
@@ -421,7 +420,7 @@ free_modules()
     struct module *mod;
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (mod->lib) {
             dlclose(mod->lib);
         }
@@ -443,14 +442,15 @@ free_modules()
             mod->mean_array = NULL;
             mod->min_array = NULL;
         }
+	free(mod);
     }
 }
 
 
 /*
- * read line from file to mod->record
+ * read line from file to mod->record and return timestamp
  */
-void
+time_t
 read_line_to_module_record(char *line)
 {
     int    i;
@@ -460,7 +460,7 @@ read_line_to_module_record(char *line)
 
     line[strlen(line) - 1] = '\0';
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (mod->enable) {
             sprintf(mod_opt, "%s%s%s", SECTION_SPLIT, mod->opt_line, STRING_SPLIT);
             memset(mod->record, 0, sizeof(mod->record));
@@ -470,8 +470,8 @@ read_line_to_module_record(char *line)
                 continue;
             }
 
-            s_token += sizeof(SECTION_SPLIT) + strlen(mod->opt_line) + sizeof(STRING_SPLIT) - 2;
-            e_token = strstr(s_token, SECTION_SPLIT);
+            s_token += strlen(mod->opt_line) + 2;
+            e_token = strpbrk(s_token, SECTION_SPLIT);
 
             if (e_token) {
                 memcpy(mod->record, s_token, e_token - s_token);
@@ -481,6 +481,7 @@ read_line_to_module_record(char *line)
             }
         }
     }
+    return atol(line);
 }
 
 
@@ -496,7 +497,7 @@ disable_col_zero()
     struct mod_info *info;
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
         }

@@ -35,7 +35,7 @@ adjust_print_opt_line(char *n_opt_line, const char *opt_line, int hdr_len)
         memset(pad, '-', pad_len);
         strcat(n_opt_line, pad);
         strcat(n_opt_line, opt_line);
-        memset(&pad, '-', hdr_len - pad_len - strlen(opt_line));
+        memset(pad, '-', hdr_len - pad_len - strlen(opt_line));
         strcat(n_opt_line, pad);
 
     } else {
@@ -54,7 +54,7 @@ print_header()
     char   header[LEN_1M] = {0};
     char   opt_line[LEN_1M] = {0};
     char   hdr_line[LEN_1M] = {0};
-    char   opt[LEN_128] = {0};
+    char   opt[LEN_256] = {0};
     char   n_opt[LEN_256] = {0};
     char   mod_hdr[LEN_256] = {0};
     char  *token, *s_token, *n_record;
@@ -70,7 +70,7 @@ print_header()
     }
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
         }
@@ -79,14 +79,14 @@ print_header()
         memset(mod_hdr, 0, sizeof(mod_hdr));
         get_mod_hdr(mod_hdr, mod);
 
-        if (strstr(mod->record, ITEM_SPLIT) && MERGE_NOT == conf.print_merge) {
+        if (strpbrk(mod->record, ITEM_SPLIT) && MERGE_NOT == conf.print_merge) {
             n_record = strdup(mod->record);
             /* set print opt line */
             token = strtok(n_record, ITEM_SPLIT);
             int count = 0;
             mod->p_item = -1;
             while (token) {
-                s_token = strstr(token, ITEM_SPSTART);
+                s_token = strpbrk(token, ITEM_SPSTART);
                 if (s_token) {
                     memset(opt, 0, sizeof(opt));
                     memset(n_opt, 0, sizeof(n_opt));
@@ -138,13 +138,10 @@ printf_result(double result)
 
     } else if ( (1000 - result / 1024) > 0.1) {
         printf("%5.1f%s", result / 1024, "K");
-
     } else if ((1000 - result / 1024 / 1024) > 0.1) {
         printf("%5.1f%s", result / 1024 / 1024, "M");
-
     } else if ((1000 - result / 1024 / 1024 / 1024) > 0.1) {
         printf("%5.1f%s", result / 1024 / 1024 / 1024, "G");
-
     } else if ((1000 - result / 1024 / 1024 / 1024 / 1024) > 0.1) {
         printf("%5.1f%s", result / 1024 / 1024 / 1024 / 1024, "T");
     }
@@ -230,7 +227,7 @@ print_record()
 
     /* print summary data */
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
         }
@@ -405,7 +402,7 @@ find_offset_from_start(FILE *fp, int number)
             do_debug(LOG_FATAL, "fgets error: maybe %s has not enough data", conf.output_file_path);
         }
         if (0 != line[0] && offset > line_len) {
-            p_sec_token = strstr(line, SECTION_SPLIT);
+            p_sec_token = strpbrk(line, SECTION_SPLIT);
             if (p_sec_token) {
                 *p_sec_token = '\0';
                 t_get = atol(line);
@@ -470,7 +467,7 @@ set_record_time(const char *line)
     static long  pre_time, c_time = 0;
 
     /* get record time */
-    token = strstr(line, SECTION_SPLIT);
+    token = strpbrk(line, SECTION_SPLIT);
     memcpy(s_time, line, token - line);
 
     /* swap time */
@@ -499,9 +496,9 @@ check_time(const char *line)
     static long pre_time;
 
     /* get record time */
-    token = strstr(line, SECTION_SPLIT);
+    token = strpbrk(line, SECTION_SPLIT);
     if ((token - line) < 32) {
-	    memcpy(s_time, line, token - line);
+        memcpy(s_time, line, token - line);
     }
     now_time = atol(s_time);
 
@@ -560,7 +557,7 @@ print_tail(int tail_type)
 
     /* print summary data */
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
         }
@@ -811,20 +808,51 @@ trim(char* src, int max_len)
     return index;
 }
 
+int
+seek_tail_lines(FILE *fp, int n, int len[])
+{
+    int total_num = 0;
+
+    /* find two \n from end*/
+    if (fseek(fp, -1, SEEK_END) != 0) {
+        do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
+    }
+    while (1) {
+        if (fgetc(fp) == '\n') {
+            ++total_num;
+            len[n - total_num] = 0;
+        } else {
+            ++len[n - total_num];
+        }
+        if (total_num > n) {
+            break;
+        }
+        if (fseek(fp, -2, SEEK_CUR) != 0) {
+            /* goto file head */
+            if (fseek(fp, 0, SEEK_SET) != 0) {
+                do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
+            }
+            break;
+        }
+    }
+
+    return total_num;
+}
+
 void
 running_check(int check_type)
 {
-    int               total_num=0, i, j, k;
+    int               total_num, len[2] = {0}, i, j, k;
     FILE             *fp;
     char              filename[LEN_128] = {0};
     char              tmp[10][LEN_4096];
     char              host_name[LEN_64] = {0};
     struct            module *mod = NULL;
     struct            stat statbuf;
-    time_t            nowtime;
+    time_t            nowtime, ts[2] = {0};
     double           *st_array;
-    static char       line[2][LEN_10M];
-    static char       check[LEN_10M] = {0};
+    char             *line[2];
+    static char       check[LEN_4096 * 11] = {0};
 
     /* get hostname */
     if (0 != gethostname(host_name, sizeof(host_name))) {
@@ -837,8 +865,6 @@ running_check(int check_type)
             break;
         }
     }
-    memset(tmp, 0, 10 * LEN_4096);
-    sprintf(check, "%s\ttsar\t", host_name);
     sprintf(filename, "%s", conf.output_file_path);
     fp = fopen(filename, "r");
     if (!fp) {
@@ -850,75 +876,35 @@ running_check(int check_type)
     if (nowtime - statbuf.st_mtime > 300) {
         do_debug(LOG_FATAL, "/var/log/tsar.data is far away from now, now time is %d, last time is %d", nowtime, statbuf.st_mtime);
     }
-    /* get file len */
-    memset(&line[0], 0, LEN_10M);
-    total_num =0;
-    /* find two \n from end*/
-    if (fseek(fp, -1, SEEK_END) != 0) {
-        do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
-    }
-    while (1) {
-        if (fgetc(fp) == '\n') {
-            ++total_num;
-        }
-        if (total_num == 3) {
-            break;
-        }
-        if (fseek(fp, -2, SEEK_CUR) != 0) {
-            /* just 1 or 2 line, goto file header */
-            if (fseek(fp, 0, SEEK_SET) != 0) {
-                do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
-            }
-            break;
-        }
-    }
     /*FIX ME*/
+    total_num = seek_tail_lines(fp, 2, len);
     if (total_num == 0) {
         if (fclose(fp) < 0) {
             do_debug(LOG_FATAL, "fclose error:%s", strerror(errno));
         }
-        memset(filename, 0, sizeof(filename));
         sprintf(filename, "%s.1", conf.output_file_path);
         fp = fopen(filename, "r");
         if (!fp) {
             do_debug(LOG_FATAL, "unable to open the log file %s.\n", filename);
         }
-        total_num = 0;
-        memset(&line[0], 0, 2 * LEN_10M);
         /* count tsar.data.1 lines */
-        if (fseek(fp, -1, SEEK_END) != 0) {
-            do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
-        }
-        while (1) {
-            if (fgetc(fp) == '\n') {
-                ++total_num;
-            }
-            if (total_num == 3) {
-                break;
-            }
-            if (fseek(fp, -2, SEEK_CUR) != 0) {
-                if (fseek(fp, 0, SEEK_SET) != 0) {
-                    do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
-                }
-                break;
-            }
-        }
+        total_num = seek_tail_lines(fp, 2, len);
         if (total_num < 2) {
             do_debug(LOG_FATAL, "not enough lines at log file %s.\n", filename);
         }
 
-        memset(&line[0], 0, LEN_10M);
-        if (!fgets(line[0], LEN_10M, fp)) {
+        line[0] = malloc(len[0] + 2);
+        if (!fgets(line[0], len[0] + 2, fp)) {
             do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
         }
-        memset(&line[1], 0, LEN_10M);
-        if (!fgets(line[1], LEN_10M, fp)) {
+        line[1] = malloc(len[1] + 2);
+        if (!fgets(line[1], len[1] + 2, fp)) {
             do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
         }
 
     } else if (total_num == 1) {
-        memset(&line[1], 0, LEN_10M);
-        if (!fgets(line[1], LEN_10M, fp)) {
+        line[1] = malloc(len[1] + 2);
+        if (!fgets(line[1], len[1] + 2, fp)) {
             do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
         }
         if (fclose(fp) < 0) {
@@ -929,42 +915,24 @@ running_check(int check_type)
         if (!fp) {
             do_debug(LOG_FATAL, "unable to open the log file %s\n", filename);
         }
-        total_num = 0;
         /* go to the start of the last line at tsar.data.1 */
-        if (fseek(fp, -1, SEEK_END) != 0) {
-            do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
-        }
-        while (1) {
-            if (fgetc(fp) == '\n') {
-                ++total_num;
-            }
-            /* find the sencond \n from the end, read fp point to the last line */
-            if (total_num == 2) {
-                break;
-            }
-            if (fseek(fp, -2, SEEK_CUR) != 0) {
-                if (fseek(fp, 0, SEEK_SET) != 0) {
-                    do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
-                }
-                break;
-            }
-        }
+        total_num = seek_tail_lines(fp, 1, len);
 
         if (total_num < 1) {
             do_debug(LOG_FATAL, "not enough lines at log file %s\n", filename);
         }
-        memset(&line[0], 0, LEN_10M);
-        if (!fgets(line[0], LEN_10M, fp)) {
+        line[0] = malloc(len[0] + 2);
+        if (!fgets(line[0], len[0] + 2, fp)) {
             do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
         }
 
     } else {
-        memset(&line[0], 0, LEN_10M);
-        if (!fgets(line[0], LEN_10M, fp)) {
+        line[0] = malloc(len[0] + 2);
+        if (!fgets(line[0], len[0] + 2, fp)) {
             do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
         }
-        memset(&line[1], 0, LEN_10M);
-        if (!fgets(line[1], LEN_10M, fp)) {
+        line[1] = malloc(len[1] + 2);
+        if (!fgets(line[1], len[1] + 2, fp)) {
             do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
         }
     }
@@ -979,17 +947,27 @@ running_check(int check_type)
     init_module_fields();
 
     /* read one line to init module parameter */
-    read_line_to_module_record(line[0]);
+    ts[0] = read_line_to_module_record(line[0]);
+    free(line[0]);
     collect_record_stat();
 
-    read_line_to_module_record(line[1]);
+    ts[1] = read_line_to_module_record(line[1]);
+    free(line[1]);
+    if (ts[0] && ts[1]) {
+        conf.print_interval = ts[1] - ts[0];
+        if (conf.print_interval == 0) {
+            do_debug(LOG_FATAL, "running tsar -c too frequently");
+            return;
+        }
+    }
     collect_record_stat();
+
     /*display check detail*/
     /* ---------------------------RUN_CHECK_NEW--------------------------------------- */
     if (check_type == RUN_CHECK_NEW) {
         printf("%s\ttsar\t", host_name);
         for (i = 0; i < statis.total_mod_num; i++) {
-            mod = &mods[i];
+            mod = mods[i];
             if (!mod->enable) {
                 continue;
             }
@@ -1008,7 +986,7 @@ running_check(int check_type)
             for (j = 0; j < mod->n_item; j++) {
                 memset(opt, 0, sizeof(opt));
                 if (token) {
-                    s_token = strstr(token, ITEM_SPSTART);
+                    s_token = strpbrk(token, ITEM_SPSTART);
                     if (s_token) {
                         strncat(opt, token, s_token - token);
                         strcat(opt, ":");
@@ -1070,8 +1048,10 @@ running_check(int check_type)
      */
     /* ------------------------------RUN_CHECK------------------------------------------- */
     if (check_type == RUN_CHECK) {
+        //memset(tmp, 0, 10 * LEN_4096);
+        sprintf(check, "%s\ttsar\t", host_name);
         for (i = 0; i < statis.total_mod_num; i++) {
-            mod = &mods[i];
+            mod = mods[i];
             if (!mod->enable){
                 continue;
             }
@@ -1126,7 +1106,7 @@ running_check(int check_type)
                 char   *token = strtok(n_record, ITEM_SPLIT);
                 char   *s_token;
                 for (j = 0; j < mod->n_item; j++) {
-                    s_token = strstr(token, ITEM_SPSTART);
+                    s_token = strpbrk(token, ITEM_SPSTART);
                     if (s_token) {
                         memset(opt, 0, sizeof(opt));
                         strncat(opt, token, s_token - token);
@@ -1175,7 +1155,7 @@ running_check(int check_type)
                 char   *token = strtok(n_record, ITEM_SPLIT);
                 char   *s_token;
                 for (j = 0; j < mod->n_item; j++) {
-                    s_token = strstr(token, ITEM_SPSTART);
+                    s_token = strpbrk(token, ITEM_SPSTART);
                     if (s_token) {
                         memset(opt, 0, sizeof(opt));
                         strncat(opt, token, s_token - token);
@@ -1206,8 +1186,8 @@ running_check(int check_type)
                     }
                 }
             }
-	    if (!strcmp(mod->name, "mod_swap")) {
-	        for (j = 0; j < mod->n_item; j++) {
+            if (!strcmp(mod->name, "mod_swap")) {
+                for (j = 0; j < mod->n_item; j++) {
                     st_array = &mod->st_array[j * mod->n_col];
                     if (!st_array || !mod->st_flag) {
                         sprintf(tmp[9], " swap/total=- swap/util=-");
@@ -1216,7 +1196,7 @@ running_check(int check_type)
                         sprintf(tmp[9], " swap/total=%0.2f swap/util=%0.2f%%", st_array[2] / 1024 / 1024, st_array[3]);
                     }
                 }
-	    }
+            }
         }
         for (j = 0; j < 10; j++) {
             strcat(check, tmp[j]);
