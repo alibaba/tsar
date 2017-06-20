@@ -30,17 +30,16 @@ output_file()
     struct      module *mod;
     static char line[LEN_10M] = {0};
 
-    if (!(fp = fopen(conf.output_file_path, "a+"))) {
-        if (!(fp = fopen(conf.output_file_path, "w"))) {
-            do_debug(LOG_FATAL, "output_file: can't create data file = %s  err=%d\n", conf.output_file_path, errno);
-        }
+    if (!(fp = fopen(conf.output_file_path, "a"))) {
+        do_debug(LOG_FATAL, "output_file: can't open or create data file = %s  err=%d\n", conf.output_file_path, errno);
     }
+    setbuf(fp, NULL);
 
     sprintf(s_time, "%ld", statis.cur_time);
     strcat(line, s_time);
 
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (mod->enable && strlen(mod->record)) {
             /* save collect data to output_file */
             n = snprintf(detail, LEN_1M, "%s%s%s%s", SECTION_SPLIT, mod->opt_line, STRING_SPLIT, mod->record);

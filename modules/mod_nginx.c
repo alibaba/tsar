@@ -18,6 +18,9 @@ struct stats_nginx {
     unsigned long long nssl;        /* ssl requests */
     unsigned long long nsslhst;     /* ssl handshake time*/
     unsigned long long nsslhsc;     /* ssl handshake count*/
+    unsigned long long nsslf;       /* ssl failed request */
+    unsigned long long nsslv3f;     /* sslv3 failed request */
+    unsigned long long nhttp2;      /* http2 requests */
 };
 
 struct hostinfo {
@@ -43,6 +46,9 @@ static struct mod_info nginx_info[] = {
     {"spdyps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
     {"sslhst", SUMMARY_BIT, 0,  STATS_NULL},
     {"sslhsc", HIDE_BIT,    0,  STATS_NULL},
+    {"  sslf", SUMMARY_BIT, 0,  STATS_SUB_INTER},
+    {"sslv3f", SUMMARY_BIT, 0,  STATS_SUB_INTER},
+    {" h2qps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
 };
 
 
@@ -82,15 +88,23 @@ set_nginx_record(struct module *mod, double st_array[],
             st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
         } else {
             st_array[i] = 0;
-        } 
+        }
     }
- 
+
     if (cur_array[11] >= pre_array[11]) {
         if (cur_array[12] > pre_array[12]) {
             /*sslhst= ( nsslhstB-nsslhstA)/(nsslhscB - nsslhscA)*/
             st_array[11] = (cur_array[11] - pre_array[11]) * 1.0 / (cur_array[12] - pre_array[12]);
         } else {
             st_array[11] = 0;
+        }
+    }
+
+    for (i = 13; i < 16;  i++){
+        if (cur_array[i] >= pre_array[i]) {
+            st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
+        } else {
+            st_array[i] = 0;
         }
     }
 }
@@ -124,9 +138,11 @@ read_nginx_stats(struct module *mod, char *parameter)
     char                buf[LEN_4096], request[LEN_4096], line[LEN_4096];
     FILE               *stream = NULL;
 
+    struct timeval      timeout;
+    struct hostinfo     hinfo;
     struct sockaddr_in  servaddr;
     struct sockaddr_un  servaddr_un;
-    struct hostinfo     hinfo;
+
 
     init_nginx_host_info(&hinfo);
     if (atoi(parameter) != 0) {
@@ -153,7 +169,6 @@ read_nginx_stats(struct module *mod, char *parameter)
         inet_pton(AF_INET, hinfo.host, &servaddr.sin_addr);
     }
 
-
     if ((sockfd = socket(domain, SOCK_STREAM, 0)) == -1) {
         goto writebuf;
     }
@@ -170,6 +185,11 @@ read_nginx_stats(struct module *mod, char *parameter)
         goto writebuf;
     }
 
+    timeout.tv_sec = 10;
+    timeout.tv_usec = 0;
+    setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(struct timeval));
+    setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval));
+
     if ((send = write(sockfd, request, strlen(request))) == -1) {
         goto writebuf;
     }
@@ -182,7 +202,7 @@ read_nginx_stats(struct module *mod, char *parameter)
         if (!strncmp(line, "Active connections:", sizeof("Active connections:") - 1)) {
             sscanf(line + sizeof("Active connections:"), "%llu", &st_nginx.nactive);
             write_flag = 1;
-        } else if (!strncmp(line, 
+        } else if (!strncmp(line,
                             "server accepts handled requests request_time",
                             sizeof("server accepts handled requests request_time") - 1)
                   ) {
@@ -192,9 +212,9 @@ read_nginx_stats(struct module *mod, char *parameter)
                     sscanf(line + 1, "%llu %llu %llu %llu",
                              &st_nginx.naccept, &st_nginx.nhandled, &st_nginx.nrequest, &st_nginx.nrstime);
                     write_flag = 1;
-                }    
-            }  
-        } else if (!strncmp(line, 
+                }
+            }
+        } else if (!strncmp(line,
                             "server accepts handled requests",
                             sizeof("server accepts handled requests") - 1)
                   ) {
@@ -204,8 +224,8 @@ read_nginx_stats(struct module *mod, char *parameter)
                     sscanf(line + 1, "%llu %llu %llu",
                              &st_nginx.naccept, &st_nginx.nhandled, &st_nginx.nrequest);
                     write_flag = 1;
-                }    
-            }  
+                }
+            }
         } else if (!strncmp(line, "Server accepts:", sizeof("Server accepts:") - 1)) {
             sscanf(line , "Server accepts: %llu handled: %llu requests: %llu request_time: %llu",
                     &st_nginx.naccept, &st_nginx.nhandled, &st_nginx.nrequest, &st_nginx.nrstime);
@@ -218,6 +238,18 @@ read_nginx_stats(struct module *mod, char *parameter)
         } else if (!strncmp(line, "SSL:", sizeof("SSL:") - 1)) {
             sscanf(line, "SSL: %llu SPDY: %llu",
                     &st_nginx.nssl, &st_nginx.nspdy);
+            write_flag = 1;
+        } else if (!strncmp(line, "HTTP2:", sizeof("HTTP2:") - 1)) {
+            sscanf(line, "HTTP2: %llu",
+                    &st_nginx.nhttp2);
+            write_flag = 1;
+        } else if (!strncmp(line, "SSL_failed:", sizeof("SSL_failed:") - 1)) {
+            sscanf(line, "SSL_failed: %llu",
+                    &st_nginx.nsslf);
+            write_flag = 1;
+        } else if (!strncmp(line, "SSLv3_failed:", sizeof("SSLv3_failed:") - 1)) {
+            sscanf(line, "SSLv3_failed: %llu",
+                    &st_nginx.nsslv3f);
             write_flag = 1;
         } else if (!strncmp(line, "SSL_Requests:", sizeof("SSL_Requests:") - 1)) {
             sscanf(line, "SSL_Requests: %llu SSL_Handshake: %llu SSL_Handshake_Time: %llu",
@@ -241,7 +273,7 @@ writebuf:
     }
 
     if (write_flag) {
-        pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
+        pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%lld",
                 st_nginx.naccept,
                 st_nginx.nhandled,
                 st_nginx.nrequest,
@@ -254,7 +286,10 @@ writebuf:
                 st_nginx.nssl,
                 st_nginx.nspdy,
                 st_nginx.nsslhst,
-                st_nginx.nsslhsc
+                st_nginx.nsslhsc,
+                st_nginx.nsslf,
+                st_nginx.nsslv3f,
+                st_nginx.nhttp2
                  );
         buf[pos] = '\0';
         set_mod_record(mod, buf);
@@ -264,5 +299,5 @@ writebuf:
 void
 mod_register(struct module *mod)
 {
-    register_mod_fields(mod, "--nginx", nginx_usage, nginx_info, 13, read_nginx_stats, set_nginx_record);
+    register_mod_fields(mod, "--nginx", nginx_usage, nginx_info, 16, read_nginx_stats, set_nginx_record);
 }
