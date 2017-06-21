@@ -285,7 +285,7 @@ process_input_line(char *config_input_line, int len, const char *file_name)
     }
     
 final:
-    memset(config_input_line, '\0', LEN_1024);
+    memset(config_input_line, '\0', len);
 }
 
 void
