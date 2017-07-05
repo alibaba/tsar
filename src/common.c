@@ -68,7 +68,7 @@ merge_one_string(U_64 *array, int l_array, char *string, struct module *mod, int
     U_64   array_2[MAX_COL_NUM] = {0};
     struct mod_info *info = mod->info;
 
-    if ((len = convert_record_to_array(array_2, l_array, string)) < l_array) {
+    if ((len = convert_record_to_array(array_2, l_array, string)) <= 0) {
         return 0;
     }
 

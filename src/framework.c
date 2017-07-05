@@ -374,7 +374,7 @@ collect_record_stat()
                     int pos = 0;
 
                     while ((item = strtok_next_item(mod->record, &pos)) != NULL) {
-                        if ((ret=convert_record_to_array(&mod->cur_array[num * mod->n_col], mod->n_col, item)) < mod->n_col) {
+                        if ((ret=convert_record_to_array(&mod->cur_array[num * mod->n_col], mod->n_col, item)) <= 0) {
                             break;
                         }
                         num++;
