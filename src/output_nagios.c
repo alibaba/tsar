@@ -66,7 +66,7 @@ output_nagios()
 
     /* print summary data */
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (!mod->enable) {
             continue;
 
@@ -90,7 +90,7 @@ output_nagios()
                     memset(check, 0, sizeof(check));
                     strcat(check, mod->name + 4);
                     strcat(check, ".");
-                    s_token = strstr(token, ITEM_SPSTART);
+                    s_token = strpbrk(token, ITEM_SPSTART);
                     /* multi item */
                     if (s_token){
                         memset(opt, 0, sizeof(opt));

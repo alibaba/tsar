@@ -42,30 +42,21 @@ is_digit(const char *str)
 int
 convert_record_to_array(U_64 *array, int l_array, const char *record)
 {
-    int     i = 0;
-    char   *token;
-    char    n_str[LEN_1M] = {0};
+    int   i = 0;
+    char *ptr;
+    U_64  num;
 
-    if (!record || !strlen(record)) {
+    if (l_array <= 0 || !record || !strlen(record)) {
         return 0;
     }
-    memcpy(n_str, record, strlen(record));
 
-    token = strtok(n_str, DATA_SPLIT);
-    while (token) {
-        if (!is_digit(token)) {
-            return 0;
-        }
-        if (i < l_array) {
-            *(array + i) = strtoull(token, NULL, 10);
-        }
-        token = strtok(NULL, DATA_SPLIT);
-        i++;
-    }
-    /* support add col*/
-    if (i > l_array) {
-        return 0;
-    }
+    do {
+        num = strtoull(record, &ptr, 10);
+        array[i++] = num;
+        if (strpbrk(ptr, DATA_SPLIT) == NULL) break;
+        record = ptr + 1;
+    } while(i < l_array);
+
     return i;
 }
 
@@ -77,7 +68,7 @@ merge_one_string(U_64 *array, int l_array, char *string, struct module *mod, int
     U_64   array_2[MAX_COL_NUM] = {0};
     struct mod_info *info = mod->info;
 
-    if (!(len = convert_record_to_array(array_2, l_array, string))) {
+    if ((len = convert_record_to_array(array_2, l_array, string)) <= 0) {
         return 0;
     }
 
@@ -97,31 +88,30 @@ merge_one_string(U_64 *array, int l_array, char *string, struct module *mod, int
 }
 
 
-int
-strtok_next_item(char item[], char *record, int *start)
+char*
+strtok_next_item(char *record, int *start)
 {
     char *s_token, *e_token, *n_record;
 
     if (!record || !strlen(record) || strlen(record) <= *start) {
-        return 0;
+        return NULL;
     }
 
     n_record = record + *start;
-    e_token = strstr(n_record, ITEM_SPLIT);
+    e_token = strpbrk(n_record, ITEM_SPLIT);
     if (!e_token) {
-        return 0;
+        return NULL;
     }
-    s_token = strstr(n_record, ITEM_SPSTART);
+    s_token = strpbrk(n_record, ITEM_SPSTART);
     if (!s_token) {
-        return 0;
+        return NULL;
     }
     if (e_token < s_token) {
-        return 0;
+        return NULL;
     }
 
-    memcpy(item, s_token + sizeof(ITEM_SPSTART) - 1, e_token - s_token - 1);
-    *start = e_token - record + sizeof(ITEM_SPLIT);
-    return 1;
+    *start = e_token - record + 2;
+    return s_token + 1;
 }
 
 
@@ -130,15 +120,14 @@ merge_mult_item_to_array(U_64 *array, struct module *mod)
 {
     int    pos = 0;
     int    n_item = 1;
-    char   item[LEN_1M] = {0};
+    char  *item;
 
     memset(array, 0, sizeof(U_64) * mod->n_col);
-    while (strtok_next_item(item, mod->record, &pos)) {
+    while ((item = strtok_next_item(mod->record, &pos)) != NULL) {
         if (!merge_one_string(array, mod->n_col, item, mod, n_item)) {
             return 0;
         }
         n_item++;
-        memset(&item, 0, sizeof(item));
     }
     return 1;
 }
@@ -222,7 +211,7 @@ get_st_array_from_file(int have_collect)
 
     sprintf(line, "%ld", statis.cur_time);
     for (i = 0; i < statis.total_mod_num; i++) {
-        mod = &mods[i];
+        mod = mods[i];
         if (mod->enable && strlen(mod->record)) {
             memset(&detail, 0, sizeof(detail));
             /* save collect data to output_file */
@@ -254,7 +243,7 @@ get_st_array_from_file(int have_collect)
     }
 
     /* set print_interval */
-    s_token = strstr(pre_line, SECTION_SPLIT);
+    s_token = strpbrk(pre_line, SECTION_SPLIT);
     if (!s_token) {
         ret = -1;
         goto out;

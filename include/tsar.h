@@ -58,7 +58,7 @@ struct statistic {
 
 
 extern struct configure conf;
-extern struct module    mods[MAX_MOD_NUM];
+extern struct module    *mods[MAX_MOD_NUM];
 extern struct statistic statis;
 extern lua_State *L;
 

@@ -28,10 +28,15 @@ parse_mod(const char *mod_name)
     struct  module *mod;
     char   *token;
 
+    token = strtok(NULL, W_SPACE);
+    if (token && strcasecmp(token, "on") && strcasecmp(token, "enable")) {
+        return;
+    }
+
     /* check if the mod load already */
     for ( i = 0; i < statis.total_mod_num; i++ )
     {
-        mod = &mods[i];
+        mod = mods[i];
         if (!strcmp(mod->name, mod_name)) {
             return;
         }
@@ -40,35 +45,35 @@ parse_mod(const char *mod_name)
         do_debug(LOG_ERR, "Max mod number is %d ignore mod %s\n", MAX_MOD_NUM, mod_name);
         return;
     }
-    mod = &mods[statis.total_mod_num++];
-    token = strtok(NULL, W_SPACE);
-    if (token && (!strcasecmp(token, "on") || !strcasecmp(token, "enable"))) {
-        strncpy(mod->name, mod_name, strlen(mod_name));
-        token = strtok(NULL, W_SPACE);
-        if (token) {
-            i = strlen(token);
-            if (i < LEN_256) {
-                strncpy(mod->parameter, token, i);
-            } else {
-                i = 0;
-            }
-
-        }
-        /*if exist more parameters, add them */
-        while((token = strtok(NULL, W_SPACE)) != NULL){
-            j = strlen(token);
-            if ((j + i) >= LEN_256) {
-                break;
-            }
-            mod->parameter[i++] = ' ';
-            strncpy(mod->parameter + i, token, j);
-            i += j;
-        }
-        mod->parameter[i] = '\0';
-    } else {
-        memset(mod, 0, sizeof(struct module));
-        statis.total_mod_num--;
+    mod = mods[statis.total_mod_num++] = malloc(sizeof(struct module));
+    if (mod == NULL) {
+        do_debug(LOG_ERR, "Failed to alloc memory for mod %s\n", mod_name);
+        return;
     }
+    memset(mod, '\0', sizeof(struct module));
+
+    strncpy(mod->name, mod_name, strlen(mod_name));
+    token = strtok(NULL, W_SPACE);
+    if (token) {
+        i = strlen(token);
+        if (i < LEN_256) {
+            strncpy(mod->parameter, token, i);
+        } else {
+            i = 0;
+        }
+
+    }
+    /*if exist more parameters, add them */
+    while((token = strtok(NULL, W_SPACE)) != NULL){
+        j = strlen(token);
+        if (i + j + 1 >= LEN_256) {
+            break;
+        }
+        mod->parameter[i++] = ' ';
+        strncpy(mod->parameter + i, token, j);
+        i += j;
+    }
+    mod->parameter[i] = '\0';
 }
 
 void
@@ -82,7 +87,7 @@ special_mod(const char *spec_mod)
     sprintf(mod_name, "mod_%s", spec_mod + 5);
     for ( i = 0; i < statis.total_mod_num; i++ )
     {
-        mod = &mods[i];
+        mod = mods[i];
         if (!strcmp(mod->name, mod_name)) {
             /* set special field */
             load_modules();
@@ -286,7 +291,7 @@ process_input_line(char *config_input_line, int len, const char *file_name)
     }
 
 final:
-    memset(config_input_line, '\0', LEN_1024);
+    memset(config_input_line, '\0', len);
 }
 
 void
@@ -299,7 +304,6 @@ parse_config_file(const char *file_name)
         do_debug(LOG_FATAL, "Unable to open configuration file: %s", file_name);
     }
 
-    memset(&mods, '\0', sizeof(mods));
     memset(&conf, '\0', sizeof(conf));
     memset(&statis, '\0', sizeof(statis));
     conf.debug_level = LOG_ERR;
@@ -413,7 +417,7 @@ set_special_field(const char *s)
 
     for (i = 0; i < statis.total_mod_num; i++)
     {
-        mod = &mods[i];
+        mod = mods[i];
         struct mod_info *info = mod->info;
         for (j=0; j < mod->n_col; j++) {
             char *p = info[j].hdr;
@@ -436,7 +440,7 @@ set_special_item(const char *s)
 
     for (i = 0; i < statis.total_mod_num; i++)
     {
-        mod = &mods[i];
+        mod = mods[i];
         strcpy(mod->print_item, s);
     }
 }

@@ -1,7 +1,9 @@
 #define   _GNU_SOURCE
 #include "tsar.h"
 
-#define LVS_STATS "/proc/net/ip_vs_stats"
+#define LVS_PROC_STATS 	"/proc/net/ip_vs_stats"
+#define LVS_CMD			"sudo /usr/local/sbin/slb_admin -ln --total --dump"
+#define LVS_CMD_PATH	"/usr/local/sbin/slb_admin"
 #define LVS_STORE_FMT(d)            \
     "%lld"d"%lld"d"%lld"d"%lld"d"%lld"d"%lld"
 #define MAX_LINE_LEN 1024
@@ -41,13 +43,19 @@ read_lvs(struct module *mod)
     st_lvs.bytin = 0;
     st_lvs.bytout = 0;
 
-    int    i = 0, pos=0;
+    int    i = 0, pos=0, use_popen = 0;
     char   buf[512];
     char   tmp[5][16];
-    FILE  *fp;
+    FILE  *fp = NULL;
     char   line[MAX_LINE_LEN];
 
-    if ((fp = fopen(LVS_STATS, "r")) != NULL) {
+	if (!access(LVS_CMD_PATH, F_OK | X_OK)) {
+		fp = popen(LVS_CMD, "r");
+		use_popen = 1;
+	} else if (!access(LVS_PROC_STATS, F_OK))
+		fp = fopen(LVS_PROC_STATS, "r");
+
+    if (fp != NULL) {
         st_lvs.stat = 1;
         while (fgets(line, MAX_LINE_LEN, fp) != NULL) {
             i++;
@@ -75,9 +83,11 @@ read_lvs(struct module *mod)
                 break;
             }
         }
-        if (fclose(fp) < 0) {
-            return;
-        }
+
+		if (use_popen)
+			pclose(fp);
+		else
+			fclose(fp);
     }
     if (st_lvs.stat == 1) {
         pos = sprintf(buf, LVS_STORE_FMT(DATA_SPLIT), st_lvs.stat, st_lvs.conns, st_lvs.pktin, st_lvs.pktout, st_lvs.bytin, st_lvs.bytout);
