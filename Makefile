@@ -1,4 +1,4 @@
-DIRS = modules src
+DIRS = src modules lualib
 
 all:
 	for i in $(DIRS); do make -C $$i; done
@@ -21,14 +21,8 @@ install: all
 	cp conf/tsar.cron /etc/cron.d/tsar
 	#copy man file
 	cp conf/tsar.8 /usr/local/man/man8/
-
-tsardevel:
-	mkdir -p /usr/local/tsar/devel
-	cp devel/mod_test.c /usr/local/tsar/devel/mod_test.c
-	cp devel/mod_test.conf /usr/local/tsar/devel/mod_test.conf
-	cp devel/tsar.h /usr/local/tsar/devel/tsar.h
-	cp devel/Makefile.test /usr/local/tsar/devel/Makefile.test
-	cp devel/tsardevel /usr/bin/tsardevel
+	#install lualib
+	make -C lualib install
 
 uninstall:
 	#rm tsar
@@ -41,11 +35,30 @@ uninstall:
 	rm -f /usr/bin/tsar
 	#rm tsardevel
 	rm -f /usr/bin/tsardevel
+	#rm tsarluadevel
+	rm -f /usr/bin/tsarluadevel
 	#backup configure file
 	if [ -f /etc/tsar/tsar.conf ]; then mv /etc/tsar/tsar.conf /etc/tsar/tsar.conf.rpmsave; fi
 	#backup the log data file
 	if [ -f /var/log/tsar.data ]; then mv /var/log/tsar.data /var/log/tsar.data.bak; fi
 
+tsardevel:
+	mkdir -p /usr/local/tsar/devel
+	cp devel/mod_test.c /usr/local/tsar/devel/mod_test.c
+	cp devel/mod_test.conf /usr/local/tsar/devel/mod_test.conf
+	cp devel/tsar.h /usr/local/tsar/devel/tsar.h
+	cp devel/Makefile.test /usr/local/tsar/devel/Makefile.test
+	cp devel/tsardevel /usr/bin/tsardevel
+
+tsarluadevel:
+	mkdir -p /usr/local/tsar/luadevel
+	cp luadevel/mod_lua_test.lua /usr/local/tsar/luadevel/mod_lua_test.lua
+	cp luadevel/mod_lua_test.conf /usr/local/tsar/luadevel/mod_lua_test.conf
+	cp luadevel/Makefile.test /usr/local/tsar/luadevel/Makefile.test
+	cp luadevel/tsarluadevel /usr/bin/tsarluadevel
+
 tags:
 	ctags -R
 	cscope -Rbq
+
+.PHONY: all clean install unintall tsardevel tsarluadevel tags

@@ -23,6 +23,7 @@
 struct statistic statis;
 struct configure conf;
 struct module   *mods[MAX_MOD_NUM];
+lua_State *L = NULL;
 
 
 void
@@ -60,10 +61,7 @@ usage()
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = mods[i];
-        if (mod->usage) {
-            fprintf(stderr, "%s", mod->usage);
-            fprintf(stderr, "\n");
-        }
+        fprintf(stderr, "%s\n", mod->usage);
     }
 
     exit(0);
@@ -205,6 +203,7 @@ main_init(int argc, char **argv)
 void
 shut_down()
 {
+    close_luavm(L);
     free_modules();
 
 /*
@@ -259,6 +258,12 @@ main(int argc, char **argv)
 {
 
     parse_config_file(DEFAULT_CONF_FILE_PATH);
+
+    L = load_luavm();
+    if (L == NULL) {
+        do_debug(LOG_ERR, "load lua vm err");
+        return 1;
+    }
 
     load_modules();
 

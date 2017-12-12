@@ -58,6 +58,7 @@
 
 #define MOD_INFO_SIZE       sizeof(strcut mod_info)
 
+#define DEFAULT_MODULE_PATH         "/usr/local/tsar/modules"
 #define DEFAULT_CONF_FILE_PATH      "/etc/tsar/tsar.conf"
 #define DEFAULT_OUTPUT_FILE_PATH    "/var/log/tsar.data"
 #define MIN_STRING "MIN:        "
@@ -76,6 +77,7 @@
 #define APACHERT "/tmp/apachert.mmap"
 #define TCP "/proc/net/tcp"
 #define NETSTAT "/proc/net/netstat"
+#define MOD_LUA_PREFIX "mod_lua_"
 
 
 enum {

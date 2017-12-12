@@ -108,22 +108,46 @@ Tsar2db receives sql data and flush it to MySQL. You can find more information a
 
 Module development
 ------------------
-Tsar is easily extended. Whenever you want information that is not collected by tsar yet, you can write a module.
+Tsar is easily extended. Whenever you want information that is not collected by tsar yet, you can write a module with `C` or `Lua`.
 
+C Module
+--------
 First, install the tsardevel tool (`make tsardevel` will do this for you):
 
 Then run `tsardevel <yourmodname>`, and you will get a directory named yourmodname, e.g.:
 
-    [kongjian@tsar]$ tsardevel test
-    build:make
-    install:make install
-    uninstall:make uninstall
+````bash
+[kongjian@tsar]$ tsardevel test
+build:make
+install:make install
+uninstall:make uninstall
 
-    [kongjian@tsar]$ ls test
-    Makefile  mod_test.c  mod_test.conf
+[kongjian@tsar]$ ls test
+Makefile  mod_test.c  mod_test.conf
+````
 
-You can modify the read_test_stats() and set_test_record() functions in test.c as you need.
+You can modify the read_test_stats() and set_test_record() functions in mod_test.c as you need.
 Then run `make;make install` to install your module and run `tsar --yourmodname` to see the output.
+
+Lua Module
+----------
+First, install the tsarluadevel tool (`make tsarluadevel` will do this for you):
+
+Then run `tsarluadevel <yourmodname>`, and you will get a directory named yourmodname, e.g.:
+
+````bash
+[kongjian@tsar]$ tsarluadevel test
+build:make
+install:make install
+uninstall:make uninstall
+test:tsar --list or tsar --lua_test --live -i 1
+
+[kongjian@tsar]$ ls test
+Makefile  mod_lua_test.conf  mod_lua_test.lua
+````
+
+You can modify the register()、read() and set() functions in mod_lua_test.lua as you need.
+Then run `make;make install` to install your module and run `tsar --lua_yourmodname` to see the output.
 
 More
 ----

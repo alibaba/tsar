@@ -20,6 +20,7 @@
 #include "tsar.h"
 
 
+
 void
 register_mod_fields(struct module *mod, const char *opt, const char *usage,
     struct mod_info *info, int n_col, void *data_collect, void *set_st_record)
@@ -55,12 +56,22 @@ load_modules()
     int    (*mod_register) (struct module *);
 
     /* get the full path of modules */
-    sprintf(buff, "/usr/local/tsar/modules");
+    sprintf(buff, DEFAULT_MODULE_PATH);
 
     for (i = 0; i < statis.total_mod_num; i++) {
         mod = mods[i];
+
+        if (strlen(mod->name) == 0) {
+            continue;
+        }
+
+        if (strncmp(MOD_LUA_PREFIX, mod->name, strlen(MOD_LUA_PREFIX)) == 0) {
+            do_debug(LOG_DEBUG, "load_modules: ready to load %s\n", mod->name);
+            load_lua_module(L, mod);
+            continue;
+        }
+
         if (!mod->lib) {
-            memset(mod_path, '\0', LEN_128);
             snprintf(mod_path, LEN_128, "%s/%s.so", buff, mod->name);
             if (!(mod->lib = dlopen(mod_path, RTLD_NOW|RTLD_GLOBAL))) {
                 do_debug(LOG_ERR, "load_modules: dlopen module %s err %s\n", mod->name, dlerror());
@@ -523,3 +534,4 @@ disable_col_zero()
         }
     }
 }
+
