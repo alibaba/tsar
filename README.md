@@ -137,7 +137,6 @@ Then run `tsarluadevel <yourmodname>`, and you will get a directory named yourmo
 
 ````bash
 [kongjian@tsar]$ tsarluadevel test
-build:make
 install:make install
 uninstall:make uninstall
 test:tsar --list or tsar --lua_test --live -i 1
@@ -147,7 +146,7 @@ Makefile  mod_lua_test.conf  mod_lua_test.lua
 ````
 
 You can modify the register()、read() and set() functions in mod_lua_test.lua as you need.
-Then run `make;make install` to install your module and run `tsar --lua_yourmodname` to see the output.
+Then run `make install` to install your module and run `tsar --lua_yourmodname` to see the output.
 
 More
 ----

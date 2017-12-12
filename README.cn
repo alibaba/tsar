@@ -100,22 +100,45 @@ Tsar使用
 -------------
 Tsar的一个比较好的功能是能够增加自己的采集，这时候需要编写模块代码，编译成so文件即可。
 
+C模块
+-----
 首先安装tsardevel，刚才安装时，如果执行`make tsardevel`，就会把模块开发的基本文件安装到系统
 然后执行tsardevel <yourmodname>，就能在当前模块生成一个模块目录：
 
-    [kongjian@v132172.sqa.cm4 tsar]$ tsardevel test
-    build:make
-    install:make install
-    uninstall:make uninstall
-    [kongjian@v132172.sqa.cm4 tsar]$ ls test
-    Makefile  mod_test.c  mod_test.conf
+````bash
+[kongjian@v132172.sqa.cm4 tsar]$ tsardevel test
+build:make
+install:make install
+uninstall:make uninstall
+
+[kongjian@v132172.sqa.cm4 tsar]$ ls test
+Makefile  mod_test.c  mod_test.conf
+````
 
 按照要求修改mod_test.c中的read_test_stats，set_test_record
-完成后make;make install就完成新模块的配置文件和so的设置，执行tsar --test就能查看效果
+完成后`make;make install`就完成新模块的配置文件和so的设置，执行`tsar --yourmodname`就能查看效果
 
 另外也可以通过配置文件对自定义模块传递参数，方法是
 修改配置文件中的`mod_test on myparameter`
 然后在mod_test.c中的read_test_stats函数中，通过parameter参数就可以获得刚才配置文件中的内容
+
+Lua模块
+-------
+首先安装tsarluadevel，刚才安装时，如果执行`make tsarluadevel`，就会把Lua模块开发的基本文件安装到系统
+然后执行tsarluadevel <yourmodname>，就能在当前模块生成一个模块目录：
+
+````bash
+[kongjian@v132172.sqa.cm4 tsar]$ tsarluadevel test
+install:make install
+uninstall:make uninstall
+test:tsar --list or tsar --lua_test --live -i 1
+
+[kongjian@v132172.sqa.cm4 tsar]$ ls test
+Makefile  mod_lua_test.conf  mod_lua_test.lua
+````
+
+按照要求修改mod_lua_test.lua中的register()，read()和set()函数
+完成后`make install`就完成新模块的安装，执行`tsar --lua_yourmodname`就能查看效果
 
 其它
 -------------

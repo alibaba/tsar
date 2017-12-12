@@ -32,6 +32,7 @@ mkdir -p %{buildroot}/usr/local/tsar/
 mkdir -p %{buildroot}/usr/local/tsar/modules/
 mkdir -p %{buildroot}/usr/local/tsar/conf/
 mkdir -p %{buildroot}/usr/local/tsar/devel/
+mkdir -p %{buildroot}/usr/local/tsar/luadevel/
 mkdir -p %{buildroot}/usr/local/man/man8/
 mkdir -p %{buildroot}/etc/logrotate.d/
 mkdir -p %{buildroot}/etc/tsar/
@@ -50,6 +51,11 @@ install -p -D -m 0644 devel/mod_test.c %{buildroot}/usr/local/tsar/devel/mod_tes
 install -p -D -m 0644 devel/mod_test.conf %{buildroot}/usr/local/tsar/devel/mod_test.conf
 install -p -D -m 0644 devel/Makefile.test %{buildroot}/usr/local/tsar/devel/Makefile.test
 install -p -D -m 0644 devel/tsar.h %{buildroot}/usr/local/tsar/devel/tsar.h
+
+install -p -D -m 0755 luadevel/tsarluadevel %{buildroot}/usr/bin/tsarluadevel
+install -p -D -m 0644 luadevel/mod_lua_test.lua %{buildroot}/usr/local/tsar/luadevel/mod_lua_test.lua
+install -p -D -m 0644 luadevel/mod_lua_test.conf %{buildroot}/usr/local/tsar/luadevel/mod_lua_test.conf
+install -p -D -m 0644 luadevel/Makefile.test %{buildroot}/usr/local/tsar/luadevel/Makefile.test
 
 %clean
 [ "%{buildroot}" != "/" ] && %{__rm} -rf %{buildroot}
@@ -71,7 +77,12 @@ install -p -D -m 0644 devel/tsar.h %{buildroot}/usr/local/tsar/devel/tsar.h
 /usr/local/tsar/devel/Makefile.test
 /usr/local/tsar/devel/mod_test.c
 /usr/local/tsar/devel/mod_test.conf
-%attr(755,root,root) /usr/bin/tsardevel
+/usr/local/tsar/luadevel/Makefile.test
+/usr/local/tsar/luadevel/mod_lua_test.lua
+/usr/local/tsar/luadevel/mod_lua_test.conf
+%attr(755,root,root)
+/usr/bin/tsardevel
+/usr/bin/tsarluadevel
 
 %changelog
 * Sun Jan  6 2013 Ke Li <kongjian@taobao.com>

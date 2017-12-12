@@ -9,7 +9,6 @@ usage()
 }
 install()
 {
- echo "build:make"
  echo "install:make install"
  echo "uninstall:make uninstall"
  echo "test:tsar --list or tsar --lua_$modname --live -i 1"
@@ -26,7 +25,7 @@ for file in mod_lua_test.lua mod_lua_test.conf Makefile.test
 do
  if [ ! -e "$install_path/$file" ] ;then
   echo "$install_path/$file not exist!"
-  echo "make sure you have run 'make tsardevel' when install tsar."
+  echo "make sure you have run 'make tsarluadevel' when install tsar."
   exit 1
  fi
 done
