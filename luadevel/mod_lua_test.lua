@@ -43,7 +43,7 @@ end
 function _M.register()
     return {
         opt = "--test",
-        usage = "--test",
+        usage = "test information",
         info = info,
     }
 end

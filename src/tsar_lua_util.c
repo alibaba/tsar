@@ -219,7 +219,7 @@ load_lua_module_optusage(lua_State *L, struct module *mod)
         do_debug(LOG_ERR, "load_lua_module usage isn't string\n");
         return 1;
     }
-    sprintf(mod->usage, "%s", lua_tostring(L, -1));
+    sprintf(mod->usage, "    %-20s%s", mod->opt_line, lua_tostring(L, -1));
     do_debug(LOG_DEBUG, "load_lua_module usage:%s\n", mod->usage);
     lua_pop(L, 1);
 

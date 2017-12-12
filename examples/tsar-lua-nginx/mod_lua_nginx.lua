@@ -120,7 +120,7 @@ end
 function _M.register()
     return {
         opt = "--lua_nginx",
-        usage = "--lua_nginx",
+        usage = "nginx statistics",
         info = info,
     }
 end
