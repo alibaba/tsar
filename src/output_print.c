@@ -127,22 +127,16 @@ print_header()
 
 
 void
-printf_result(double result, int print_llu)
+printf_result(double result)
 {
     if (conf.print_detail) {
-        if(print_llu == 1) {
-            printf("%6llu", (unsigned long long )result);
-        }else {
-            printf("%6.2f", result);
-        }
+        printf("%6.2f", result);
         printf("%s", PRINT_DATA_SPLIT);
         return;
     }
-
-    if(print_llu == 1) {
-        printf("%6llu", (unsigned long long )result);
-    }else if ((1000 - result) > 0.1) {
+    if ((1000 - result) > 0.1) {
         printf("%6.2f", result);
+
     } else if ( (1000 - result / 1024) > 0.1) {
         printf("%5.1f%s", result / 1024, "K");
     } else if ((1000 - result / 1024 / 1024) > 0.1) {
@@ -178,7 +172,7 @@ print_array_stat(const struct module *mod, const double *st_array)
                 if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[i].summary_bit))
                         || ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[i].summary_bit)))
                 {
-                    printf_result(st_array[i], info[i].print_llu);
+                    printf_result(st_array[i]);
                 }
             }
 
@@ -197,7 +191,7 @@ print_array_stat(const struct module *mod, const double *st_array)
                 if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[i].summary_bit))
                         || ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[i].summary_bit)))
                 {
-                    printf_result(st_array[i], info[i].print_llu);
+                    printf_result(st_array[i]);
                 }
             }
         }
@@ -599,14 +593,14 @@ print_tail(int tail_type)
                     if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[i].summary_bit))
                             || ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[i].summary_bit)))
                     {
-                        printf_result(m_tail[k],info[i].print_llu);
+                        printf_result(m_tail[k]);
                     }
 
                 } else {
                     if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[i].summary_bit))
                             || ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[i].summary_bit)))
                     {
-                        printf_result(m_tail[k],info[i].print_llu);
+                        printf_result(m_tail[k]);
                     }
                 }
                 k++;
