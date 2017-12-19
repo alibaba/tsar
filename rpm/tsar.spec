@@ -57,6 +57,8 @@ install -p -D -m 0644 luadevel/mod_lua_test.lua %{buildroot}/usr/local/tsar/luad
 install -p -D -m 0644 luadevel/mod_lua_test.conf %{buildroot}/usr/local/tsar/luadevel/mod_lua_test.conf
 install -p -D -m 0644 luadevel/Makefile.test %{buildroot}/usr/local/tsar/luadevel/Makefile.test
 
+make -C lualib INSTALL_DIR=%{buildroot}/usr/local/tsar/lualib install
+
 %clean
 [ "%{buildroot}" != "/" ] && %{__rm} -rf %{buildroot}
 
@@ -64,6 +66,7 @@ install -p -D -m 0644 luadevel/Makefile.test %{buildroot}/usr/local/tsar/luadeve
 %files
 %defattr(-,root,root)
 /usr/local/tsar/modules/*.so
+/usr/local/tsar/lualib
 
 %attr(755,root,root) /usr/bin/tsar
 %config(noreplace) /etc/tsar/tsar.conf

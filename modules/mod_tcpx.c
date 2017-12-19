@@ -88,7 +88,7 @@ read_stat_tcpx(struct module *mod)
     st_tcpx.tcppersistdrop = 0;
     st_tcpx.tcpkadrop = 0;
 
-    int pos = sprintf(buf,
+    sprintf(buf,
             "%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,"
             "%llu,%llu,%llu,%llu,%llu,%llu,%llu",
             st_tcpx.tcprecvq,
@@ -106,7 +106,6 @@ read_stat_tcpx(struct module *mod)
             st_tcpx.tcprexmitdrop,
             st_tcpx.tcppersistdrop,
             st_tcpx.tcpkadrop);
-    buf[pos] = '\0';
     set_mod_record(mod, buf);
     fclose(fp_tcp);
     fclose(fp_snmp);

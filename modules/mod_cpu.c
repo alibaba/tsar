@@ -19,18 +19,23 @@ struct stats_cpu {
 #define STATS_CPU_SIZE (sizeof(struct stats_cpu))
 
 static char *cpu_usage = "    --cpu               CPU share (user, system, interrupt, nice, & idle)";
+static int   cpu_quota = 1;
 
 
 static void
 read_cpu_stats(struct module *mod)
 {
     FILE   *fp, *ncpufp;
+    char   *max_cpu;
     char    line[LEN_4096];
     char    buf[LEN_4096];
     struct  stats_cpu st_cpu;
 
     memset(buf, 0, LEN_4096);
     memset(&st_cpu, 0, sizeof(struct stats_cpu));
+    //get cpu number for cpushare
+    max_cpu = getenv("SIGMA_MAX_CPU_QUOTA");
+    cpu_quota = max_cpu ? atoi(max_cpu) / 100 : 1;
     //unsigned long long cpu_util;
     if ((fp = fopen(STAT, "r")) == NULL) {
         return;
@@ -70,7 +75,7 @@ read_cpu_stats(struct module *mod)
     /*      st_cpu.cpu_user + st_cpu.cpu_sys + */
     /*      st_cpu.cpu_hardirq + st_cpu.cpu_softirq; */
 
-    int pos = sprintf(buf, "%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu",
+    sprintf(buf, "%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu",
             /* the store order is not same as read procedure */
             st_cpu.cpu_user,
             st_cpu.cpu_sys,
@@ -83,7 +88,6 @@ read_cpu_stats(struct module *mod)
             st_cpu.cpu_guest,
             st_cpu.cpu_number);
 
-    buf[pos] = '\0';
     set_mod_record(mod, buf);
     if (fclose(fp) < 0) {
         return;
@@ -125,6 +129,7 @@ set_cpu_record(struct module *mod, double st_array[],
     /* util = 100 - idle - iowait - steal */
     if (cur_array[5] >= pre_array[5]) {
         st_array[5] = 100.0 - (cur_array[5] - pre_array[5]) * 100.0 / (cur_total - pre_total) - st_array[2] - st_array[7];
+        st_array[5] = st_array[5] / cpu_quota;
     }
 
     st_array[9] = cur_array[9];

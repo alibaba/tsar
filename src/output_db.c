@@ -85,7 +85,7 @@ send_sql_txt(int fd, int have_collect)
                     while (*p == ' ') {
                         p++;
                     }
-                    strcat(sql_hdr, p);
+                    strncat(sql_hdr, p, LEN_128);
                     strcat(sql_hdr, "`");
                 }
                 strcat(sql_hdr, ") VALUES ('");

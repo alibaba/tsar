@@ -334,10 +334,11 @@ get_haproxy_detail(void)
         return -1;
     }
 
-    if ((t=recv(s, str, MAX_SIZE, 0)) > 0) {
+    t = recv(s, str, MAX_SIZE, 0);
+    close(s);
+	if (t > 0) {
         str[t] = '\0';
     } else {
-        close(s);
         if (t < 0 && DEBUG) {
             perror("recv");
         } else if (DEBUG) {
@@ -345,8 +346,8 @@ get_haproxy_detail(void)
         }
         return -1;
     }
+
     if (!strstr(str, "Uptime_sec")) {
-        close(s);
         if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
             if (DEBUG) {
                 perror("socket");
@@ -410,6 +411,5 @@ get_haproxy_detail(void)
         }
         p_split = strtok(NULL, "\n");
     }
-    close(s);
     return 0;
 }

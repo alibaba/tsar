@@ -75,7 +75,10 @@ read_proc_stats(struct module *mod, char *parameter)
             return;
         }
 
-        p = strstr(line, ")");
+        if ((p = strstr(line, ")")) == NULL) {
+            fclose(fp);
+            return;
+        }
         if (sscanf(p, "%*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %llu %llu %llu %llu",
                     &cpudata[0], &cpudata[1], &cpudata[2], &cpudata[3]) == EOF) {
             fclose(fp);
@@ -149,8 +152,7 @@ read_proc_stats(struct module *mod, char *parameter)
     st_proc.total_mem *= 1024;
     fclose(fp);
     /* store data to tsar */
-    int pos = 0;
-    pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld",
+    int pos = sprintf(buf, "%lld,%lld,%lld,%lld,%lld,%lld,%lld",
             st_proc.user_cpu,
             st_proc.sys_cpu,
             st_proc.total_cpu,
@@ -159,7 +161,7 @@ read_proc_stats(struct module *mod, char *parameter)
             st_proc.read_bytes,
             st_proc.write_bytes
             );
-    buf[pos] = '\0';
+    if (pos >= 0) buf[pos] = '\0';
     set_mod_record(mod, buf);
 }
 

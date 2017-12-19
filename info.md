@@ -124,13 +124,19 @@ UDP的数据来源文件和TCP一样,也是在/proc/net/snmp
 ####字段含义
 * rrqms: The number of read requests merged per second that were issued to the device.
 * wrqms: The number of write requests merged per second that were issued to the device.
+* %rrqm: The percentage of read requests merged together before being sent to the device.
+* %wrqm: The percentage of write requests merged together before being sent to the device.
 * rs:    The number of read requests that were issued to the device per second.
 * ws:    The number of write requests that were issued to the device per second.
 * rsecs: The number of sectors read from the device per second.
 * wsecs: The number of sectors written to the device per second.
-* rqsize:The average size (in sectors) of the requests that were issued to the device.
+* rqsize:The average size (in megabytes) of the requests that were issued to the device.
+* rarqsz:The average size (in megabytes) of the read requests that were issued to the device.
+* warqsz:The average size (in megabytes) of the write requests that were issued to the device.
 * qusize:The average queue length of the requests that were issued to the device.
 * await: The average time (in milliseconds) for I/O requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.
+* rawait:The average time (in milliseconds) for read requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.
+* wawait:The average time (in milliseconds) for write requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.
 * svctm: The average service time (in milliseconds) for I/O requests that were issued to the device.
 * util:  Percentage of CPU time during which I/O requests were issued to the device (bandwidth utilization for the device).Device saturation occurs when this value is close to 100%.
 
@@ -159,19 +165,23 @@ IO的计数器文件是:/proc/diskstats,比如:
 通过这些计数器可以算出来上面的每个字段的值
 
     double n_ios = rd_ios + wr_ios;
-    double n_ticks = rd_ticks + wr_ticks;
-    double n_kbytes = (rd_sectors + wr_sectors) / 2;
     st_array[0] = rd_merges / (inter * 1.0);
     st_array[1] = wr_merges / (inter * 1.0);
-    st_array[2] = rd_ios / (inter * 1.0);
-    st_array[3] = wr_ios / (inter * 1.0);
-    st_array[4] = rd_sectors / (inter * 2.0);
-    st_array[5] = wr_sectors / (inter * 2.0);
-    st_array[6] = n_ios ? n_kbytes / n_ios : 0.0;
-    st_array[7] = aveq / (inter * 1000);
-    st_array[8] = n_ios ? n_ticks / n_ios : 0.0;
-    st_array[9] = n_ios ? ticks / n_ios : 0.0;
-    st_array[10] = ticks / (inter * 10.0); /* percentage! */
+    st_array[2] = rd_merges + rd_ios ? (double)rd_merges / (rd_merges + rd_ios) * 100 : 0.0;
+    st_array[3] = wr_merges + wr_ios ? (double)wr_merges / (wr_merges + wr_ios) * 100 : 0.0;
+    st_array[4] = rd_ios / (inter * 1.0);
+    st_array[5] = wr_ios / (inter * 1.0);
+    st_array[6] = rd_sectors / (inter * 1.0);
+    st_array[7] = wr_sectors / (inter * 1.0);
+    st_array[8] = n_ios ? (rd_sectors + wr_sectors) / (n_ios * 2) : 0.0;
+    st_array[9] = rd_ios ? rd_sectors / ((double)rd_ios * 2) : 0.0;
+    st_array[10] = wr_ios ? wr_sectors / ((double)wr_ios * 2) : 0.0;
+    st_array[11] = aveq / (inter * 1000);
+    st_array[12] = n_ios ? (rd_ticks + wr_ticks) / (double)n_ios : 0.0;
+    st_array[13] = rd_ios ? rd_ticks / (double)rd_ios : 0.0;
+    st_array[14] = wr_ios ? wr_ticks / (double)wr_ios : 0.0;
+    st_array[15] = n_ios ? ticks / n_ios : 0.0;
+    st_array[16] = ticks / (inter * 10.0); /* percentage! */
     /*st_array分别代表tsar显示的每一个值*/
 
 注意:

@@ -24,7 +24,7 @@
 void
 parse_mod(const char *mod_name)
 {
-    int     i = 0, j = 0;
+    int     i;
     struct  module *mod;
     char   *token;
 
@@ -52,28 +52,28 @@ parse_mod(const char *mod_name)
     }
     memset(mod, '\0', sizeof(struct module));
 
-    strncpy(mod->name, mod_name, strlen(mod_name));
+    strncpy(mod->name, mod_name, LEN_32);
     token = strtok(NULL, W_SPACE);
     if (token) {
-        i = strlen(token);
-        if (i < LEN_256) {
-            strncpy(mod->parameter, token, i);
+        size_t p = strlen(token);
+        if (p < LEN_256) {
+            strncpy(mod->parameter, token, p);
         } else {
-            i = 0;
+            p = 0;
         }
 
-    }
-    /*if exist more parameters, add them */
-    while((token = strtok(NULL, W_SPACE)) != NULL){
-        j = strlen(token);
-        if (i + j + 1 >= LEN_256) {
-            break;
+        /*if exist more parameters, add them */
+        while((token = strtok(NULL, W_SPACE)) != NULL) {
+            size_t l = strlen(token);
+            if (p + l + 1 >= LEN_256) {
+                break;
+            }
+            mod->parameter[p++] = ' ';
+            strncpy(mod->parameter + p, token, l);
+            p += l;
         }
-        mod->parameter[i++] = ' ';
-        strncpy(mod->parameter + i, token, j);
-        i += j;
+        mod->parameter[p] = '\0';
     }
-    mod->parameter[i] = '\0';
 }
 
 void
@@ -274,15 +274,15 @@ process_input_line(char *config_input_line, int len, const char *file_name)
     char *token;
 
     if ((token = strchr(config_input_line, '\n'))) {
-    	*token = '\0';
+        *token = '\0';
     }
     if ((token = strchr(config_input_line, '\r'))) {
-    	*token = '\0';
+        *token = '\0';
     }
     if (config_input_line[0] == '#') {
-    	goto final;
+        goto final;
     } else if (config_input_line[0] == '\0') {
-    	goto final;
+        goto final;
     }
     /* FIXME can't support wrap line */
     if (!parse_line(config_input_line)) {
@@ -441,6 +441,6 @@ set_special_item(const char *s)
     for (i = 0; i < statis.total_mod_num; i++)
     {
         mod = mods[i];
-        strcpy(mod->print_item, s);
+        strncpy(mod->print_item, s, LEN_256);
     }
 }

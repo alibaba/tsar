@@ -18,6 +18,7 @@
 
 
 #include "tsar.h"
+#include <fnmatch.h>
 
 
 /*
@@ -91,7 +92,7 @@ print_header()
                     memset(opt, 0, sizeof(opt));
                     memset(n_opt, 0, sizeof(n_opt));
                     strncat(opt, token, s_token - token);
-                    if (*mod->print_item != 0 && strcmp(mod->print_item, opt)) {
+                    if (*mod->print_item != 0 && fnmatch(mod->print_item, opt, 0)) {
                         token = strtok(NULL, ITEM_SPLIT);
                         count++;
                         continue;
@@ -126,16 +127,22 @@ print_header()
 
 
 void
-printf_result(double result)
+printf_result(double result, int print_llu)
 {
     if (conf.print_detail) {
-        printf("%6.2f", result);
+        if(print_llu == 1) {
+            printf("%6llu", (unsigned long long )result);
+        }else {
+            printf("%6.2f", result);
+        }
         printf("%s", PRINT_DATA_SPLIT);
         return;
     }
-    if ((1000 - result) > 0.1) {
-        printf("%6.2f", result);
 
+    if(print_llu == 1) {
+        printf("%6llu", (unsigned long long )result);
+    }else if ((1000 - result) > 0.1) {
+        printf("%6.2f", result);
     } else if ( (1000 - result / 1024) > 0.1) {
         printf("%5.1f%s", result / 1024, "K");
     } else if ((1000 - result / 1024 / 1024) > 0.1) {
@@ -171,7 +178,7 @@ print_array_stat(const struct module *mod, const double *st_array)
                 if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[i].summary_bit))
                         || ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[i].summary_bit)))
                 {
-                    printf_result(st_array[i]);
+                    printf_result(st_array[i], info[i].print_llu);
                 }
             }
 
@@ -190,7 +197,7 @@ print_array_stat(const struct module *mod, const double *st_array)
                 if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[i].summary_bit))
                         || ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[i].summary_bit)))
                 {
-                    printf_result(st_array[i]);
+                    printf_result(st_array[i], info[i].print_llu);
                 }
             }
         }
@@ -497,6 +504,9 @@ check_time(const char *line)
 
     /* get record time */
     token = strpbrk(line, SECTION_SPLIT);
+    if (token == NULL) {
+        return 1;
+    }
     if ((token - line) < 32) {
         memcpy(s_time, line, token - line);
     }
@@ -589,14 +599,14 @@ print_tail(int tail_type)
                     if (((DATA_SUMMARY == conf.print_mode) && (SPEC_BIT == info[i].summary_bit))
                             || ((DATA_DETAIL == conf.print_mode) && (SPEC_BIT == info[i].summary_bit)))
                     {
-                        printf_result(m_tail[k]);
+                        printf_result(m_tail[k],info[i].print_llu);
                     }
 
                 } else {
                     if (((DATA_SUMMARY == conf.print_mode) && (SUMMARY_BIT == info[i].summary_bit))
                             || ((DATA_DETAIL == conf.print_mode) && (HIDE_BIT != info[i].summary_bit)))
                     {
-                        printf_result(m_tail[k]);
+                        printf_result(m_tail[k],info[i].print_llu);
                     }
                 }
                 k++;
@@ -1105,7 +1115,7 @@ running_check(int check_type)
                 char   *n_record = strdup(mod->record);
                 char   *token = strtok(n_record, ITEM_SPLIT);
                 char   *s_token;
-                for (j = 0; j < mod->n_item; j++) {
+                for (j = 0; j < mod->n_item && token != NULL; j++) {
                     s_token = strpbrk(token, ITEM_SPSTART);
                     if (s_token) {
                         memset(opt, 0, sizeof(opt));
@@ -1154,7 +1164,7 @@ running_check(int check_type)
                 char   *n_record = strdup(mod->record);
                 char   *token = strtok(n_record, ITEM_SPLIT);
                 char   *s_token;
-                for (j = 0; j < mod->n_item; j++) {
+                for (j = 0; j < mod->n_item && token != NULL; j++) {
                     s_token = strpbrk(token, ITEM_SPSTART);
                     if (s_token) {
                         memset(opt, 0, sizeof(opt));

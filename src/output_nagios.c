@@ -88,7 +88,7 @@ output_nagios()
                 /* get mod_name.(item_name).col_name value */
                 while (token) {
                     memset(check, 0, sizeof(check));
-                    strcat(check, mod->name + 4);
+                    strncat(check, mod->name + 4, LEN_32);
                     strcat(check, ".");
                     s_token = strpbrk(token, ITEM_SPSTART);
                     /* multi item */
@@ -112,23 +112,23 @@ output_nagios()
                         while (*p == ' ') {
                             p++;
                         }
-                        strcat(check_item, p);
+                        strncat(check_item, p, LEN_64);
                         for (l = 0; l < conf.mod_num; l++){
                             /* cmp tsar item with naigos item*/
                             if (!strcmp(conf.check_name[l], check_item)) {
                                 char    value[LEN_32];
                                 memset(value, 0, sizeof(value));
                                 sprintf(value, "%0.2f", st_array[k]);
-                                strcat(output, check_item);
+                                strncat(output, check_item, LEN_64);
                                 strcat(output, "=");
-                                strcat(output, value);
+                                strncat(output, value, LEN_32);
                                 strcat(output, " ");
                                 if (conf.cmin[l] != 0 && st_array[k] >= conf.cmin[l]) {
                                     if (conf.cmax[l] == 0 || (conf.cmax[l] != 0 && st_array[k] <= conf.cmax[l])) {
                                         result = 2;
-                                        strcat(output_err, check_item);
+                                        strncat(output_err, check_item, LEN_64);
                                         strcat(output_err, "=");
-                                        strcat(output_err, value);
+                                        strncat(output_err, value, LEN_32);
                                         strcat(output_err, " ");
                                         continue;
                                     }
@@ -138,9 +138,9 @@ output_nagios()
                                         if (result != 2) {
                                             result = 1;
                                         }
-                                        strcat(output_err, check_item);
+                                        strncat(output_err, check_item, LEN_64);
                                         strcat(output_err, "=");
-                                        strcat(output_err, value);
+                                        strncat(output_err, value, LEN_32);
                                         strcat(output_err, " ");
                                     }
                                 }

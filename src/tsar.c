@@ -130,7 +130,7 @@ main_init(int argc, char **argv)
                 conf.running_mode = RUN_PRINT_LIVE;
                 break;
             case 'f':
-                strcpy(conf.output_file_path, optarg);
+                strncpy(conf.output_file_path, optarg, LEN_128);
                 break;
             case 's':
                 set_special_field(optarg);
@@ -161,7 +161,7 @@ main_init(int argc, char **argv)
                 break;
             case '?':
                 if (argv[oind] && strstr(argv[oind], "--")) {
-                    strcat(conf.output_print_mod, argv[oind]);
+                    strncat(conf.output_print_mod, argv[oind], LEN_512 - sizeof(DATA_SPLIT));
                     strcat(conf.output_print_mod, DATA_SPLIT);
 
                 } else {

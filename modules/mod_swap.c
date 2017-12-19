@@ -58,8 +58,7 @@ read_vmstat_swap(struct module *mod)
     }
     fclose(fp);
 
-    int pos = sprintf(buf, "%lld,%lld,%lld,%lld", st_swap.pswpin, st_swap.pswpout, st_swap.swaptotal*1024, st_swap.swapfree*1024);
-    buf[pos] = '\0';
+    sprintf(buf, "%lld,%lld,%lld,%lld", st_swap.pswpin, st_swap.pswpout, st_swap.swaptotal*1024, st_swap.swapfree*1024);
     set_mod_record(mod, buf);
     return;
 }

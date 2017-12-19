@@ -342,7 +342,7 @@ collect_record()
 
 
 /*
- * computer mod->st_array and swap cur_info to pre_info
+ * compute mod->st_array and swap cur_info to pre_info
  * return:  1 -> ok
  *      0 -> some mod->n_item have modify will reprint header
  */

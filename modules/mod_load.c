@@ -54,13 +54,12 @@ read_stat_load(struct module *mod)
         st_load.nr_running--;
     }
 
-    int pos = sprintf(buf , "%u,%u,%u,%lu,%u",
+    sprintf(buf , "%u,%u,%u,%lu,%u",
             st_load.load_avg_1,
             st_load.load_avg_5,
             st_load.load_avg_15,
             st_load.nr_running,
             st_load.nr_threads);
-    buf[pos] = '\0';
     set_mod_record(mod, buf);
     fclose(fp);
 }

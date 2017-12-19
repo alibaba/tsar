@@ -48,13 +48,19 @@ unsigned int max_partitions = MAX_PARTITIONS;  /* Max of partitions */
 static struct mod_info io_info[] = {
     {" rrqms", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
     {" wrqms", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
+    {" %rrqm", DETAIL_BIT,  MERGE_AVG,  STATS_NULL},
+    {" %wrqm", DETAIL_BIT,  MERGE_AVG,  STATS_NULL},
     {"    rs", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
     {"    ws", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
     {" rsecs", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
     {" wsecs", DETAIL_BIT,  MERGE_SUM,  STATS_NULL},
     {"rqsize", DETAIL_BIT,  MERGE_AVG,  STATS_NULL},
+    {"rarqsz", DETAIL_BIT,  MERGE_AVG,  STATS_NULL},
+    {"warqsz", DETAIL_BIT,  MERGE_AVG,  STATS_NULL},
     {"qusize", DETAIL_BIT,  MERGE_AVG,  STATS_NULL},
     {" await", DETAIL_BIT,  MERGE_AVG,  STATS_NULL},
+    {"rawait", DETAIL_BIT,  MERGE_AVG,  STATS_NULL},
+    {"wawait", DETAIL_BIT,  MERGE_AVG,  STATS_NULL},
     {" svctm", DETAIL_BIT,  MERGE_AVG,  STATS_NULL},
     {"  util", SUMMARY_BIT,  MERGE_AVG,  STATS_NULL}
 };
@@ -311,25 +317,29 @@ set_io_record(struct module *mod, double st_array[],
     unsigned long long ticks = cur_array[8] - pre_array[8];
     unsigned long long aveq = cur_array[9] - pre_array[9];
     double n_ios = rd_ios + wr_ios;
-    double n_ticks = rd_ticks + wr_ticks;
-    double n_kbytes = (rd_sectors + wr_sectors) / 2;
     st_array[0] = rd_merges / (inter * 1.0);
     st_array[1] = wr_merges / (inter * 1.0);
-    st_array[2] = rd_ios / (inter * 1.0);
-    st_array[3] = wr_ios / (inter * 1.0);
-    st_array[4] = rd_sectors / (inter * 2.0);
-    st_array[5] = wr_sectors / (inter * 2.0);
-    st_array[6] = n_ios ? n_kbytes / n_ios : 0.0;
-    st_array[7] = aveq / (inter * 1000);
-    st_array[8] = n_ios ? n_ticks / n_ios : 0.0;
-    st_array[9] = n_ios ? ticks / n_ios : 0.0;
-    st_array[10] = ticks / (inter * 10.0); /* percentage! */
-    if(st_array[10] > 100.0)
-        st_array[10] = 100.0;
+    st_array[2] = rd_merges + rd_ios ? (double)rd_merges / (rd_merges + rd_ios) * 100 : 0.0;
+    st_array[3] = wr_merges + wr_ios ? (double)wr_merges / (wr_merges + wr_ios) * 100 : 0.0;
+    st_array[4] = rd_ios / (inter * 1.0);
+    st_array[5] = wr_ios / (inter * 1.0);
+    st_array[6] = rd_sectors / (inter * 1.0);
+    st_array[7] = wr_sectors / (inter * 1.0);
+    st_array[8] = n_ios ? (rd_sectors + wr_sectors) / (n_ios * 2) : 0.0;
+    st_array[9] = rd_ios ? rd_sectors / ((double)rd_ios * 2) : 0.0;
+    st_array[10] = wr_ios ? wr_sectors / ((double)wr_ios * 2) : 0.0;
+    st_array[11] = aveq / (inter * 1000);
+    st_array[12] = n_ios ? (rd_ticks + wr_ticks) / (double)n_ios : 0.0;
+    st_array[13] = rd_ios ? rd_ticks / (double)rd_ios : 0.0;
+    st_array[14] = wr_ios ? wr_ticks / (double)wr_ios : 0.0;
+    st_array[15] = n_ios ? ticks / n_ios : 0.0;
+    st_array[16] = ticks / (inter * 10.0); /* percentage! */
+    if(st_array[16] > 100.0)
+        st_array[16] = 100.0;
 }
 
 void
 mod_register(struct module *mod)
 {
-    register_mod_fields(mod, "--io", io_usage, io_info, 11, read_io_stat, set_io_record);
+    register_mod_fields(mod, "--io", io_usage, io_info, 17, read_io_stat, set_io_record);
 }
