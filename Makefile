@@ -43,19 +43,19 @@ uninstall:
 	if [ -f /var/log/tsar.data ]; then mv /var/log/tsar.data /var/log/tsar.data.bak; fi
 
 tsardevel:
-	mkdir -p /usr/local/tsar/devel
-	cp devel/mod_test.c /usr/local/tsar/devel/mod_test.c
-	cp devel/mod_test.conf /usr/local/tsar/devel/mod_test.conf
-	cp devel/tsar.h /usr/local/tsar/devel/tsar.h
-	cp devel/Makefile.test /usr/local/tsar/devel/Makefile.test
-	cp devel/tsardevel /usr/bin/tsardevel
+	mkdir -p $(DESTDIR)/usr/local/tsar/devel
+	cp devel/mod_test.c $(DESTDIR)/usr/local/tsar/devel/mod_test.c
+	cp devel/mod_test.conf $(DESTDIR)/usr/local/tsar/devel/mod_test.conf
+	cp devel/tsar.h $(DESTDIR)/usr/local/tsar/devel/tsar.h
+	cp devel/Makefile.test $(DESTDIR)/usr/local/tsar/devel/Makefile.test
+	cp devel/tsardevel $(DESTDIR)/usr/bin/tsardevel
 
 tsarluadevel:
-	mkdir -p /usr/local/tsar/luadevel
-	cp luadevel/mod_lua_test.lua /usr/local/tsar/luadevel/mod_lua_test.lua
-	cp luadevel/mod_lua_test.conf /usr/local/tsar/luadevel/mod_lua_test.conf
-	cp luadevel/Makefile.test /usr/local/tsar/luadevel/Makefile.test
-	cp luadevel/tsarluadevel /usr/bin/tsarluadevel
+	mkdir -p $(DESTDIR)/usr/local/tsar/luadevel
+	cp luadevel/mod_lua_test.lua $(DESTDIR)/usr/local/tsar/luadevel/mod_lua_test.lua
+	cp luadevel/mod_lua_test.conf $(DESTDIR)/usr/local/tsar/luadevel/mod_lua_test.conf
+	cp luadevel/Makefile.test $(DESTDIR)/usr/local/tsar/luadevel/Makefile.test
+	cp luadevel/tsarluadevel $(DESTDIR)/usr/bin/tsarluadevel
 
 tags:
 	ctags -R

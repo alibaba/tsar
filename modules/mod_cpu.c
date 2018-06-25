@@ -99,7 +99,13 @@ set_cpu_record(struct module *mod, double st_array[],
     U_64 pre_array[], U_64 cur_array[], int inter)
 {
     int    i, j;
+    char  *max_cpu;
     U_64   pre_total, cur_total;
+
+    //get cpu number for cpushare
+    max_cpu = getenv("SIGMA_MAX_CPU_QUOTA");
+    cpu_quota = max_cpu ? atoi(max_cpu) / 100 : 1;
+
     pre_total = cur_total = 0;
 
     for (i = 0; i < 9; i++) {
@@ -130,6 +136,14 @@ set_cpu_record(struct module *mod, double st_array[],
     if (cur_array[5] >= pre_array[5]) {
         st_array[5] = 100.0 - (cur_array[5] - pre_array[5]) * 100.0 / (cur_total - pre_total) - st_array[2] - st_array[7];
         st_array[5] = st_array[5] / cpu_quota;
+    }
+    if (cpu_quota > 1) {
+        st_array[5] = st_array[5] * cur_array[9] / cpu_quota;
+        for (i = 0; i < 9; i++) {
+            if (i != 5) {
+                st_array[i] = st_array[i] * cur_array[9] / cpu_quota;
+            }
+        }
     }
 
     st_array[9] = cur_array[9];

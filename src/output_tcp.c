@@ -20,50 +20,6 @@
 #include <fcntl.h>
 #include "tsar.h"
 
-/*
- * send check to remote
- */
-void
-send_tcp(int fd, int have_collect)
-{
-    int           out_pipe[2];
-    int           len;
-    static char   data[LEN_10M] = {0};
-
-    /* get st_array */
-    /*
-    if (get_st_array_from_file(have_collect)) {
-        return;
-    }
-    */
-
-    /* only output from output_db_mod */
-    reload_modules(conf.output_tcp_mod);
-
-    if (!strcasecmp(conf.output_tcp_merge, "on") || !strcasecmp(conf.output_tcp_merge, "enable")) {
-        conf.print_merge = MERGE_ITEM;
-    } else {
-        conf.print_merge = MERGE_NOT;
-    }
-
-    if (pipe(out_pipe) != 0) {
-        return;
-    }
-
-    dup2(out_pipe[1], STDOUT_FILENO);
-    close(out_pipe[1]);
-
-    running_check(RUN_CHECK_NEW);
-
-    fflush(stdout);
-    len = read(out_pipe[0], data, LEN_10M);
-    close(out_pipe[0]);
-
-    if (len > 0 && write(fd, data, len) != len) {
-        do_debug(LOG_ERR, "output_db write error:%s", strerror(errno));
-    }
-}
-
 void
 send_data_tcp(char *output_addr, char *data, int len)
 {
@@ -133,11 +89,7 @@ output_multi_tcp(int have_collect)
     int           len;
     static char   data[LEN_10M] = {0};
     int         i;
-    /* get st_array */
-    if (get_st_array_from_file(have_collect)) {
-        return;
-    }
-    /* only output from output_db_mod */
+    /* only output from output_tcp_mod */
     reload_modules(conf.output_tcp_mod);
 
     if (!strcasecmp(conf.output_tcp_merge, "on") || !strcasecmp(conf.output_tcp_merge, "enable")) {

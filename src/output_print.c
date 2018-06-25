@@ -134,9 +134,9 @@ printf_result(double result)
         printf("%s", PRINT_DATA_SPLIT);
         return;
     }
+
     if ((1000 - result) > 0.1) {
         printf("%6.2f", result);
-
     } else if ( (1000 - result / 1024) > 0.1) {
         printf("%5.1f%s", result / 1024, "K");
     } else if ((1000 - result / 1024 / 1024) > 0.1) {
@@ -258,8 +258,10 @@ print_record()
 void
 running_print_live()
 {
-    int print_num = 1, re_p_hdr = 0;
+    int print_num = 1, re_p_hdr = 0, cost_time = 0, to_sleep = 0;
 
+    struct timeval tv_begin, tv_end;
+    gettimeofday(&tv_begin, NULL);
     collect_record();
 
     /* print header */
@@ -272,10 +274,16 @@ running_print_live()
     if (collect_record_stat() == 0) {
         do_debug(LOG_INFO, "collect_record_stat warn\n");
     }
-    sleep(conf.print_interval);
+    gettimeofday(&tv_end, NULL);
+    cost_time = (tv_end.tv_sec - tv_begin.tv_sec)*1000000 + (tv_end.tv_usec - tv_begin.tv_usec);
+    to_sleep = conf.print_interval*1000000 - cost_time;
+    if (to_sleep > 0) {
+      usleep(to_sleep);
+    }
 
     /* print live record */
     while (1) {
+        gettimeofday(&tv_begin, NULL);
         collect_record();
 
         if (!((print_num) % DEFAULT_PRINT_NUM) || re_p_hdr) {
@@ -296,8 +304,14 @@ running_print_live()
         fflush(stdout);
 
         print_num++;
+
         /* sleep every interval */
-        sleep(conf.print_interval);
+        gettimeofday(&tv_end, NULL);
+        cost_time = (tv_end.tv_sec - tv_begin.tv_sec)*1000000 + (tv_end.tv_usec - tv_begin.tv_usec);
+        to_sleep = conf.print_interval*1000000 - cost_time;
+        if (to_sleep > 0) {
+          usleep(to_sleep);
+        }
     }
 }
 
@@ -395,12 +409,12 @@ find_offset_from_start(FILE *fp, int number)
         if (fseek(fp, offset, SEEK_SET) != 0) {
             do_debug(LOG_FATAL, "fseek error:%s", strerror(errno));
         }
-        if (!fgets(line, LEN_10M, fp)) {
-            do_debug(LOG_FATAL, "fgets error: maybe %s has not enough data", conf.output_file_path);
+        if (!fgets(line, LEN_10M, fp) && errno != 0) {
+            do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
         }
         memset(&line, 0, LEN_10M);
-        if (!fgets(line, LEN_10M, fp)) {
-            do_debug(LOG_FATAL, "fgets error: maybe %s has not enough data", conf.output_file_path);
+        if (!fgets(line, LEN_10M, fp) && errno != 0) {
+            do_debug(LOG_FATAL, "fgets error:%s", strerror(errno));
         }
         if (0 != line[0] && offset > line_len) {
             p_sec_token = strpbrk(line, SECTION_SPLIT);

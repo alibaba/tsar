@@ -188,12 +188,15 @@ IO的计数器文件是:/proc/diskstats,比如:
 > 扇区一般都是512字节,因此有的地方除以2了
 > ws是指真正落到io设备上的写次数, wrqpms是指系统调用合并的写次数, 它们之间的大小关系没有可比性,因为不知道多少请求能够被合并,比如发起了100个read系统调用,每个读4K,假如这100个都是连续的读,由于硬盘通常允许最大的request为256KB,那么block层会把这100个读请求合并成2个request,一个256KB,另一个144KB,rrqpm/s为100,因为100个request都发生了合并,不管它最后合并成几个；r/s为2,因为最后的request数为2
 
-###paritition
+###partition
 ####字段含义
 * bfree: 分区空闲的字节
 * bused: 分区使用中的字节
 * btotl: 分区总的大小
 * util:  分区使用率
+* ifree: 可用文件结点数
+* itotl: 文件结点总数
+* iutil: 文件结点使用率
 
 ####采集方法
 首先通过/etc/mtab获取到分区信息,然后通过statfs访问该分区的信息,查询文件系统相关信息,包含:
@@ -479,9 +482,19 @@ haproxy经过了patch,能够在多进程模式下进行统计信息的汇总,然
 * pktout:发出的包数
 * bytin: 收到的字节数
 * bytout:发出的字节数
+* total: lvs所有的 session 数量, 包含 local 和 sync
+* local: lvs本机转发的 session 数量
+* lact: local session 中处于 establish 状态的数量
+* linact: local session 中处于非 establish 状态的数量
+* sync: 其他lvs同步过来的 session 数量
+* sact: sync session 中处于 establish 状态的数量
+* sinact: sync session 中处于非 establish 状态的数量
+* templ: 会话保持(模板) session 的数量
+
 
 ####采集方法
-访问lvs的统计文件:/proc/net/ip_vs_stats
+内核版 lvs: 访问lvs的统计文件:/proc/net/ip_vs_stats, /proc/net/ip_vs_conn_stats
+netframe lvs: 访问 lvs 的命令行工具: slb_admin -ln --total --dump, appctl -cas
 
 ###apache
 参见:https://github.com/kongjian/tsar-apache
