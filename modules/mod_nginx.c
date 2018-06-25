@@ -15,9 +15,9 @@ struct stats_nginx {
     unsigned long long nwaiting;    /* keep-alive connections, actually it is active - (reading + writing) */
     unsigned long long nrstime;     /* reponse time of handled requests */
     unsigned long long nspdy;       /* spdy requests */
+    unsigned long long nsslhds;     /* ssl handshake */
     unsigned long long nssl;        /* ssl requests */
-    unsigned long long nsslhst;     /* ssl handshake time*/
-    unsigned long long nsslhsc;     /* ssl handshake count*/
+    unsigned long long nsslk;       /* ssl keepalive requests */
     unsigned long long nsslf;       /* ssl failed request */
     unsigned long long nsslv3f;     /* sslv3 failed request */
     unsigned long long nhttp2;      /* http2 requests */
@@ -44,11 +44,11 @@ static struct mod_info nginx_info[] = {
     {"    rt", SUMMARY_BIT, 0,  STATS_NULL},
     {"sslqps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
     {"spdyps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
-    {"sslhst", SUMMARY_BIT, 0,  STATS_NULL},
-    {"sslhsc", HIDE_BIT,    0,  STATS_NULL},
     {"  sslf", SUMMARY_BIT, 0,  STATS_SUB_INTER},
     {"sslv3f", SUMMARY_BIT, 0,  STATS_SUB_INTER},
     {" h2qps", SUMMARY_BIT, 0,  STATS_SUB_INTER},
+    {"sslhds", SUMMARY_BIT, 0,  STATS_SUB_INTER},
+    {"  sslk", SUMMARY_BIT, 0,  STATS_SUB_INTER},
 };
 
 
@@ -83,24 +83,7 @@ set_nginx_record(struct module *mod, double st_array[],
         }
     }
 
-    for (i = 9; i < 11;  i++){
-        if (cur_array[i] >= pre_array[i]) {
-            st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
-        } else {
-            st_array[i] = 0;
-        }
-    }
-
-    if (cur_array[11] >= pre_array[11]) {
-        if (cur_array[12] > pre_array[12]) {
-            /*sslhst= ( nsslhstB-nsslhstA)/(nsslhscB - nsslhscA)*/
-            st_array[11] = (cur_array[11] - pre_array[11]) * 1.0 / (cur_array[12] - pre_array[12]);
-        } else {
-            st_array[11] = 0;
-        }
-    }
-
-    for (i = 13; i < 16;  i++){
+    for (i = 9; i < 16;  i++){
         if (cur_array[i] >= pre_array[i]) {
             st_array[i] = (cur_array[i] - pre_array[i]) * 1.0 / inter;
         } else {
@@ -251,9 +234,13 @@ read_nginx_stats(struct module *mod, char *parameter)
             sscanf(line, "SSLv3_failed: %llu",
                     &st_nginx.nsslv3f);
             write_flag = 1;
-        } else if (!strncmp(line, "SSL_Requests:", sizeof("SSL_Requests:") - 1)) {
-            sscanf(line, "SSL_Requests: %llu SSL_Handshake: %llu SSL_Handshake_Time: %llu",
-                    &st_nginx.nssl, &st_nginx.nsslhsc, &st_nginx.nsslhst);
+        } else if (!strncmp(line, "SSL_handshake:", sizeof("SSL_handshake:") - 1)) {
+            sscanf(line, "SSL_handshake: %llu",
+                    &st_nginx.nsslhds);
+            write_flag = 1;
+        } else if (!strncmp(line, "SSL_keepalive_reqs:", sizeof("SSL_keepalive_reqs:") - 1)) {
+            sscanf(line, "SSL_keepalive_reqs: %llu",
+                    &st_nginx.nsslk);
             write_flag = 1;
         } else {
             ;
@@ -285,11 +272,11 @@ writebuf:
                 st_nginx.nrstime,
                 st_nginx.nssl,
                 st_nginx.nspdy,
-                st_nginx.nsslhst,
-                st_nginx.nsslhsc,
                 st_nginx.nsslf,
                 st_nginx.nsslv3f,
-                st_nginx.nhttp2
+                st_nginx.nhttp2,
+                st_nginx.nsslhds,
+                st_nginx.nsslk
                  );
         buf[pos] = '\0';
         set_mod_record(mod, buf);

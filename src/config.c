@@ -123,7 +123,7 @@ parse_string(char *var)
 {
     char   *token = strtok(NULL, W_SPACE);
 
-    if (token) {
+    if (token != NULL && var != NULL) {
         strncpy(var, token, strlen(token));
     }
 }
@@ -133,19 +133,11 @@ parse_add_string(char *var)
 {
     char   *token = strtok(NULL, W_SPACE);
 
-    if (var == NULL) {
-        if (token) {
-            strncpy(var, token, strlen(token));
+    if (token != NULL && var != NULL) {
+        if (var[0] != '\0') {
+            strcat(var, ",");
         }
-
-    } else {
-        if (token) {
-            strcat(token, ",");
-            strncat(token, var, strlen(var));
-        }
-        if (token) {
-            strncpy(var, token, strlen(token));
-        }
+        strncat(var, token, strlen(token));
     }
 }
 
