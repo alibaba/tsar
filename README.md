@@ -53,7 +53,7 @@ Usage
 ------
 * null          :see default mods history data, `tsar`
 * --modname     :specify module to show, `tsar --cpu`
-* -L/--list     :list available moudule, `tsar -L`
+* -L/--list     :list available module, `tsar -L`
 * -l/--live     :show real-time info, `tsar -l --cpu`
 * -i/--interval :set interval for report, `tsar -i 1 --cpu`
 * -s/--spec     :specify module detail field, `tsar --cpu -s sys,util`
