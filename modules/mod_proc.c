@@ -36,7 +36,7 @@ read_proc_stats(struct module *mod, char *parameter)
     if (strlen(parameter) > 20) {
         return;
     }
-    char cmd[32] = "/sbin/pidof ";
+    char cmd[32] = "pidof ";
     strncat(cmd, parameter, sizeof(cmd) - strlen(cmd) -1);
     char  spid[256];
     fp = popen(cmd, "r");
