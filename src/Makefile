@@ -9,6 +9,8 @@ LUAJIT = $(notdir $(patsubst %.tar.gz,%,$(wildcard deps/LuaJIT*.tar.gz)))
 ODIR = obj
 DEPS = $(ODIR)/lib/libluajit-5.1.a
 
+OBJ := $(addprefix $(ODIR)/, $(patsubst %.c, %.o,$(SRC)))
+
 CFLAGS = -g -O2 -Wall -I../include -I$(ODIR)/include
 LDFLAGS += -L$(ODIR)/lib -lluajit-5.1 -lm -ldl -rdynamic
 
@@ -27,7 +29,7 @@ $(ODIR)/lib/libluajit-5.1.a: $(ODIR)/$(LUAJIT) | $(ODIR)
 	@echo Building LuaJIT...
 	@$(MAKE) -C $< PREFIX=$(abspath $(ODIR)) BUILDMODE=static install
 
-$(ODIR)/%.o : %.c
+$(OBJ): $(ODIR)/%.o : %.c
 	@echo CC $<
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
