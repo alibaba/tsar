@@ -19,7 +19,7 @@ Or you can download the zip file and install it:
 
     $ wget -O tsar.zip https://github.com/alibaba/tsar/archive/master.zip --no-check-certificate
     $ unzip tsar.zip
-    $ cd tsar
+    $ cd tsar-master
     $ make
     # make install
 
