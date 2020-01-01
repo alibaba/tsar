@@ -9,7 +9,7 @@ LUAJIT = $(notdir $(patsubst %.tar.gz,%,$(wildcard deps/LuaJIT*.tar.gz)))
 ODIR = obj
 DEPS = $(ODIR)/lib/libluajit-5.1.a
 
-CFLAGS = -g -O2 -Wall -I../include -I$(ODIR)/include
+CFLAGS = -MD -g -O2 -Wall -I../include -I$(ODIR)/include
 LDFLAGS += -L$(ODIR)/lib -lluajit-5.1 -lm -ldl -rdynamic
 
 all: $(BIN)
@@ -35,4 +35,7 @@ $(ODIR):
 	@mkdir -p $@
 
 clean:
-	rm -rf *.o $(BIN) $(ODIR);
+	rm -rf *.o *.d $(BIN) $(ODIR);
+
+OBJS = *.o
+-include $(OBJS:.o=.d)

@@ -1,4 +1,4 @@
-CFLAGS = -Wall -fPIC --shared -g -O2 -Wno-strict-aliasing
+CFLAGS = -MD -Wall -fPIC --shared -g -O2 -Wno-strict-aliasing
 CC = gcc
 INCLUDE_DIR = ../include
 LINK = $(CC) -I$(INCLUDE_DIR) -I../src/obj/include $(CFLAGS)
@@ -24,4 +24,7 @@ $(OBJS): %.so: %.c
 	$(LINK) $< -o $@
 clean:
 	rm -f *.so;
+	rm -f *.d;
 	rm -rf *.dSYM;
+
+-include $(OBJS:.so=.d)
