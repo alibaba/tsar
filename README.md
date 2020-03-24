@@ -10,7 +10,7 @@ Installation
 -------------
 Tsar is available on GitHub, you can clone and install it as follows:
 
-    $ git clone git://github.com/kongjian/tsar.git
+    $ git clone https://github.com/alibaba/tsar.git
     $ cd tsar
     $ make
     # make install
