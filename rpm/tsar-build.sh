@@ -39,8 +39,7 @@ building_tag
 
 echo "/etc/redhat-release:"
 cat /etc/redhat-release
-distroverpkg=$(awk -F= '$1=="distroverpkg"{print $2}' /etc/yum.conf)
-releasever=$(rpm -q $distroverpkg|grep -Po "(?<=$distroverpkg-)[0-9]+")
+releasever=$(cut -d: -f5 /etc/system-release-cpe)
 if [[ -n "$releasever" ]]
 then
         release="$git_revision".el$releasever
