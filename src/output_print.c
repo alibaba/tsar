@@ -515,7 +515,7 @@ check_time(const char *line)
     if (token == NULL) {
         return 1;
     }
-    if ((token - line) < 32) {
+    if ((token - line) < 32 && (token - line) > 0) {
         memcpy(s_time, line, token - line);
     }
     now_time = atol(s_time);
