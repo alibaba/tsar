@@ -1,3 +1,0 @@
-# cron tsar collect once per minute
-MAILTO=""
-* * * * * root /usr/bin/tsar --cron > /dev/null 2>&1
