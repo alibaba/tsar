@@ -1,9 +1,0 @@
-*.o
-*.so
-*.so.*
-tags
-src/tsar
-*.DS_Store
-*.dSYM
-cscope.out
-ttsar.sh
