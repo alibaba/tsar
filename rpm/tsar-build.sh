@@ -39,21 +39,12 @@ building_tag
 
 echo "/etc/redhat-release:"
 cat /etc/redhat-release
-
-if [ `cat /etc/redhat-release|cut -d " " -f 7|cut -d "." -f 1` = 4 ]
+releasever=$(cut -d: -f5 /etc/system-release-cpe)
+if [[ -n "$releasever" ]]
 then
-        release="$git_revision".el4
-elif [ `cat /etc/redhat-release|cut -d " " -f 7|cut -d "." -f 1` = 5 ]
-then
-        release="$git_revision".el5
-elif [ `cat /etc/redhat-release|cut -d " " -f 7|cut -d "." -f 1` = 6 ]
-then
-        release="$git_revision".el6
-elif [ `cat /etc/redhat-release|cut -d " " -f 7|cut -d "." -f 1` = 7 ]
-then
-        release="$git_revision".el7
+        release="$git_revision".el$releasever
 else
-        release="$git_revision".el5
+        release="$git_revision".el7
 fi
 
 RPM_MACROS=$HOME/.rpmmacros
